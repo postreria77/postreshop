@@ -1,0 +1,29 @@
+/* Objectiviy Font Family Import (Light, Regular, Medium, Bold)*/
+@font-face {
+  font-family: "Objectivity";
+  src: url("/fonts/Objectivity-Light.otf") format("OpenType");
+  font-weight: light;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Objectivity";
+  src: url("/fonts/Objectivity-Medium.otf") format("OpenType");
+  font-weight: medium;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Objectivity";
+  src: url("/fonts/Objectivity-Regular.otf") format("OpenType");
+  font-weight: regular;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "Objectivity";
+  src: url("/fonts/Objectivity-Bold.otf") format("OpenType");
+  font-weight: bold;
+  font-style: normal;
+  font-display: swap;
+}
