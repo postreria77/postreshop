@@ -1,0 +1,83 @@
+---
+import type { HTMLAttributes } from "astro/types";
+import { cva, type VariantProps } from "class-variance-authority";
+
+import { Icon } from "astro-icon/components";
+
+const button = cva(
+  "rounded-sm border text-center leading-none  border-light border-opacity-25 bg-light bg-opacity-5  transition duration-75 ease-out hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand relative",
+  {
+    variants: {
+      intent: {
+        primary: [],
+        secondary: [],
+      },
+      size: {
+        small: ["px-2", "pb-1", "pt-[6px]", "text-xs"],
+        medium: ["px-4", "pb-2", "pt-[10px]", "text-sm"],
+      },
+      icon: {
+        cart: ["flex", "items-center"],
+      },
+      disabled: {
+        false: null,
+        true: ["opacity-50", "cursor-not-allowed"],
+      },
+    },
+    compoundVariants: [
+      {
+        size: "small",
+        icon: "cart",
+        class: "gap-1",
+      },
+      {
+        size: "medium",
+        icon: "cart",
+        class: "gap-2",
+      },
+    ],
+  },
+);
+
+export interface Props
+  extends Omit<HTMLAttributes<"button">, "disabled">,
+    VariantProps<typeof button> {
+  intent?: "primary" | "secondary";
+  disabled?: boolean;
+  size?: "small" | "medium";
+  id?: string;
+  href?: string;
+  type?: "button" | "submit" | "reset";
+  icon?: "cart";
+}
+
+const {
+  class: className,
+  intent = "primary",
+  disabled = false,
+  size = "medium",
+  id,
+  href,
+  type = "button",
+  icon,
+} = Astro.props;
+---
+
+{
+  href ? (
+    <a href={href} class={button({ intent, size, className, icon })} id={id}>
+      {icon && <Icon name={icon} />}
+      <slot />
+    </a>
+  ) : (
+    <button
+      id={id}
+      class={button({ intent, size, className, icon })}
+      disabled={disabled}
+      type={type}
+    >
+      {icon && <Icon name={icon} />}
+      <slot />
+    </button>
+  )
+}

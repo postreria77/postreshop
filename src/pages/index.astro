@@ -1,13 +1,30 @@
 ---
 export const prerender = false;
 
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+import Layout from "../layouts/Layout.astro";
+import Button from "@components/ui/Button.astro";
+import { Image } from "astro:assets";
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+import hero from "@assets/xmas-hero.webp";
 ---
 
-<Layout>
-	<Welcome />
+<Layout
+  title="La Postre Shop"
+  description="Ordena un pastel y recogelo en tu sucursal de La Postre de preferencia."
+>
+  <header class="bg-dark-2 mb-16 grid grid-cols-2">
+    <div
+      class="ml-auto flex w-full max-w-[40rem] flex-col items-start justify-center py-16 pl-16 pr-20"
+    >
+      <h1 class="mb-2 text-balance text-5xl font-medium tracking-tighter">
+        Simply The Best
+      </h1>
+      <p class="mb-8 max-w-prose text-base">
+        Nuestros pasteles son el arte de endulzar momentos, el secreto que une a
+        la familia con su irresistible encanto.
+      </p>
+      <Button href="/#pasteles">Ver Pasteles</Button>
+    </div>
+    <Image src={hero} alt="Hero image" class="h-[60vh] object-cover" />
+  </header>
 </Layout>

@@ -1,0 +1,24 @@
+---
+import { Icon } from "astro-icon/components";
+import SimpleLink from "@/components/ui/SimpleLink.astro";
+---
+
+<footer class="border-light mt-16 border-t border-opacity-25 bg-black">
+  <div
+    class="mx-auto flex max-w-7xl items-end justify-between px-16 pb-8 pt-12"
+  >
+    <div>
+      <a href="/"><Icon name="logo" class="aspect-[12/1]" /></a>
+      <ul class="mt-6 flex gap-8">
+        <SimpleLink href="https://laopstreria77.com" label="La Postreria 77" />
+        <SimpleLink
+          href="https://lapasteleriadelaopstreria77.com"
+          label="La Pasteleria de La Postreria 77"
+        />
+        <SimpleLink href="/login" label="Iniciar Sesión" />
+        <SimpleLink href="/signup" label="Crear Cuenta" />
+      </ul>
+    </div>
+    <p class="text-gray-400">All rights reserved &copy; La Postreria 77 2024</p>
+  </div>
+</footer>
