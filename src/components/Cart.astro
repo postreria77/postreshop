@@ -12,29 +12,43 @@ import { Icon } from "astro-icon/components";
     <Icon
       name="close"
       class="absolute right-8 top-16 size-6 cursor-pointer opacity-15 hover:opacity-100"
-      id="closeCartIcon"
+      id="close-cart"
     />
     <!--     <CartItems client:only /> -->
   </div>
 </dialog>
 
-<!-- <script>
-  import {
-    closeCartDialog,
-    toggleCartDialog,
-    toggleCheckoutDialog,
-  } from "@/lib/utils/dialogs";
+<script>
+  import { cartOpen } from "@/store";
 
-  const checkoutButton = document.getElementById("cart-to-checkout");
+  // Get the dialog
+  const cartDialog = document.getElementById(
+    "cart-dialog",
+  ) as HTMLDialogElement;
 
-  checkoutButton?.addEventListener("click", async () => {
-    toggleCartDialog();
-    toggleCheckoutDialog();
+  // Get the close button
+  const closeIcon = document.getElementById("close-cart") as HTMLButtonElement;
+
+  // Listen to changes in the store, and show/hide the dialog accordingly
+  cartOpen.subscribe((open) => {
+    if (open) {
+      cartDialog?.showModal();
+    } else {
+      cartDialog.close();
+    }
   });
 
-  const closeCartIcon = document.getElementById("closeCartIcon");
+  // Close the dialog
+  function closeCartDialog() {
+    cartOpen.set(false);
+  }
 
-  closeCartIcon?.addEventListener("click", async () => {
-    closeCartDialog();
-  });
-</script> -->
+  // Close the dialog if the user clicks outside of it
+  cartDialog?.addEventListener(
+    "click",
+    (e) => e.target === e.currentTarget && closeCartDialog(),
+  );
+
+  // Close the dialog if the user clicks on the close button
+  closeIcon?.addEventListener("click", closeCartDialog);
+</script>

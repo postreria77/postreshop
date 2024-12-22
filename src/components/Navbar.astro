@@ -34,3 +34,18 @@ const { showCart } = Astro.props;
     toggleCartDialog();
   });
 </script> -->
+<script>
+  import { cartOpen } from "@/store";
+
+  // Set the store to true when the button is clicked
+  function openDialog() {
+    cartOpen.set(true);
+  }
+
+  // Add an event listener to the button
+  const cartButton = document.getElementById(
+    "nav-to-cart",
+  ) as HTMLButtonElement;
+
+  cartButton?.addEventListener("click", openDialog);
+</script>
