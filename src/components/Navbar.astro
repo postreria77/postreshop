@@ -1,7 +1,7 @@
 ---
 import { Icon } from "astro-icon/components";
 import Button from "@ui/Button.astro";
-/* import CartIndicator from "@components/react/CartIndicator"; */
+import CartIndicator from "@components/react/CartIndicator";
 
 interface Props {
   showCart: boolean;
@@ -19,21 +19,13 @@ const { showCart } = Astro.props;
       showCart && (
         <Button icon="cart" id="nav-to-cart">
           Carrito
-          {/*           <CartIndicator client:load /> */}
+          <CartIndicator client:load />
         </Button>
       )
     }
   </div>
 </nav>
 
-<!-- <script>
-  import { toggleCartDialog } from "@/lib/utils/dialogs";
-  const cartButton = document.getElementById("nav-to-cart");
-
-  cartButton?.addEventListener("click", () => {
-    toggleCartDialog();
-  });
-</script> -->
 <script>
   import { cartOpen } from "@/store";
 
