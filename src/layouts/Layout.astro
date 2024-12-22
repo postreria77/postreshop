@@ -1,7 +1,7 @@
 ---
 import { SEO } from "astro-seo";
-/* import Navbar from "../components/Navbar.astro"; */
-/* import Footer from "../components/Footer.astro"; */
+import Navbar from "../components/Navbar.astro";
+import Footer from "../components/Footer.astro";
 /* import Cart from "@/components/Cart.astro"; */
 
 interface Props {
@@ -34,11 +34,11 @@ const { title, description, showCart = true } = Astro.props;
     <title>{title}</title>
   </head>
   <body class="bg-dark text-light relative text-sm font-light">
-    <!--     <Navbar showCart={showCart} /> -->
+    <Navbar showCart={showCart} />
     <main class="min-h-[85vh]">
       <slot />
     </main>
-    <!--     <Footer /> -->
+    <Footer />
     <!--     {showCart && <Cart />} -->
   </body>
 </html>
