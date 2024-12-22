@@ -41,6 +41,7 @@ import { Icon } from "astro-icon/components";
   // Close the dialog
   function closeCartDialog() {
     cartOpen.set(false);
+    document.body.classList.remove("overflow-hidden");
   }
 
   // Close the dialog if the user clicks outside of it

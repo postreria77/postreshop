@@ -39,6 +39,7 @@ const { showCart } = Astro.props;
 
   // Set the store to true when the button is clicked
   function openDialog() {
+    document.body.classList.add("overflow-hidden");
     cartOpen.set(true);
   }
 
