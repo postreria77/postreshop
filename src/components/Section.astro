@@ -8,11 +8,11 @@ const { tag = "section" } = Astro.props;
 
 {
   tag === "header" ? (
-    <header class="mx-auto max-w-7xl px-16 py-4">
+    <header class="~px-4/16 mx-auto max-w-7xl py-4">
       <slot />
     </header>
   ) : (
-    <section class="mx-auto max-w-7xl px-16 py-4">
+    <section class="~px-4/16 mx-auto max-w-7xl py-4">
       <slot />
     </section>
   )
