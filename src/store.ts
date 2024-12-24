@@ -14,29 +14,16 @@ export type CartItem = {
   quantity: number;
 };
 
-export const cartItems = map<Record<string, CartItem>>({
-  initial: {
-    id: "1",
-    name: "Pasteles",
-    price: { id: "1", amount: 0 },
-    image: "https://placekitten.com/200/300",
-    quantity: 0,
-    size: "Grande",
-  },
-});
+export const cartItems = map<Record<string, CartItem>>({});
 
-type ItemDisplayInfo = Pick<
-  CartItem,
-  "id" | "name" | "image" | "quantity" | "price" | "size"
->;
 export function addCartItem({
   id,
+  price,
   name,
+  size,
   image,
   quantity,
-  price,
-  size,
-}: ItemDisplayInfo) {
+}: CartItem) {
   const existingEntry = cartItems.get()[id];
   if (existingEntry) {
     cartItems.setKey(id, {

@@ -2,7 +2,7 @@
 import type { CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
 import Button from "@ui/Button.astro";
-/* import AddToCart from "./react/AddToCart"; */
+import AddToCart from "@components/react/AddToCart";
 
 interface Props {
   product: CollectionEntry<"pasteles">;
@@ -10,21 +10,6 @@ interface Props {
 
 const { product } = Astro.props;
 const { id, name, description, images, defaultPrice, metadata } = product.data;
-
-import type { CartItem } from "@/store";
-const item: CartItem = {
-  id,
-  name,
-  image: images[0],
-  quantity: 1,
-  price: {
-    id: defaultPrice ? defaultPrice.id : "",
-    amount: defaultPrice ? defaultPrice.unitAmount : 0,
-  },
-  size: metadata.tamaño,
-};
-
-const itemJson = JSON.stringify(item);
 ---
 
 <li class="relative rounded-sm">
@@ -39,8 +24,7 @@ const itemJson = JSON.stringify(item);
     <h3 class="mb-1 mt-3 text-xl capitalize">{name}</h3>
   </div>
   <p class="mb-4 text-xs opacity-60">{description}</p>
-  <Button id="add-to-cart" data-item={itemJson}>Añadir al Carrito</Button>
-  <!--   <AddToCart
+  <AddToCart
     id={id}
     price={defaultPrice
       ? { id: defaultPrice.id, amount: defaultPrice.unitAmount }
@@ -50,21 +34,5 @@ const itemJson = JSON.stringify(item);
     image={images[0]}
     quantity={1}
     client:only
-  /> -->
+  />
 </li>
-
-<script>
-  import { addCartItem, cartOpen } from "@/store";
-  import type { CartItem } from "@/store";
-
-  const addToCart = (item: CartItem) => {
-    cartOpen.set(true);
-    console.log(item);
-    addCartItem(item);
-  };
-
-  const button = document.getElementById("add-to-cart") as HTMLButtonElement;
-  const item = JSON.parse(button.getAttribute("data-item")!);
-
-  button.addEventListener("click", () => addToCart(item));
-</script>
