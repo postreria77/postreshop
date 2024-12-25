@@ -33,7 +33,7 @@ const { title, description, showCart = true } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body class="bg-dark text-light relative text-sm font-light">
+  <body class="relative bg-dark font-sans text-sm font-light text-light">
     <Navbar showCart={showCart} />
     <main class="min-h-[85vh]">
       <slot />
