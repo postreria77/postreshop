@@ -11,6 +11,7 @@ const button = cva(
       intent: {
         primary: [],
         secondary: [],
+        cart: ["w-full", "flex", "items-center", "justify-center", "mt-8"],
       },
       size: {
         small: ["px-2", "pb-1", "pt-[6px]", "text-xs"],
@@ -42,7 +43,7 @@ const button = cva(
 export interface Props
   extends Omit<HTMLAttributes<"button">, "disabled">,
     VariantProps<typeof button> {
-  intent?: "primary" | "secondary";
+  intent?: "primary" | "secondary" | "cart";
   disabled?: boolean;
   size?: "small" | "medium";
   id?: string;

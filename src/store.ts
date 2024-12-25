@@ -34,3 +34,20 @@ export function addCartItem({
     cartItems.setKey(id, { id, name, image, quantity, price, size });
   }
 }
+
+export function removeCartItem(id: string) {
+  const existingEntry = cartItems.get()[id];
+  if (!existingEntry) return;
+  if (existingEntry.quantity === 1) {
+    // Remove the entire entry
+    const itemsWithoutEntry = Object.entries(cartItems.get()).filter(
+      ([key]) => key !== id,
+    );
+    cartItems.set(Object.fromEntries(itemsWithoutEntry));
+  } else {
+    cartItems.setKey(id, {
+      ...existingEntry,
+      quantity: existingEntry.quantity - 1,
+    });
+  }
+}
