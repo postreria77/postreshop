@@ -1,4 +1,5 @@
 import fluid, { extract, fontSize, screens } from "fluid-tailwind";
+import defaultTheme from "tailwindcss/defaultTheme";
 //** @type {import("prettier").Config} *//** @type {import("prettier").Config} */** @type {import('tailwindcss').Config} */
 export default {
   content: {
@@ -9,7 +10,7 @@ export default {
     screens,
     fontSize,
     fontFamily: {
-      sans: ["Objectivity", "sans-serif"],
+      sans: ["Objectivity", ...defaultTheme.fontFamily.sans],
     },
     extend: {
       colors: {

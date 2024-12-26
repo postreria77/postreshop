@@ -21,9 +21,13 @@ const { id, name, description, images, defaultPrice, metadata } = product.data;
     class="aspect-square overflow-clip rounded-md object-cover"
   />
   <div class="flex items-center justify-between">
-    <h3 class="mb-1 mt-3 text-xl capitalize">{name}</h3>
+    <h3 class="mb-1 mt-3 text-xl font-medium capitalize tracking-tighter">
+      {name}
+    </h3>
   </div>
-  <p class="mb-4 text-xs opacity-60">{description}</p>
+  <p class="mb-4 text-xs font-light leading-relaxed opacity-60">
+    {description}
+  </p>
   <AddToCart
     id={id}
     price={defaultPrice

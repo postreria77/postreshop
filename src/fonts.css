@@ -1,0 +1,32 @@
+;/* Objectivity Font Family Import (Light, Regular, Medium, Bold) */
+@font-face {
+  font-family: "Objectivity";
+  src: url("/fonts/Objectivity-Light.woff") format("woff");
+  font-weight: 300; /* Light */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Objectivity";
+  src: url("/fonts/Objectivity-Regular.woff") format("woff");
+  font-weight: 400; /* Regular */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Objectivity";
+  src: url("/fonts/Objectivity-Medium.woff") format("woff");
+  font-weight: 500; /* Medium */
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Objectivity";
+  src: url("/fonts/Objectivity-Bold.woff2") format("woff2");
+  font-weight: 700; /* Bold */
+  font-style: normal;
+  font-display: swap;
+}

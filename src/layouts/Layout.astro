@@ -4,6 +4,8 @@ import Navbar from "../components/Navbar.astro";
 import Footer from "../components/Footer.astro";
 import Cart from "@/components/Cart.astro";
 
+import "@/fonts.css";
+
 interface Props {
   title: string;
   description: string;
@@ -30,11 +32,10 @@ const { title, description, showCart = true } = Astro.props;
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="stylesheet" href="/fonts/fonts.css" />
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body class="relative bg-dark font-sans text-sm font-light text-light">
+  <body class="relative bg-dark text-sm text-light">
     <Navbar showCart={showCart} />
     <main class="min-h-[85vh]">
       <slot />
