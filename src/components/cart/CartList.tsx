@@ -2,7 +2,7 @@ import { useStore } from "@nanostores/react";
 import { cartItems, removeCartItem } from "@/store";
 import CartItem from "./CartItem";
 
-export default function CartItems() {
+export default function CartList() {
   const $items = useStore(cartItems);
 
   const handleRemoveItem = (itemId: string) => {
