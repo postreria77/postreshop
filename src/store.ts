@@ -14,7 +14,14 @@ export type CartItem = {
   quantity: number;
 };
 
-export const cartItems = map<Record<string, CartItem>>({});
+const initialCartItems =
+  typeof window !== "undefined"
+    ? JSON.parse(localStorage.getItem("cartItems") || "{}")
+    : {};
+
+export const cartItems = map<Record<string, CartItem>>({
+  ...initialCartItems,
+});
 
 export function addCartItem({
   id,
@@ -30,8 +37,10 @@ export function addCartItem({
       ...existingEntry,
       quantity: existingEntry.quantity + quantity,
     });
+    localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
   } else {
     cartItems.setKey(id, { id, name, image, quantity, price, size });
+    localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
   }
 }
 
@@ -44,10 +53,12 @@ export function removeCartItem(id: string) {
       ([key]) => key !== id,
     );
     cartItems.set(Object.fromEntries(itemsWithoutEntry));
+    localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
   } else {
     cartItems.setKey(id, {
       ...existingEntry,
       quantity: existingEntry.quantity - 1,
     });
+    localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
   }
 }
