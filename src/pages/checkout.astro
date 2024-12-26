@@ -114,19 +114,18 @@ const sucursales: Sucursal[] = [
 </Layout>
 
 <script>
-  /*   import { actions } from "astro:actions";
-  import { navigate } from "astro:transitions/client"; */
+  import { actions } from "astro:actions";
+  import { navigate } from "astro:transitions/client";
 
   const form = document.querySelector("form") as HTMLFormElement;
   form?.addEventListener("submit", async (event) => {
     event.preventDefault();
     const formData = new FormData(form);
-    /*     const { error, data } = await actions.orders.create(formData);
+    const { data, error } = await actions.orders.create(formData);
     if (error) alert("Error al crear orden: " + error);
     if (data) {
       console.log(data.message);
       if (data.url) navigate(data.url);
-    } */
-    alert("Proceder al Pago");
+    }
   });
 </script>
