@@ -20,6 +20,9 @@ const button = cva(
       icon: {
         cart: ["flex", "items-center"],
       },
+      slot: {
+        responsive: ["sm:block", "hidden"],
+      },
       disabled: {
         false: null,
         true: ["opacity-50", "cursor-not-allowed"],
@@ -50,6 +53,7 @@ export interface Props
   href?: string;
   type?: "button" | "submit" | "reset";
   icon?: "cart";
+  slot?: "responsive";
   data?: string;
 }
 
@@ -62,7 +66,10 @@ const {
   href,
   type = "button",
   icon,
+  slot,
 } = Astro.props;
+
+const slotClasses = button({ slot });
 ---
 
 {

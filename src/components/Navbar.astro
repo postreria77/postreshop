@@ -17,7 +17,7 @@ const { showCart } = Astro.props;
     <a href="/" class="font-medium ~text-lg/2xl"><Icon name="logo" /></a>
     {
       showCart && (
-        <Button icon="cart" id="nav-to-cart">
+        <Button icon="cart" id="nav-to-cart" slot="responsive">
           Carrito
           <CartIndicator client:load />
         </Button>

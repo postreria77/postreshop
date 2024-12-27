@@ -57,7 +57,9 @@ const anytimesPrice = formatPrice(anytimes[0].data.defaultPrice?.unitAmount);
         >( {tradicionalesPrice} )</span
       >
     </h2>
-    <ul class="mt-4 grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4">
+    <ul
+      class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))]"
+    >
       {tradicionales?.map((product: any) => <ProductCard product={product} />)}
     </ul>
   </Section>
