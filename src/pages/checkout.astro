@@ -78,6 +78,16 @@ const sucursales: Sucursal[] = [
             }
           </select>
         </p>
+        <p class="mb-6">
+          <label for="fecha">Fecha</label>
+          <input
+            type="date"
+            name="fecha"
+            id="fecha"
+            class="mt-1 min-h-5 w-full rounded-sm border border-opacity-25 px-3 pb-[10px] pt-3 leading-none text-dark"
+            min={new Date().toISOString().split("T")[0]}
+          />
+        </p>
         <Button type="submit">Proceder Al Pago</Button>
       </form>
     </div>

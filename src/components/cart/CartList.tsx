@@ -5,10 +5,6 @@ import CartItem from "./CartItem";
 export default function CartList() {
   const $items = useStore(cartItems);
 
-  const handleRemoveItem = (itemId: string) => {
-    removeCartItem(itemId);
-  };
-
   return (
     <div>
       {Object.keys($items).length === 0 ? (

@@ -18,7 +18,7 @@ export default function CartItem({ item }: { item: CartItem }) {
         className="aspect-square overflow-clip rounded-md border border-light border-opacity-10 object-cover"
       />
       <div className="py-2">
-        <h3 className="text-lg font-medium leading-none tracking-tighter">
+        <h3 className="~text-md/lg font-medium leading-none tracking-tighter">
           {item.name}
         </h3>
         <p className="mb-1 text-xs capitalize opacity-60">{item.size}</p>

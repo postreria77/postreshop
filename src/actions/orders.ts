@@ -13,13 +13,11 @@ export const orders = {
       productos: z.string(),
       tel: z.string(),
       nombre: z.string(),
-      calle: z.string(),
-      ext: z.number(),
-      int: z.number(),
       sucursal: z.number(),
+      fecha: z.string(),
     }),
     handler: async (input) => {
-      const { productos, tel, nombre, calle, ext, int, sucursal } = input;
+      const { productos, tel, nombre, sucursal, fecha } = input;
 
       const id = generateRandomInteger(32);
 
