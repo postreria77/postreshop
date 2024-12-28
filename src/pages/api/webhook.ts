@@ -4,6 +4,7 @@ import type { APIRoute } from "astro";
 import { stripe } from "@lib/stripe";
 import { db, eq, Orders } from "astro:db";
 import { getSecret } from "astro:env/server";
+import type { SystemOrder } from "db/config";
 
 const updateOrder = async (orderId: number): Promise<boolean> => {
   const order = await db
@@ -18,6 +19,20 @@ const updateOrder = async (orderId: number): Promise<boolean> => {
     return true;
   }
   return false;
+};
+
+const uploadOrder = async (order: SystemOrder) => {
+  try {
+    await fetch("https://app.rmstech.mx/api/guardar_pedido", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(order),
+    });
+  } catch (error) {
+    console.error(error);
+  }
 };
 
 const endpointSecret = getSecret("STRIPE_WEBHOOK_SECRET");
@@ -71,11 +86,40 @@ export const POST: APIRoute = async ({ request }) => {
       }
 
       const updated = await updateOrder(numberOrderId);
-      if (updated === true) {
-        console.log("Order updated");
-      } else {
-        console.log("Unable to update order");
+      if (updated === false) {
+        console.log("Order not found");
+        break;
       }
+
+      const order = await db
+        .select()
+        .from(Orders)
+        .where(eq(Orders.id, orderId))
+        .limit(1);
+
+      if (order.length === 0) {
+        console.log("Order not found");
+        break;
+      }
+
+      const orderData = order[0];
+
+      const systemOrder: SystemOrder = {
+        productos: JSON.parse(orderData.productos as string),
+        telefono: orderData.tel,
+        nombre: orderData.nombre,
+        sucursalId: orderData.sucursal,
+        fechaPedido: orderData.fecha,
+        direccion: "",
+        calle: "",
+        numeroExterior: "",
+        numeroInterior: "",
+        colonia: "",
+        municipio: "",
+        referencia: "",
+      };
+
+      uploadOrder(systemOrder);
       break;
     default:
       console.log(`Unhandled event type ${event.type}`);

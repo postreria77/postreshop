@@ -1,6 +1,6 @@
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
-import { db, Orders } from "astro:db";
+import { db, eq, Orders } from "astro:db";
 import { stripe } from "@/lib/stripe";
 import { generateRandomInteger, generateRandomString } from "oslo/crypto";
 
@@ -19,8 +19,6 @@ export const orders = {
     handler: async (input) => {
       const { productos, tel, nombre, sucursal, fecha } = input;
 
-      const id = generateRandomInteger(32);
-
       const line_items = JSON.parse(productos).map(
         (producto: OrderProduct) => ({
           price: producto.stripePriceId,
@@ -28,29 +26,9 @@ export const orders = {
         }),
       );
 
-      const session = await stripe.checkout.sessions.create({
-        success_url: "https://postreshop.vercel.app/order-success/" + id,
-        line_items,
-        mode: "payment",
-        expand: ["payment_intent"],
-        payment_intent_data: {
-          metadata: {
-            order_id: id,
-          },
-        },
-      });
-
-      if (!session) {
-        throw new ActionError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Error al crear la sesión de pago. Intente nuevamente.",
-        });
-      }
-
       const order = await db
         .insert(Orders)
         .values({
-          id,
           productos,
           tel,
           nombre,
@@ -66,6 +44,31 @@ export const orders = {
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Error al crear la orden. Intente nuevamente.",
+        });
+      }
+
+      const id = order[0].id;
+
+      const session = await stripe.checkout.sessions.create({
+        success_url: "https://postreshop.vercel.app/order-success/" + id,
+        line_items,
+        mode: "payment",
+        expand: ["payment_intent"],
+        payment_intent_data: {
+          metadata: {
+            order_id: id,
+          },
+        },
+      });
+
+      if (!session) {
+        await db
+          .update(Orders)
+          .set({ estado: "Error" })
+          .where(eq(Orders.id, id));
+        throw new ActionError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error al crear la sesión de pago. Intente nuevamente.",
         });
       }
 
