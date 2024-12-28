@@ -1,8 +1,8 @@
-import { defineAction } from "astro:actions";
+import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { db, Orders } from "astro:db";
 import { stripe } from "@/lib/stripe";
-import { generateRandomInteger } from "oslo/crypto";
+import { generateRandomInteger, generateRandomString } from "oslo/crypto";
 
 import type { OrderProduct } from "db/config";
 
@@ -22,8 +22,8 @@ export const orders = {
       const id = generateRandomInteger(32);
 
       const line_items = JSON.parse(productos).map(
-        (producto: any /* : OrderProduct */) => ({
-          price: producto.priceId,
+        (producto: OrderProduct) => ({
+          price: producto.stripePriceId,
           quantity: producto.cantidad,
         }),
       );
@@ -39,23 +39,35 @@ export const orders = {
           },
         },
       });
-      /*       const order = await db
+
+      if (!session) {
+        throw new ActionError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error al crear la sesión de pago. Intente nuevamente.",
+        });
+      }
+
+      const order = await db
         .insert(Orders)
         .values({
           id,
           productos,
           tel,
           nombre,
-          calle,
-          ext,
-          int,
           sucursal,
+          fecha,
           estado: "Pendiente",
-          creado: new Date(),
+          creado: new Date().toISOString(),
+          modificado: new Date().toISOString(),
         })
-        .returning(); */
+        .returning();
 
-      /*       console.log(order); */
+      if (!order) {
+        throw new ActionError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error al crear la orden. Intente nuevamente.",
+        });
+      }
 
       return {
         message: "Checkout session created for order: " + id,

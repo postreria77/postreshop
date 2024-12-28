@@ -4,26 +4,32 @@ import { defineDb, defineTable, column } from "astro:db";
 
 const Orders = defineTable({
   columns: {
-    id: column.text({ primaryKey: true }),
+    id: column.number({ primaryKey: true }),
     productos: column.json(),
     tel: column.text(),
     nombre: column.text(),
     sucursal: column.number(),
     fecha: column.text(),
+    estado: column.text(),
+    creado: column.text(),
+    modificado: column.text(),
   },
 });
 
 export type Order = {
-  id: string;
+  id: number;
   productos: string;
   tel: string;
   nombre: string;
   sucursal: number;
   fecha: string;
+  estado: string;
+  creado: string;
+  modificado: string;
 };
 
 export type OrderProduct = {
-  id: number | string;
+  id: string;
   cantidad: number;
   stripePriceId: string;
   presentacion: string;
