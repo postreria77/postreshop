@@ -29,7 +29,7 @@ export const orders = {
       );
 
       const session = await stripe.checkout.sessions.create({
-        success_url: "http://localhost:4321/order-success/" + id,
+        success_url: "https://postreshop.vercel.app/order-success/" + id,
         line_items,
         mode: "payment",
         expand: ["payment_intent"],
