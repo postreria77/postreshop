@@ -1,10 +1,10 @@
 import { defineAction } from "astro:actions";
 import { z } from "astro:schema";
-/* import { db, Orders } from "astro:db"; */
+import { db, Orders } from "astro:db";
 import { stripe } from "@/lib/stripe";
 import { generateRandomInteger } from "oslo/crypto";
 
-/* import type { OrderProduct } from "db/config"; */
+import type { OrderProduct } from "db/config";
 
 export const orders = {
   create: defineAction({
@@ -39,9 +39,6 @@ export const orders = {
           },
         },
       });
-
-      console.log(session);
-
       /*       const order = await db
         .insert(Orders)
         .values({
