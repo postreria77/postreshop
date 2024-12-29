@@ -5,6 +5,7 @@ import { stripe } from "@lib/stripe";
 import { db, eq, Orders } from "astro:db";
 import { getSecret } from "astro:env/server";
 import type { SystemOrder } from "db/config";
+import { string } from "astro:schema";
 
 const updateOrder = async (orderId: number): Promise<boolean> => {
   const order = await db
@@ -91,10 +92,18 @@ export const POST: APIRoute = async ({ request }) => {
         break;
       }
 
+      let orderIdNumber: number;
+
+      if (typeof orderId === "string") {
+        orderIdNumber = parseInt(orderId);
+      } else {
+        orderIdNumber = orderId;
+      }
+
       const order = await db
         .select()
         .from(Orders)
-        .where(eq(Orders.id, orderId))
+        .where(eq(Orders.id, orderIdNumber))
         .limit(1);
 
       if (order.length === 0) {

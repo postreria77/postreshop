@@ -4,7 +4,7 @@ import { defineDb, defineTable, column } from "astro:db";
 
 const Orders = defineTable({
   columns: {
-    id: column.text({ primaryKey: true }),
+    id: column.number({ primaryKey: true }),
     productos: column.json(),
     tel: column.text(),
     nombre: column.text(),
