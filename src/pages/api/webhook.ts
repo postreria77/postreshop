@@ -57,6 +57,7 @@ const uploadOrderToSystem = async (order: SystemOrder) => {
       },
       body: JSON.stringify(order),
     });
+    console.log(`Order uploaded to system`);
   } catch (error) {
     console.error(error);
   }
@@ -69,11 +70,6 @@ if (!endpointSecret) {
 }
 
 export const POST: APIRoute = async ({ request }) => {
-  console.log({
-    Endpoint: "/api/webhook",
-    Method: request.method,
-  });
-
   const requestBody = await request.text();
   const sig = request.headers.get("stripe-signature");
 
