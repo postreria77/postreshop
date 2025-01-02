@@ -4,7 +4,7 @@ import type { APIRoute } from "astro";
 import { stripe } from "@lib/stripe";
 import { db, eq, Orders } from "astro:db";
 import { getSecret } from "astro:env/server";
-import type { OrderProduct, SystemOrder, SystemOrderProduct } from "db/config";
+import type { OrderProduct, SystemOrder } from "db/config";
 
 const updateOrder = async (
   orderId: number,
@@ -66,10 +66,7 @@ const uploadOrderToSystem = async (
         error: new Error(`HTTP error! Status: ${response.status}`),
       };
     }
-
-    // Parse the JSON response
-    const responseData = await response.json();
-    return { data: responseData, error: null };
+    return { data: "No HTTP error", error: null };
   } catch (error) {
     return { data: null, error: error as Error };
   }
