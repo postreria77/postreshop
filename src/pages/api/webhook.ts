@@ -48,7 +48,9 @@ const updateOrder = async (
   return { data: null, error: Error("Order not found") };
 };
 
-const uploadOrderToSystem = async (order: SystemOrder) => {
+const uploadOrderToSystem = async (
+  order: SystemOrder,
+): Promise<{ data: string | null; error: Error | null }> => {
   try {
     const response = await fetch("https://app.rmstech.mx/api/guardar_pedido", {
       method: "POST",
@@ -59,14 +61,17 @@ const uploadOrderToSystem = async (order: SystemOrder) => {
     });
     // Check if the response is OK
     if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`); // Handle HTTP errors
+      return {
+        data: null,
+        error: new Error(`HTTP error! Status: ${response.status}`),
+      };
     }
 
     // Parse the JSON response
     const responseData = await response.json();
-    console.log("Success:", responseData); // Handle the response data
+    return { data: responseData, error: null };
   } catch (error) {
-    console.error("Error:", error); // Handle errors
+    return { data: null, error: error as Error };
   }
 };
 
@@ -125,7 +130,16 @@ export const POST: APIRoute = async ({ request }) => {
       } else if (data) {
         console.log(JSON.stringify(data, null, 2)); // log the data);
         console.log("Uploading order to system...");
-        uploadOrderToSystem(data);
+        const { data: orderData, error: orderError } =
+          await uploadOrderToSystem(data);
+        console.log("Order upload returned:");
+        if (orderError) {
+          console.error(orderError.message);
+          break;
+        } else if (orderData) {
+          console.log(JSON.stringify(orderData, null, 2)); // log the data);
+          break;
+        }
         break;
       }
 
