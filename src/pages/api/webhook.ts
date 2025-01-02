@@ -49,18 +49,17 @@ const updateOrder = async (
 };
 
 const uploadOrderToSystem = async (order: SystemOrder) => {
-  try {
-    await fetch("https://app.rmstech.mx/api/guardar_pedido", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(order),
-    });
-    console.log(`Order uploaded to system`);
-  } catch (error) {
-    console.error(error);
-  }
+  await fetch("https://app.rmstech.mx/api/guardar_pedido", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(order),
+  })
+    .then((res) => res.json())
+    .then((data) => console.log(data))
+    .catch((error) => console.error(error));
+  console.log(`Order uploaded to system`);
 };
 
 const endpointSecret = getSecret("STRIPE_WEBHOOK_SECRET");
@@ -108,6 +107,8 @@ export const POST: APIRoute = async ({ request }) => {
         });
       }
 
+      console.log(`Order ID: ${numberOrderId}`);
+      console.log("Updating order...");
       const { data, error } = await updateOrder(numberOrderId);
 
       if (error) {
