@@ -123,8 +123,7 @@ export const POST: APIRoute = async ({ request }) => {
         console.error(error.message);
         break;
       } else if (data) {
-        console.log(`Order updated: ${numberOrderId}`);
-        console.log(data);
+        console.log(JSON.stringify(data, null, 2)); // log the data);
         console.log("Uploading order to system...");
         uploadOrderToSystem(data);
         break;
