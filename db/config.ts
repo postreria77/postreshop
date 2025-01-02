@@ -1,6 +1,19 @@
 import { defineDb, defineTable, column } from "astro:db";
 
 // https://astro.build/db/config
+const Pasteles = defineTable({
+  columns: {
+    id: column.number({ primaryKey: true, autoIncrement: true }),
+    nombre: column.text(),
+    descripcion: column.text(),
+    precio: column.text(),
+    precioAnytime: column.text({ optional: true }),
+    imagen: column.text(),
+    categoria: column.text({ default: "Pasteles" }),
+    nuevo: column.boolean({ default: false }),
+    archived: column.boolean({ default: false }),
+  },
+});
 
 const Orders = defineTable({
   columns: {
@@ -35,17 +48,17 @@ export type OrderProduct = {
   presentacion: string;
 };
 
+export type SystemOrderProduct = {
+  producto: string; //id,
+  cantidad: number;
+  presentacion: string; //id,
+  precioProducto: number; // 0,
+  precioPresentacion: number; // precio real,
+  comentarios: string;
+};
+
 export type SystemOrder = {
-  productos: [
-    {
-      producto: string; //id,
-      cantidad: number;
-      presentacion: string; //id,
-      precioProducto: number; // 0,
-      precioPresentacion: number; // precio real,
-      comentarios: string;
-    },
-  ];
+  productos: SystemOrderProduct[];
   telefono: string;
   nombre: string;
   sucursalId: number;
@@ -62,5 +75,6 @@ export type SystemOrder = {
 export default defineDb({
   tables: {
     Orders,
+    Pasteles,
   },
 });

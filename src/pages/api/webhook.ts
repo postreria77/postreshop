@@ -4,10 +4,11 @@ import type { APIRoute } from "astro";
 import { stripe } from "@lib/stripe";
 import { db, eq, Orders } from "astro:db";
 import { getSecret } from "astro:env/server";
-import type { SystemOrder } from "db/config";
-import { string } from "astro:schema";
+import type { OrderProduct, SystemOrder, SystemOrderProduct } from "db/config";
 
-const updateOrder = async (orderId: number): Promise<boolean> => {
+const updateOrder = async (
+  orderId: number,
+): Promise<{ data: SystemOrder | null; error: Error | null }> => {
   const order = await db
     .update(Orders)
     .set({
@@ -17,12 +18,37 @@ const updateOrder = async (orderId: number): Promise<boolean> => {
     .returning();
 
   if (order.length > 0) {
-    return true;
+    const productos = JSON.parse(
+      order[0].productos as string,
+    ) as OrderProduct[];
+    const systemOrder: SystemOrder = {
+      productos: productos.map((producto) => ({
+        producto: producto.id,
+        cantidad: producto.cantidad,
+        presentacion: producto.presentacion === "tradicional" ? "68" : "1069",
+        precioProducto: 0,
+        precioPresentacion:
+          producto.presentacion === "tradicional" ? 1250 : 590,
+        comentarios: "",
+      })),
+      telefono: order[0].tel,
+      nombre: order[0].nombre,
+      sucursalId: order[0].sucursal,
+      fechaPedido: order[0].fecha,
+      direccion: "",
+      calle: "",
+      numeroExterior: "",
+      numeroInterior: "",
+      colonia: "",
+      municipio: "",
+      referencia: "",
+    };
+    return { data: systemOrder, error: null };
   }
-  return false;
+  return { data: null, error: Error("Order not found") };
 };
 
-const uploadOrder = async (order: SystemOrder) => {
+const uploadOrderToSystem = async (order: SystemOrder) => {
   try {
     await fetch("https://app.rmstech.mx/api/guardar_pedido", {
       method: "POST",
@@ -86,50 +112,16 @@ export const POST: APIRoute = async ({ request }) => {
         });
       }
 
-      const updated = await updateOrder(numberOrderId);
-      if (updated === false) {
-        console.log("Order not found");
+      const { data, error } = await updateOrder(numberOrderId);
+
+      if (error) {
+        console.error(error.message);
+        break;
+      } else if (data) {
+        uploadOrderToSystem(data);
         break;
       }
 
-      let orderIdNumber: number;
-
-      if (typeof orderId === "string") {
-        orderIdNumber = parseInt(orderId);
-      } else {
-        orderIdNumber = orderId;
-      }
-
-      const order = await db
-        .select()
-        .from(Orders)
-        .where(eq(Orders.id, orderIdNumber))
-        .limit(1);
-
-      if (order.length === 0) {
-        console.log("Order not found");
-        break;
-      }
-
-      const orderData = order[0];
-
-      const systemOrder: SystemOrder = {
-        productos: JSON.parse(orderData.productos as string),
-        telefono: orderData.tel,
-        nombre: orderData.nombre,
-        sucursalId: orderData.sucursal,
-        fechaPedido: orderData.fecha,
-        direccion: "",
-        calle: "",
-        numeroExterior: "",
-        numeroInterior: "",
-        colonia: "",
-        municipio: "",
-        referencia: "",
-      };
-
-      uploadOrder(systemOrder);
-      break;
     default:
       console.log(`Unhandled event type ${event.type}`);
   }

@@ -2,7 +2,6 @@ import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { db, eq, Orders } from "astro:db";
 import { stripe } from "@/lib/stripe";
-import { generateRandomInteger, generateRandomString } from "oslo/crypto";
 
 import type { OrderProduct } from "db/config";
 
@@ -25,6 +24,15 @@ export const orders = {
           quantity: producto.cantidad,
         }),
       );
+
+      try {
+        JSON.parse(productos) as OrderProduct[];
+      } catch (error) {
+        throw new ActionError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error en los productos. Intente nuevamente.",
+        });
+      }
 
       const order = await db
         .insert(Orders)
@@ -53,7 +61,6 @@ export const orders = {
         success_url: "https://postreshop.vercel.app/order-success/" + id,
         line_items,
         mode: "payment",
-        expand: ["payment_intent"],
         payment_intent_data: {
           metadata: {
             order_id: id,
@@ -64,7 +71,7 @@ export const orders = {
       if (!session) {
         await db
           .update(Orders)
-          .set({ estado: "Error" })
+          .set({ estado: "Error en Stripe" })
           .where(eq(Orders.id, id));
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
