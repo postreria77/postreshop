@@ -31,31 +31,31 @@ export function addCartItem({
   image,
   quantity,
 }: CartItem) {
-  const existingEntry = cartItems.get()[id];
+  const existingEntry = cartItems.get()[price.id];
   if (existingEntry) {
-    cartItems.setKey(id, {
+    cartItems.setKey(price.id, {
       ...existingEntry,
       quantity: existingEntry.quantity + quantity,
     });
     localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
   } else {
-    cartItems.setKey(id, { id, name, image, quantity, price, size });
+    cartItems.setKey(price.id, { id, name, image, quantity, price, size });
     localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
   }
 }
 
-export function removeCartItem(id: string) {
-  const existingEntry = cartItems.get()[id];
+export function removeCartItem(price: { id: string }) {
+  const existingEntry = cartItems.get()[price.id];
   if (!existingEntry) return;
   if (existingEntry.quantity === 1) {
     // Remove the entire entry
     const itemsWithoutEntry = Object.entries(cartItems.get()).filter(
-      ([key]) => key !== id,
+      ([key]) => key !== price.id,
     );
     cartItems.set(Object.fromEntries(itemsWithoutEntry));
     localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
   } else {
-    cartItems.setKey(id, {
+    cartItems.setKey(price.id, {
       ...existingEntry,
       quantity: existingEntry.quantity - 1,
     });

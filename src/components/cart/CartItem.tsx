@@ -2,7 +2,7 @@ import { type CartItem, removeCartItem } from "@/store";
 
 export default function CartItem({ item }: { item: CartItem }) {
   const handleRemoveItem = () => {
-    removeCartItem(item.id);
+    removeCartItem(item.price);
   };
 
   return (

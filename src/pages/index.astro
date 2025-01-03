@@ -9,27 +9,14 @@ import { Image } from "astro:assets";
 // Asset imports
 import hero from "@assets/xmas-hero.jpg";
 
-// Content collection data fetching
-import { getCollection } from "astro:content";
-import type { CollectionEntry } from "astro:content";
-import { formatPrice } from "@lib/format";
+import { db, eq, Pasteles } from "astro:db";
 
-const tradicionales = await getCollection(
-  "pasteles",
-  ({ data }: CollectionEntry<"pasteles">) => {
-    return data.metadata.tamaño === "tradicional";
-  },
-);
-const tradicionalesPrice = formatPrice(
-  tradicionales[0].data.defaultPrice?.unitAmount,
-);
-const anytimes = await getCollection(
-  "pasteles",
-  ({ data }: CollectionEntry<"pasteles">) => {
-    return data.metadata.tamaño === "anytime";
-  },
-);
-const anytimesPrice = formatPrice(anytimes[0].data.defaultPrice?.unitAmount);
+const pasteles = await db
+  .select()
+  .from(Pasteles)
+  .where(eq(Pasteles.archived, false));
+
+console.log(pasteles);
 ---
 
 <Layout
@@ -51,29 +38,12 @@ const anytimesPrice = formatPrice(anytimes[0].data.defaultPrice?.unitAmount);
     </div>
     <Image src={hero} alt="Hero image" class="h-[60vh] object-cover" />
   </header>
+
   <Section>
-    <h2
-      class="scroll-m-40 font-medium tracking-tighter ~text-2xl/3xl"
-      id="pasteles"
-    >
-      Tradicionales <span class="font-light tracking-normal ~text-lg/xl"
-        >( {tradicionalesPrice} )</span
-      >
-    </h2>
     <ul
       class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))]"
     >
-      {tradicionales?.map((product: any) => <ProductCard product={product} />)}
-    </ul>
-  </Section>
-  <Section>
-    <h2 class="scroll-m-40 font-medium tracking-tighter ~text-2xl/3xl">
-      Anytimes <span class="font-light tracking-normal ~text-lg/xl"
-        >( {anytimesPrice} )</span
-      >
-    </h2>
-    <ul class="mt-4 grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-4">
-      {anytimes?.map((product: any) => <ProductCard product={product} />)}
+      {pasteles?.map((pastel: any) => <ProductCard pastel={pastel} />)}
     </ul>
   </Section>
 </Layout>

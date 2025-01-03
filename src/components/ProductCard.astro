@@ -2,40 +2,77 @@
 import type { CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
 import AddToCart from "@/components/cart/AddToCart";
+import type { Pastel } from "db/config";
 
-interface Props {
+/* interface Props {
   product: CollectionEntry<"pasteles">;
-}
+} */
 
-const { product } = Astro.props;
-const { id, name, description, images, defaultPrice, metadata } = product.data;
+type Props = {
+  pastel: Pastel;
+};
+
+const { pastel } = Astro.props;
+const {
+  id,
+  nombre,
+  descripcion,
+  imagen,
+  precio,
+  precioAnytime,
+  imagenAnytime,
+} = pastel;
 ---
 
 <li class="relative rounded-sm">
   <Image
-    src={images[0]}
-    alt={name}
+    src={imagen}
+    alt={nombre}
     width={480}
     height={480}
     class="aspect-square overflow-clip rounded-md object-cover"
   />
   <div class="flex items-center justify-between">
     <h3 class="mb-1 mt-3 font-medium capitalize tracking-tighter ~text-lg/xl">
-      {name}
+      {nombre}
     </h3>
   </div>
   <p class="mb-4 font-light leading-relaxed opacity-60 ~text-[0.6rem]/xs">
-    {description}
+    {descripcion}
   </p>
-  <AddToCart
-    id={id}
-    price={defaultPrice
-      ? { id: defaultPrice.id, amount: defaultPrice.unitAmount }
-      : { id: "", amount: 0 }}
-    name={name}
-    size={metadata.tamaño}
-    image={images[0]}
-    quantity={1}
-    client:only
-  />
+  <div class="flex items-center justify-between">
+    <div>
+      <span class="text-[8px] capitalize opacity-50">Tradicional</span>
+      <AddToCart
+        id={id}
+        price={precio ? { id: precio, amount: 125000 } : { id: "", amount: 0 }}
+        name={nombre}
+        size="tradicional"
+        image={imagen}
+        quantity={1}
+        client:only
+      />
+    </div>
+    {
+      precioAnytime && (
+        <div>
+          <span class="text-[8px] capitalize opacity-50">Anytime</span>
+
+          <AddToCart
+            id={id}
+            price={
+              precioAnytime
+                ? { id: precioAnytime, amount: 59000 }
+                : { id: "", amount: 0 }
+            }
+            name={nombre}
+            size="anytime"
+            image={imagenAnytime ? imagenAnytime : imagen}
+            quantity={1}
+            client:only
+          />
+        </div>
+      )
+    }
+  </div>
 </li>
