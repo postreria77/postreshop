@@ -4,7 +4,8 @@ export const prerender = false;
 import Layout from "@/layouts/Layout.astro";
 import Section from "@/components/Section.astro";
 import CartList from "@/components/cart/CartList";
-import CheckoutForm from "@/components/checkout/CheckoutForm.astro";
+import { CheckoutForm } from "@/components/checkout/CheckoutForm";
+/* import CheckoutForm from "@/components/checkout/CheckoutForm.astro"; */
 ---
 
 <Layout
@@ -20,7 +21,7 @@ import CheckoutForm from "@/components/checkout/CheckoutForm.astro";
         </h1>
         <CartList client:only />
       </div>
-      <CheckoutForm />
+      <CheckoutForm client:load />
     </div>
   </Section>
 </Layout>

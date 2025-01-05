@@ -14,33 +14,33 @@ export const orders = {
         .string()
         .min(10, { message: "El teléfono debe tener 10 dígitos." })
         .max(10, { message: "El teléfono debe tener 10 dígitos." })
-        .nonempty({ message: "El teléfono es requerido." })
+        .nonempty({ message: "Ingresa un teléfono." })
         .nullable()
         .refine((tel) => tel !== null, {
-          message: "El teléfono es requerido.",
+          message: "Ingresa un teléfono.",
         }),
       nombre: z
         .string()
         .max(48, { message: "El nombre debe tener menos de 48 letras." })
         .min(3, { message: "El nombre debe tener al menos 3 letras." })
-        .nonempty({ message: "El nombre es requerido." })
+        .nonempty({ message: "Ingresa un nombre." })
         .nullable()
         .refine((name) => name !== null, {
-          message: "El nombre es requerido.",
+          message: "Ingresa un nombre.",
         }),
       sucursal: z
         .string()
-        .min(1, { message: "La sucursal es requerida." })
+        .min(1, { message: "Selecciona una sucursal." })
         .nullable()
         .refine((sucursal) => sucursal !== null, {
-          message: "La sucursal es requerida.",
+          message: "Selecciona una sucursal.",
         }),
       fecha: z
         .string()
-        .min(1, { message: "La fecha es requerida." })
+        .min(1, { message: "Selecciona una fecha." })
         .nullable()
         .refine((fecha) => fecha !== null, {
-          message: "La fecha es requerida.",
+          message: "Selecciona una fecha.",
         }),
     }),
     handler: async (input) => {
