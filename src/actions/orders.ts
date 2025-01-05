@@ -86,7 +86,7 @@ export const orders = {
       const id = order[0].id;
 
       const session = await stripe.checkout.sessions.create({
-        success_url: "https://postreshop.vercel.app/order-success/" + id,
+        success_url: "https://postreshop.vercel.app/order-success/" /* + id */,
         line_items,
         mode: "payment",
         payment_intent_data: {
