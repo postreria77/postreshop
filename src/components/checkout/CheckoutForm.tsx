@@ -58,8 +58,7 @@ export function CheckoutForm() {
           name="nombre"
           id="nombre"
           aria-describedby="error-nombre"
-          disabled={isPending}
-          className="mt-1 min-h-5 w-full rounded-sm border border-opacity-25 px-3 pb-[10px] pt-3 leading-none text-dark disabled:opacity-50"
+          className="mt-1 min-h-5 w-full rounded-sm border border-opacity-25 px-3 pb-[10px] pt-3 leading-none text-dark"
         />
       </label>
       <label htmlFor="tel" className="mb-4">
@@ -80,7 +79,6 @@ export function CheckoutForm() {
           name="tel"
           id="tel"
           aria-describedby="error-tel"
-          disabled={isPending}
           className="mt-1 min-h-5 w-full rounded-sm border border-opacity-25 px-3 pb-[10px] pt-3 leading-none text-dark"
         />
       </label>
@@ -101,17 +99,13 @@ export function CheckoutForm() {
           name="sucursal"
           id="sucursal"
           aria-describedby="error-sucursal"
-          disabled={isPending}
-          className="mt-1 min-h-5 w-full rounded-sm border border-opacity-25 px-3 pb-[10px] pt-3 leading-none text-dark disabled:opacity-50"
+          className="mt-1 min-h-5 w-full rounded-sm border border-opacity-25 px-3 pb-[10px] pt-3 leading-none text-dark"
         >
           <option selected value="">
             Sucursal de Entrega
           </option>
           {sucursales.map((sucursal) => (
-            <option
-              value={sucursal.id}
-              className="min-h-5 capitalize disabled:opacity-50"
-            >
+            <option value={sucursal.id} className="min-h-5 capitalize">
               {sucursal.name}
             </option>
           ))}
@@ -135,8 +129,7 @@ export function CheckoutForm() {
           name="fecha"
           id="fecha"
           aria-describedby="error-fecha"
-          disabled={isPending}
-          className="mt-1 min-h-5 w-full rounded-sm border border-opacity-25 px-3 pb-[10px] pt-3 leading-none text-dark disabled:opacity-50"
+          className="mt-1 min-h-5 w-full rounded-sm border border-opacity-25 px-3 pb-[10px] pt-3 leading-none text-dark"
           min={new Date().toISOString().slice(0, 16)}
         />
       </label>
