@@ -75,7 +75,7 @@ export type SystemOrder = {
   productos: SystemOrderProduct[];
   telefono: string;
   nombre: string;
-  sucursalId: number;
+  sucursalId: string;
   fechaPedido: string;
   direccion: string; //empty,
   calle: string; //empty,

@@ -1,0 +1,26 @@
+---
+// Component Imports
+import Layout from "@layouts/Layout.astro";
+import Section from "@components/Section.astro";
+import Button from "@components/ui/Button.astro";
+---
+
+<Layout
+  title="Orden Realizada"
+  description="Gracias por tu pedido. Te contactaremos pronto."
+>
+  <Section>
+    <div class="grid gap-16 py-16 sm:grid-cols-2 md:grid-cols-[2fr_1fr]">
+      <div>
+        <h1 class="mb-2 text-3xl font-medium tracking-tighter">
+          Orden Realizada
+        </h1>
+        <p class="mb-8">
+          Gracias por tu pedido. Revisa tu correo electr&oacute;nico para
+          recibir los detalles de tu pedido.
+        </p>
+        <Button href="/" intent="secondary">Volver al Inicio</Button>
+      </div>
+    </div>
+  </Section>
+</Layout>
