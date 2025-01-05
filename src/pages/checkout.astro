@@ -1,31 +1,10 @@
 ---
+export const prerender = false;
+
 import Layout from "@/layouts/Layout.astro";
 import Section from "@/components/Section.astro";
 import CartList from "@/components/cart/CartList";
-import Button from "@/components/ui/Button.astro";
-import CheckoutProductsInput from "@/components/checkout/CheckoutProductsInput";
-
-/* import { db, Sucursales } from "astro:db";
-const sucursales = await db.select().from(Sucursales); */
-type Sucursal = {
-  id: number;
-  name: string;
-  address: string;
-};
-
-const sucursales: Sucursal[] = [
-  {
-    id: 547,
-    name: "Formula 1",
-    address: "Av. La Postrería 77, Buenos Aires, Argentina",
-  },
-  {
-    id: 44,
-    name: "Serena",
-    address:
-      "Pueblo Serena, Carretera Nacional #500 Local F. Colonia Valle Alto, Monterrey, N.L.",
-  },
-];
+import CheckoutForm from "@/components/checkout/CheckoutForm.astro";
 ---
 
 <Layout
@@ -41,72 +20,7 @@ const sucursales: Sucursal[] = [
         </h1>
         <CartList client:only />
       </div>
-      <form class="flex flex-col">
-        <CheckoutProductsInput client:only />
-        <p class="mb-4">
-          <label for="nombre">Nombre</label>
-          <input
-            type="text"
-            name="nombre"
-            id="nombre"
-            class="mt-1 min-h-5 w-full rounded-sm border border-opacity-25 px-3 pb-[10px] pt-3 leading-none text-dark"
-          />
-        </p>
-        <p class="mb-4">
-          <label for="tel">Teléfono</label>
-          <input
-            type="tel"
-            name="tel"
-            id="tel"
-            class="mt-1 min-h-5 w-full rounded-sm border border-opacity-25 px-3 pb-[10px] pt-3 leading-none text-dark"
-          />
-        </p>
-        <p class="mb-4">
-          <label for="sucursal">Sucursal</label>
-          <select
-            name="sucursal"
-            id="sucursal"
-            class="mt-1 min-h-5 w-full rounded-sm border border-opacity-25 px-3 pb-[10px] pt-3 leading-none text-dark"
-          >
-            <option selected value="">Sucursal de Entrega</option>
-            {
-              sucursales.map((sucursal) => (
-                <option value={sucursal.id} class="min-h-5 capitalize">
-                  {sucursal.name}
-                </option>
-              ))
-            }
-          </select>
-        </p>
-        <p class="mb-6">
-          <label for="fecha">Fecha</label>
-          <input
-            type="date"
-            name="fecha"
-            id="fecha"
-            class="mt-1 min-h-5 w-full rounded-sm border border-opacity-25 px-3 pb-[10px] pt-3 leading-none text-dark"
-            min={new Date().toISOString().split("T")[0]}
-          />
-        </p>
-        <Button type="submit">Proceder Al Pago</Button>
-      </form>
+      <CheckoutForm />
     </div>
   </Section>
 </Layout>
-
-<script>
-  import { actions } from "astro:actions";
-  import { navigate } from "astro:transitions/client";
-
-  const form = document.querySelector("form") as HTMLFormElement;
-  form?.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    const formData = new FormData(form);
-    const { data, error } = await actions.orders.create(formData);
-    if (error) alert("Error al crear orden: " + error);
-    if (data) {
-      console.log(data.message);
-      if (data.url) navigate(data.url);
-    }
-  });
-</script>

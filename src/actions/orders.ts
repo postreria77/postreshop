@@ -10,10 +10,38 @@ export const orders = {
     accept: "form",
     input: z.object({
       productos: z.string(),
-      tel: z.string(),
-      nombre: z.string(),
-      sucursal: z.number(),
-      fecha: z.string(),
+      tel: z
+        .string()
+        .min(10, { message: "El teléfono debe tener 10 dígitos." })
+        .max(10, { message: "El teléfono debe tener 10 dígitos." })
+        .nonempty({ message: "El teléfono es requerido." })
+        .nullable()
+        .refine((tel) => tel !== null, {
+          message: "El teléfono es requerido.",
+        }),
+      nombre: z
+        .string()
+        .max(48, { message: "El nombre debe tener menos de 48 letras." })
+        .min(3, { message: "El nombre debe tener al menos 3 letras." })
+        .nonempty({ message: "El nombre es requerido." })
+        .nullable()
+        .refine((name) => name !== null, {
+          message: "El nombre es requerido.",
+        }),
+      sucursal: z
+        .string()
+        .min(1, { message: "La sucursal es requerida." })
+        .nullable()
+        .refine((sucursal) => sucursal !== null, {
+          message: "La sucursal es requerida.",
+        }),
+      fecha: z
+        .string()
+        .min(1, { message: "La fecha es requerida." })
+        .nullable()
+        .refine((fecha) => fecha !== null, {
+          message: "La fecha es requerida.",
+        }),
     }),
     handler: async (input) => {
       const { productos, tel, nombre, sucursal, fecha } = input;

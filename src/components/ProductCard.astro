@@ -37,41 +37,34 @@ const {
       {nombre}
     </h3>
   </div>
-  <p class="mb-4 font-light leading-relaxed opacity-60 ~text-[0.6rem]/xs">
+  <p class="mb-2 font-light leading-relaxed opacity-60 ~text-[0.6rem]/xs">
     {descripcion}
   </p>
   <div class="flex items-center justify-between">
-    <div>
-      <span class="text-[8px] capitalize opacity-50">Tradicional</span>
-      <AddToCart
-        id={id}
-        price={precio ? { id: precio, amount: 125000 } : { id: "", amount: 0 }}
-        name={nombre}
-        size="tradicional"
-        image={imagen}
-        quantity={1}
-        client:only
-      />
-    </div>
+    <AddToCart
+      id={id}
+      price={precio ? { id: precio, amount: 125000 } : { id: "", amount: 0 }}
+      name={nombre}
+      size="tradicional"
+      image={imagen}
+      quantity={1}
+      client:only
+    />
     {
       precioAnytime && (
-        <div>
-          <span class="text-[8px] capitalize opacity-50">Anytime</span>
-
-          <AddToCart
-            id={id}
-            price={
-              precioAnytime
-                ? { id: precioAnytime, amount: 59000 }
-                : { id: "", amount: 0 }
-            }
-            name={nombre}
-            size="anytime"
-            image={imagenAnytime ? imagenAnytime : imagen}
-            quantity={1}
-            client:only
-          />
-        </div>
+        <AddToCart
+          id={id}
+          price={
+            precioAnytime
+              ? { id: precioAnytime, amount: 59000 }
+              : { id: "", amount: 0 }
+          }
+          name={nombre}
+          size="anytime"
+          image={imagenAnytime ? imagenAnytime : imagen}
+          quantity={1}
+          client:only
+        />
       )
     }
   </div>

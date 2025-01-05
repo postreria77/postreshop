@@ -35,7 +35,7 @@ const Orders = defineTable({
     productos: column.json(),
     tel: column.text(),
     nombre: column.text(),
-    sucursal: column.number(),
+    sucursal: column.text(),
     fecha: column.text(),
     estado: column.text(),
     creado: column.text(),
@@ -48,7 +48,7 @@ export type Order = {
   productos: string;
   tel: string;
   nombre: string;
-  sucursal: number;
+  sucursal: string;
   fecha: string;
   estado: string;
   creado: string;

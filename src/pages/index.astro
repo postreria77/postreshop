@@ -15,8 +15,6 @@ const pasteles = await db
   .select()
   .from(Pasteles)
   .where(eq(Pasteles.archived, false));
-
-console.log(pasteles);
 ---
 
 <Layout
