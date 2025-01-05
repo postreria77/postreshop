@@ -143,7 +143,7 @@ export function CheckoutForm() {
 
       <button
         type="submit"
-        className="relative mt-4 rounded-sm border border-light border-opacity-25 bg-light bg-opacity-5 text-center leading-none transition duration-75 ease-out ~px-2/4 ~pt-[.5rem]/[.625rem] ~pb-[.4rem]/2 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand"
+        className={`${isPending ? "bg-brand bg-opacity-25" : "bg-light bg-opacity-5"} relative mt-4 rounded-sm border border-light border-opacity-25 text-center leading-none transition duration-75 ease-out ~px-2/4 ~pt-[.5rem]/[.625rem] ~pb-[.4rem]/2 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand`}
       >
         {isPending ? <span>Procesando...</span> : <span>Proceder Al Pago</span>}
       </button>
