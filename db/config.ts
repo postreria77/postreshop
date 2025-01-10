@@ -86,9 +86,24 @@ export type SystemOrder = {
   referencia: string; //empty,
 };
 
+const Sucursales = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    name: column.text(),
+    address: column.text(),
+  },
+});
+
+export type Sucursal = {
+  id: string;
+  name: string;
+  address: string;
+};
+
 export default defineDb({
   tables: {
     Orders,
     Pasteles,
+    Sucursales,
   },
 });

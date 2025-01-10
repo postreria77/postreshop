@@ -1,4 +1,4 @@
-import { db, Pasteles } from "astro:db";
+import { db, Pasteles, Sucursales } from "astro:db";
 
 // https://astro.build/db/seed
 export default async function seed() {
@@ -28,6 +28,19 @@ export default async function seed() {
       categoria: "Pasteles",
       nuevo: false,
       archived: false,
+    },
+  ]);
+  await db.insert(Sucursales).values([
+    {
+      id: "547",
+      name: "Formula 1",
+      address: "Av. La Postrería 77, Buenos Aires, Argentina",
+    },
+    {
+      id: "44",
+      name: "Serena",
+      address:
+        "Pueblo Serena, Carretera Nacional #500 Local F. Colonia Valle Alto, Monterrey, N.L.",
     },
   ]);
 }

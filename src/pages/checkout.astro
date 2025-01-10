@@ -5,7 +5,9 @@ import Layout from "@/layouts/Layout.astro";
 import Section from "@/components/Section.astro";
 import CartList from "@/components/cart/CartList";
 import { CheckoutForm } from "@/components/checkout/CheckoutForm";
-/* import CheckoutForm from "@/components/checkout/CheckoutForm.astro"; */
+import { db, Sucursales } from "astro:db";
+
+const sucursales = await db.select().from(Sucursales);
 ---
 
 <Layout
@@ -21,7 +23,7 @@ import { CheckoutForm } from "@/components/checkout/CheckoutForm";
         </h1>
         <CartList client:only />
       </div>
-      <CheckoutForm client:load />
+      <CheckoutForm sucursales={sucursales} client:load />
     </div>
   </Section>
 </Layout>

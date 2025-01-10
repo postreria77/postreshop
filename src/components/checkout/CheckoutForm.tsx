@@ -4,28 +4,9 @@ import { useActionState } from "react";
 import { experimental_withState as withState } from "@astrojs/react/actions";
 
 import CheckoutProductsInput from "@/components/checkout/CheckoutProductsInput";
+import type { Sucursal } from "db/config";
 
-type Sucursal = {
-  id: number;
-  name: string;
-  address: string;
-};
-
-const sucursales: Sucursal[] = [
-  {
-    id: 547,
-    name: "Formula 1",
-    address: "Av. La Postrería 77, Buenos Aires, Argentina",
-  },
-  {
-    id: 44,
-    name: "Serena",
-    address:
-      "Pueblo Serena, Carretera Nacional #500 Local F. Colonia Valle Alto, Monterrey, N.L.",
-  },
-];
-
-export function CheckoutForm() {
+export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
   const [{ data, error }, action, isPending] = useActionState(
     withState(actions.orders.create),
     {
