@@ -45,6 +45,7 @@ export const orders = {
     }),
     handler: async (input) => {
       const { productos, tel, nombre, sucursal, fecha } = input;
+      console.log("Productos: ", productos);
 
       const line_items = JSON.parse(productos).map(
         (producto: OrderProduct) => ({

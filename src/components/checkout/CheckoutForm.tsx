@@ -16,7 +16,11 @@ export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
   );
 
   const inputErrors = isInputError(error) ? error.fields : {};
-  if (data?.url && !error) navigate(data.url);
+  const actionError = !isInputError(error) ? error : undefined;
+  if (data?.url && !error) {
+    console.log("redirigiendo");
+    return navigate(data.url);
+  }
 
   return (
     <form className="flex flex-col" method="POST" action={action}>
@@ -81,12 +85,15 @@ export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
           id="sucursal"
           aria-describedby="error-sucursal"
           className="mt-1 min-h-5 w-full rounded-sm border border-opacity-25 px-3 pb-[10px] pt-3 leading-none text-dark"
+          defaultValue=""
+          required
         >
-          <option selected value="">
-            Sucursal de Entrega
-          </option>
           {sucursales.map((sucursal) => (
-            <option value={sucursal.id} className="min-h-5 capitalize">
+            <option
+              value={sucursal.id}
+              key={sucursal.id}
+              className="min-h-5 capitalize"
+            >
               {sucursal.name}
             </option>
           ))}
@@ -114,6 +121,17 @@ export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
           min={new Date().toISOString().slice(0, 16)}
         />
       </label>
+      {actionError?.message && (
+        <p
+          id="error-fecha"
+          className="ml-2 inline -translate-y-1 text-[8px] text-red-500"
+        >
+          <span className="mr-1 inline-flex size-[10px] items-center justify-center rounded-full bg-red-500 text-light">
+            i
+          </span>
+          {actionError.message}
+        </p>
+      )}
 
       <button
         type="submit"
@@ -121,7 +139,6 @@ export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
       >
         {isPending ? <span>Procesando...</span> : <span>Proceder Al Pago</span>}
       </button>
-      {/*       <Button type="submit">Proceder Al Pago</Button> */}
     </form>
   );
 }

@@ -9,7 +9,7 @@ export default async function seed() {
       descripcion:
         "Pan de chocolate relleno de Nutella, betún de chocolate y ganache. Decorado con Ferrero Rocher.",
       precio: "price_1QRC3nB2G7gLVqvPMv6x4Th2",
-      precioAnytime: "price_1QdBBoB2G7gLVqvPVjLm7s44",
+      precioAnytime: "price_1Qg3cY2N0hejjjHDbNwNqE3v",
       imagen: "https://lapasteleriadelapostreria.com/images/menu/ferrero.webp",
       imagenAnytime:
         "https://files.stripe.com/links/MDB8YWNjdF8xUVJCeWlCMkc3Z0xWcXZQfGZsX3Rlc3RfcXNLS2NQT0dqdnBiaUFFUm9JQWxVRDh500OyUsFR1a",
