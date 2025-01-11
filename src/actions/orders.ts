@@ -77,6 +77,7 @@ export const orders = {
         .returning();
 
       if (!order) {
+        console.log("Error al crear la orden.");
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Error al crear la orden. Intente nuevamente.",
@@ -97,6 +98,7 @@ export const orders = {
       });
 
       if (!session) {
+        console.log("Error al crear la orden.");
         await db
           .update(Orders)
           .set({ estado: "Error en Stripe" })
