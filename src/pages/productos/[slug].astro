@@ -1,0 +1,36 @@
+---
+import { db, eq, Pasteles } from "astro:db";
+import type { GetStaticPaths } from "astro";
+import Section from "@/components/Section.astro";
+import Layout from "@/layouts/Layout.astro";
+import { slugify } from "@/lib/format";
+
+export const getStaticPaths = (async () => {
+  const pasteles = await db
+    .select()
+    .from(Pasteles)
+    .where(eq(Pasteles.archived, false));
+
+  return pasteles.map((pastel) => {
+    return {
+      params: {
+        slug: slugify(pastel.nombre),
+      },
+      props: {
+        pastel: pastel,
+      },
+    };
+  });
+}) satisfies GetStaticPaths;
+
+const { pastel } = Astro.props;
+---
+
+<Layout title={pastel.nombre} description={pastel.descripcion}>
+  <Section>
+    <div>
+      <a href="/" class="opacity-15">Volver a la tienda</a>
+      <h1>{pastel.nombre}</h1>
+    </div>
+  </Section>
+</Layout>

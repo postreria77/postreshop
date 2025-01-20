@@ -18,7 +18,6 @@ export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
   const inputErrors = isInputError(error) ? error.fields : {};
   const actionError = !isInputError(error) ? error : undefined;
   if (data?.url && !error) {
-    console.log("redirigiendo");
     return navigate(data.url);
   }
 

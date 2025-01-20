@@ -62,3 +62,8 @@ export function removeCartItem(price: { id: string }) {
     localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
   }
 }
+
+export function clearCart() {
+  cartItems.set({});
+  localStorage.removeItem("cartItems");
+}

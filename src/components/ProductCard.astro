@@ -1,12 +1,8 @@
 ---
-import type { CollectionEntry } from "astro:content";
 import { Image } from "astro:assets";
 import AddToCart from "@/components/cart/AddToCart";
 import type { Pastel } from "db/config";
-
-/* interface Props {
-  product: CollectionEntry<"pasteles">;
-} */
+import { slugify } from "@/lib/format";
 
 type Props = {
   pastel: Pastel;
@@ -22,22 +18,28 @@ const {
   precioAnytime,
   imagenAnytime,
 } = pastel;
+
+const slug = slugify(nombre);
 ---
 
 <li class="relative rounded-sm">
-  <Image
-    src={imagen}
-    alt={nombre}
-    width={480}
-    height={480}
-    class="aspect-square overflow-clip rounded-md object-cover"
-  />
+  <a href=`productos/${slug}`>
+    <Image
+      src={imagen}
+      alt={nombre}
+      width={480}
+      height={480}
+      class="aspect-square overflow-clip rounded-md object-cover"
+    />
+  </a>
   <div class="flex items-center justify-between">
     <h3 class="mb-1 mt-3 font-medium capitalize tracking-tighter ~text-lg/xl">
       {nombre}
     </h3>
   </div>
-  <p class="mb-2 font-light leading-relaxed opacity-60 ~text-[0.6rem]/xs">
+  <p
+    class="mb-2 line-clamp-3 font-light leading-relaxed opacity-60 ~text-[0.6rem]/xs"
+  >
     {descripcion}
   </p>
   <div class="flex items-center justify-between">

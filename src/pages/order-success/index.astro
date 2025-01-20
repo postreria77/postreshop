@@ -8,6 +8,7 @@ import Button from "@components/ui/Button.astro";
 <Layout
   title="Orden Realizada"
   description="Gracias por tu pedido. Te contactaremos pronto."
+  showCart={false}
 >
   <Section>
     <div class="grid gap-16 py-16 sm:grid-cols-2 md:grid-cols-[2fr_1fr]">
@@ -24,3 +25,9 @@ import Button from "@components/ui/Button.astro";
     </div>
   </Section>
 </Layout>
+
+<script>
+  import { clearCart } from "@/store";
+
+  clearCart();
+</script>

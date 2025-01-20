@@ -39,6 +39,7 @@ const pasteles = await db
 
   <Section>
     <ul
+      id="pasteles"
       class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))]"
     >
       {pasteles?.map((pastel: any) => <ProductCard pastel={pastel} />)}
