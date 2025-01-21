@@ -1,5 +1,5 @@
 import { useStore } from "@nanostores/react";
-import { cartItems, removeCartItem } from "@/store";
+import { cartItems } from "@/store";
 import CartItem from "./CartItem";
 
 export default function CartList() {
@@ -14,7 +14,7 @@ export default function CartList() {
           {/* Display item list */}
           <ul className="mb-4 border-b border-light border-opacity-25">
             {Object.values($items).map((item) => (
-              <CartItem key={item.id} item={item} />
+              <CartItem key={item.price.id} item={item} />
             ))}
           </ul>
           {/* Display Cart Total */}

@@ -35,12 +35,14 @@ export default async function seed() {
       id: "547",
       name: "Formula 1",
       address: "Av. La Postrería 77, Buenos Aires, Argentina",
+      connectedStripeAccount: "acct_1QiyF92KiO5HpTFD",
     },
     {
       id: "44",
       name: "Serena",
       address:
         "Pueblo Serena, Carretera Nacional #500 Local F. Colonia Valle Alto, Monterrey, N.L.",
+      connectedStripeAccount: "acct_1Qg3Dy2N0hejjjHD",
     },
   ]);
 }

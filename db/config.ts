@@ -91,6 +91,7 @@ const Sucursales = defineTable({
     id: column.text({ primaryKey: true }),
     name: column.text(),
     address: column.text(),
+    connectedStripeAccount: column.text({ default: "acct_1Qg3Dy2N0hejjjHD" }),
   },
 });
 
@@ -98,6 +99,7 @@ export type Sucursal = {
   id: string;
   name: string;
   address: string;
+  connectedStripeAccount: string;
 };
 
 export default defineDb({

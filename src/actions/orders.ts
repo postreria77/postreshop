@@ -1,6 +1,6 @@
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
-import { db, eq, Orders } from "astro:db";
+import { db, eq, Orders, Sucursales } from "astro:db";
 import { stripe } from "@/lib/stripe";
 
 import type { OrderProduct } from "db/config";
@@ -86,12 +86,27 @@ export const orders = {
       }
 
       const id = order[0].id;
+      const { connectedStripeAccount } = await db
+        .select()
+        .from(Sucursales)
+        .where(eq(Sucursales.id, sucursal))
+        .then((sucursales) => sucursales[0]);
+
+      if (!connectedStripeAccount) {
+        throw new ActionError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error al crear la sesión de pago. Intente nuevamente.",
+        });
+      }
 
       const session = await stripe.checkout.sessions.create({
         success_url: "https://postreshop.vercel.app/order-success/" /* + id */,
         line_items,
         mode: "payment",
         payment_intent_data: {
+          transfer_data: {
+            destination: connectedStripeAccount,
+          },
           metadata: {
             order_id: id,
           },
