@@ -1,9 +1,12 @@
 ---
-import { db, eq, Pasteles } from "astro:db";
-import type { GetStaticPaths } from "astro";
 import Section from "@/components/Section.astro";
 import Layout from "@/layouts/Layout.astro";
+import { Image } from "astro:assets";
+
+import { db, eq, Pasteles } from "astro:db";
+import type { GetStaticPaths } from "astro";
 import { slugify } from "@/lib/format";
+import AddToCart from "@/components/cart/AddToCart";
 
 export const getStaticPaths = (async () => {
   const pasteles = await db
@@ -24,13 +27,66 @@ export const getStaticPaths = (async () => {
 }) satisfies GetStaticPaths;
 
 const { pastel } = Astro.props;
+const {
+  descripcion,
+  imagen,
+  id,
+  nombre,
+  precio,
+  precioAnytime,
+  imagenAnytime,
+} = pastel;
 ---
 
-<Layout title={pastel.nombre} description={pastel.descripcion}>
+<Layout title={nombre} description={descripcion}>
   <Section>
-    <div>
-      <a href="/" class="opacity-15">Volver a la tienda</a>
-      <h1>{pastel.nombre}</h1>
+    <div class="mt-16 grid grid-cols-2 gap-8">
+      <Image
+        src={pastel.imagen}
+        alt={pastel.nombre}
+        width={500}
+        height={500}
+        class="w-full rounded-lg object-cover"
+      />
+      <div class="mt-8">
+        <a href="/" class="text-lg opacity-25">Volver a la tienda</a>
+        <h1 class="mb-2 mt-8 text-4xl font-medium">{pastel.nombre}</h1>
+        <p class="mb-2 font-light leading-relaxed opacity-60 ~text-lg/xl">
+          {descripcion}
+        </p>
+        <div class="mt-8 flex items-center gap-4">
+          <AddToCart
+            id={id}
+            price={precio
+              ? { id: precio, amount: 125000 }
+              : { id: "", amount: 0 }}
+            name={nombre}
+            size="tradicional"
+            image={imagen}
+            quantity={1}
+            client:only
+            buttonSize="large"
+          />
+          {
+            precioAnytime && (
+              <AddToCart
+                id={id}
+                price={
+                  precioAnytime
+                    ? { id: precioAnytime, amount: 59000 }
+                    : { id: "", amount: 0 }
+                }
+                name={nombre}
+                size="anytime"
+                image={imagenAnytime ? imagenAnytime : imagen}
+                quantity={1}
+                client:only
+                buttonSize="large"
+              />
+            )
+          }
+        </div>
+      </div>
     </div>
   </Section>
 </Layout>
