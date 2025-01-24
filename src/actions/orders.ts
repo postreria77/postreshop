@@ -10,15 +10,6 @@ export const orders = {
     accept: "form",
     input: z.object({
       productos: z.string(),
-      tel: z
-        .string()
-        .min(10, { message: "El teléfono debe tener 10 dígitos." })
-        .max(10, { message: "El teléfono debe tener 10 dígitos." })
-        .nonempty({ message: "Ingresa un teléfono." })
-        .nullable()
-        .refine((tel) => tel !== null, {
-          message: "Ingresa un teléfono.",
-        }),
       nombre: z
         .string()
         .max(48, { message: "El nombre debe tener menos de 48 letras." })
@@ -27,6 +18,24 @@ export const orders = {
         .nullable()
         .refine((name) => name !== null, {
           message: "Ingresa un nombre.",
+        }),
+      apellido: z
+        .string()
+        .max(48, { message: "El apellido debe tener menos de 48 letras." })
+        .min(3, { message: "El apellido debe tener al menos 3 letras." })
+        .nonempty({ message: "Ingresa un apellido." })
+        .nullable()
+        .refine((name) => name !== null, {
+          message: "Ingresa un apellido.",
+        }),
+      tel: z
+        .string()
+        .min(10, { message: "El teléfono debe tener 10 dígitos." })
+        .max(10, { message: "El teléfono debe tener 10 dígitos." })
+        .nonempty({ message: "Ingresa un teléfono." })
+        .nullable()
+        .refine((tel) => tel !== null, {
+          message: "Ingresa un teléfono.",
         }),
       sucursal: z
         .string()
@@ -42,9 +51,16 @@ export const orders = {
         .refine((fecha) => fecha !== null, {
           message: "Selecciona una fecha.",
         }),
+      hora: z
+        .string()
+        .min(1, { message: "Selecciona una hora." })
+        .nullable()
+        .refine((hora) => hora !== null, {
+          message: "Selecciona una hora.",
+        }),
     }),
     handler: async (input) => {
-      const { productos, tel, nombre, sucursal, fecha } = input;
+      const { productos, tel, nombre, apellido, sucursal, fecha, hora } = input;
       console.log("Productos: ", productos);
 
       const line_items = JSON.parse(productos).map(
@@ -63,14 +79,17 @@ export const orders = {
         });
       }
 
+      const nombreCompleto = `${nombre} ${apellido}`;
+      const fechaCompleta = `${fecha}T${hora}`;
+
       const order = await db
         .insert(Orders)
         .values({
           productos,
           tel,
-          nombre,
+          nombre: nombreCompleto,
           sucursal,
-          fecha,
+          fecha: fechaCompleta,
           estado: "Pendiente",
           creado: new Date().toISOString(),
           modificado: new Date().toISOString(),
@@ -100,7 +119,7 @@ export const orders = {
       }
 
       const session = await stripe.checkout.sessions.create({
-        success_url: "https://postreshop.vercel.app/order-success/" /* + id */,
+        success_url: "https://shop.lapostreria77.com/order-success/" /* + id */,
         line_items,
         mode: "payment",
         payment_intent_data: {
