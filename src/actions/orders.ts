@@ -1,7 +1,7 @@
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { db, eq, Orders, Sucursales } from "astro:db";
-import { stripe } from "@/lib/stripe";
+import { createStripeCheckout } from "@/lib/stripe";
 
 import type { OrderProduct } from "db/config";
 
@@ -61,7 +61,6 @@ export const orders = {
     }),
     handler: async (input) => {
       const { productos, tel, nombre, apellido, sucursal, fecha, hora } = input;
-      console.log("Productos: ", productos);
 
       const line_items = JSON.parse(productos).map(
         (producto: OrderProduct) => ({
@@ -118,19 +117,11 @@ export const orders = {
         });
       }
 
-      const session = await stripe.checkout.sessions.create({
-        success_url: "https://shop.lapostreria77.com/order-success/" /* + id */,
+      const session = await createStripeCheckout(
+        connectedStripeAccount,
+        id,
         line_items,
-        mode: "payment",
-        payment_intent_data: {
-          transfer_data: {
-            destination: connectedStripeAccount,
-          },
-          metadata: {
-            order_id: id,
-          },
-        },
-      });
+      );
 
       if (!session) {
         console.log("Error al crear la orden.");
