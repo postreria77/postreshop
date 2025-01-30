@@ -17,29 +17,29 @@ import {
 import { today, getLocalTimeZone, Time } from "@internationalized/date";
 
 export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
-  // const [{ data, error }, action, isPending] = useActionState(
-  //   withState(actions.orders.create),
-  //   {
-  //     data: { message: "", url: "" },
-  //     error: undefined,
-  //   },
-  // );
-  //
-  // const inputErrors = isInputError(error) ? error.fields : {};
-  // const actionError = !isInputError(error) ? error : undefined;
-  //
-  // if (data?.url && !error) {
-  //   return navigate(data.url);
-  // }
+  const [{ data, error }, action, isPending] = useActionState(
+    withState(actions.orders.create),
+    {
+      data: { message: "", url: "" },
+      error: undefined,
+    },
+  );
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const data = Object.fromEntries(new FormData(event.currentTarget));
-    console.log(data);
-  };
+  const inputErrors = isInputError(error) ? error.fields : {};
+  const actionError = !isInputError(error) ? error : undefined;
+
+  if (data?.url && !error) {
+    return navigate(data.url);
+  }
+
+  // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  //   event.preventDefault();
+  //   const data = Object.fromEntries(new FormData(event.currentTarget));
+  //   console.log(data);
+  // };
 
   return (
-    <form className="space-y-4" onSubmit={handleSubmit}>
+    <form className="space-y-4" method="POST" action={action}>
       <CheckoutProductsInput />
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -50,10 +50,11 @@ export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
             aria-describedby="error-nombre"
             label="Nombre"
             isRequired
+            radius="sm"
           />
-          {/* {inputErrors.nombre && ( */}
-          {/*   <FormInputError error={inputErrors.nombre} name="nombre" /> */}
-          {/* )} */}
+          {inputErrors.nombre && (
+            <FormInputError error={inputErrors.nombre} name="nombre" />
+          )}
         </div>
         <div>
           <Input
@@ -62,10 +63,11 @@ export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
             id="apellido"
             aria-describedby="error-apellido"
             label="Apellido"
+            radius="sm"
           />
-          {/* {inputErrors.nombre && ( */}
-          {/*   <FormInputError error={inputErrors.nombre} name="apellido" /> */}
-          {/* )} */}
+          {inputErrors.nombre && (
+            <FormInputError error={inputErrors.nombre} name="apellido" />
+          )}
         </div>
       </div>
       <div>
@@ -76,22 +78,28 @@ export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
           aria-describedby="error-tel"
           label="Teléfono"
           isRequired
+          radius="sm"
         />
-        {/* {inputErrors.tel && ( */}
-        {/*   <FormInputError error={inputErrors.tel} name="tel" /> */}
-        {/* )} */}
+        {inputErrors.tel && (
+          <FormInputError error={inputErrors.tel} name="tel" />
+        )}
       </div>
       <div>
-        <Select name="sucursal" label="Selecciona una Sucursal" isRequired>
+        <Select
+          name="sucursal"
+          label="Selecciona una Sucursal"
+          isRequired
+          radius="sm"
+        >
           {sucursales.map((sucursal) => (
             <SelectItem value={sucursal.id} key={sucursal.id}>
               {sucursal.name}
             </SelectItem>
           ))}
         </Select>
-        {/* {inputErrors.sucursal && ( */}
-        {/*   <FormInputError error={inputErrors.sucursal} name="sucursal" /> */}
-        {/* )} */}
+        {inputErrors.sucursal && (
+          <FormInputError error={inputErrors.sucursal} name="sucursal" />
+        )}
       </div>
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -102,10 +110,11 @@ export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
             maxValue={today(getLocalTimeZone()).add({ days: 30 })}
             minValue={today(getLocalTimeZone()).add({ days: 2 })}
             isRequired
+            radius="sm"
           />
-          {/* {inputErrors.fecha && ( */}
-          {/*   <FormInputError error={inputErrors.fecha} name="fecha" /> */}
-          {/* )} */}
+          {inputErrors.fecha && (
+            <FormInputError error={inputErrors.fecha} name="fecha" />
+          )}
         </div>
         <div>
           <TimeInput
@@ -118,20 +127,18 @@ export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
             granularity="hour"
             defaultValue={new Time(12)}
             isRequired
+            radius="sm"
           />
         </div>
       </div>
-      {/* {actionError?.message && ( */}
-      {/*   <FormInputError error={actionError.message} name="form" /> */}
-      {/* )} */}
-
+      {actionError?.message && (
+        <FormInputError error={actionError.message} name="form" />
+      )}
       <button
         type="submit"
-        // className={`${isPending ? "bg-brand bg-opacity-25" : "bg-light bg-opacity-5"} relative mt-4 w-full rounded-sm border border-light border-opacity-25 py-2 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand`}
-        className="relative mt-4 w-full border border-light"
+        className={`${isPending ? "bg-brand bg-opacity-25" : "bg-light bg-opacity-5"} relative mt-4 w-full rounded-sm border border-light border-opacity-25 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand`}
       >
-        {/* {isPending ? <span>Procesando...</span> : <span>Proceder Al Pago</span>} */}
-        <span>Proceder Al Pago</span>
+        {isPending ? <span>Procesando...</span> : <span>Proceder Al Pago</span>}
       </button>
     </form>
   );

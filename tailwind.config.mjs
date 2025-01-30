@@ -32,6 +32,18 @@ export default {
     heroui({
       defaultTheme: "dark",
       defaultExtendTheme: "dark",
+      themes: {
+        dark: {
+          colors: {
+            focus: "#E0AA3E",
+          }
+        }
+      },
+      layout: {
+        radius: {
+          small: "0.125rem",
+        },
+      },
     }),
   ],
 };
