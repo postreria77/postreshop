@@ -6,7 +6,7 @@ export default function CartIndicator() {
   return (
     <>
       {$items && Object.values($items).length > 0 && (
-        <p className="absolute -right-2 -top-2 grid place-items-center rounded-full bg-red-500 ~text-[.6rem]/xs ~size-5/6">
+        <p className="rounded-sm bg-danger px-2 py-[0.125rem] text-xs leading-none text-light">
           {Object.values($items).length}
         </p>
       )}

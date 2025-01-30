@@ -5,20 +5,21 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Icon } from "astro-icon/components";
 
 const button = cva(
-  "border text-center leading-none  border-light border-opacity-25 bg-dark transition duration-75 ease-out hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand relative",
+  "text-center leading-none bg-dark transition duration-75 ease-out hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand relative",
   {
     variants: {
       intent: {
-        primary: [],
+        primary: ["border", "border-light/25"],
         secondary: [],
         cart: ["w-full", "flex", "items-center", "justify-center", "mt-8"],
       },
       size: {
+        zero: ["p-2", "rounded-md"],
         small: ["px-2", "pb-1", "pt-[6px]", "text-xs"],
         medium: ["~px-2/4", "~text-xs/sm", "py-1", "rounded-md"],
       },
       icon: {
-        cart: ["flex", "items-center"],
+        cart: ["flex", "items-center", "gap-2"],
       },
       disabled: {
         false: null,
@@ -34,7 +35,7 @@ const button = cva(
       {
         size: "medium",
         icon: "cart",
-        class: "~gap-1/2",
+        class: ["~gap-1/2"],
       },
     ],
   },
@@ -45,7 +46,7 @@ export interface Props
     VariantProps<typeof button> {
   intent?: "primary" | "secondary" | "cart";
   disabled?: boolean;
-  size?: "small" | "medium";
+  size?: "zero" | "small" | "medium";
   id?: string;
   href?: string;
   type?: "button" | "submit" | "reset";

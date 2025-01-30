@@ -40,7 +40,7 @@ export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
   // };
 
   return (
-    <form className="space-y-4" method="POST" action={action}>
+    <form className="space-y-4 sticky top-32" method="POST" action={action}>
       <CheckoutProductsInput />
       <div className="grid grid-cols-2 gap-4">
         <div>
