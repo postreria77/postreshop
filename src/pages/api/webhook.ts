@@ -75,10 +75,7 @@ const uploadOrderToSystem = async (
     });
     // Check if the response is OK
     if (!response.ok) {
-      return {
-        data: null,
-        error: new Error(`HTTP error! Status: ${response.status}`),
-      };
+      throw new Error(`HTTP error! Status: ${response.status}`);
     }
     return { data: "No HTTP error", error: null };
   } catch (error) {

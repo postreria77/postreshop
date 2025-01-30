@@ -5,7 +5,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { Icon } from "astro-icon/components";
 
 const button = cva(
-  "rounded-sm border text-center leading-none  border-light border-opacity-25 bg-light bg-opacity-5  transition duration-75 ease-out hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand relative",
+  "border text-center leading-none  border-light border-opacity-25 bg-dark transition duration-75 ease-out hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand relative",
   {
     variants: {
       intent: {
@@ -15,12 +15,7 @@ const button = cva(
       },
       size: {
         small: ["px-2", "pb-1", "pt-[6px]", "text-xs"],
-        medium: [
-          "~px-2/4",
-          "~pb-[.4rem]/2",
-          "~pt-[.5rem]/[.625rem]",
-          "~text-xs/sm",
-        ],
+        medium: ["~px-2/4", "~text-xs/sm", "py-1", "rounded-md"],
       },
       icon: {
         cart: ["flex", "items-center"],

@@ -7,7 +7,7 @@ import Button from "@components/ui/Button.astro";
 import { Image } from "astro:assets";
 
 // Asset imports
-import hero from "@assets/xmas-hero.jpg";
+import hero from "@assets/hero_black.png";
 
 import { db, eq, Pasteles } from "astro:db";
 
@@ -21,26 +21,32 @@ const pasteles = await db
   title="La Postre Shop"
   description="Ordena un pastel y recogelo en tu sucursal de La Postre de preferencia."
 >
-  <header class="mb-16 grid-cols-2 bg-dark-2 sm:grid">
-    <div
-      class="ml-auto flex w-full max-w-[40rem] flex-col items-start justify-center py-16 ~pr-4/20 ~pl-4/16"
-    >
+  <header
+    class="to-dark-3 flex max-h-[90vh] flex-col items-center overflow-clip bg-gradient-to-b from-dark pt-16 ~px-4/16"
+  >
+    <div class="mb-8 flex max-w-[40rem] flex-col items-center text-center">
       <h1 class="mb-2 text-balance font-medium tracking-tighter ~text-4xl/5xl">
         Simply The Best
       </h1>
-      <p class="mb-8 max-w-prose text-base font-light leading-relaxed">
-        Nuestros pasteles son el arte de endulzar momentos, el secreto que une a
-        la familia con su irresistible encanto.
+      <p
+        class="mb-8 max-w-prose text-base font-light leading-relaxed text-light/60"
+      >
+        Realiza un pedido de tus pasteles favoritos y recógelo en tu sucursal de
+        preferencia.
       </p>
       <Button href="/#pasteles">Ver Pasteles</Button>
     </div>
-    <Image src={hero} alt="Hero image" class="h-[60vh] object-cover" />
+    <Image
+      src={hero}
+      alt="Hero image"
+      class="w-[110%] max-w-7xl object-cover object-top"
+    />
   </header>
 
   <Section>
     <ul
       id="pasteles"
-      class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))]"
+      class="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))]"
     >
       {pasteles?.map((pastel: any) => <ProductCard pastel={pastel} />)}
     </ul>
