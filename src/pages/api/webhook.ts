@@ -8,6 +8,7 @@ import type { OrderProduct, SystemOrder } from "db/config";
 
 const updateOrder = async (
   orderId: number,
+  cardBrand: string
 ): Promise<{ data: SystemOrder | null; error: Error | null }> => {
   const order = await db
     .update(Orders)
@@ -21,6 +22,18 @@ const updateOrder = async (
     const productos = JSON.parse(
       order[0].productos as string,
     ) as OrderProduct[];
+    let cardCode = "";
+    switch (cardBrand) {
+      case "visa":
+        cardCode = "0";
+        break;
+      case "mastercard":
+        cardCode = "1";
+        break;
+      case "amex":
+        cardCode = "2";
+        break;
+    }
     const systemOrder: SystemOrder = {
       productos: productos.map((producto) => ({
         producto: producto.id,
@@ -42,6 +55,7 @@ const updateOrder = async (
       colonia: "",
       municipio: "",
       referencia: "",
+      forma_pago_id: cardCode
     };
     return { data: systemOrder, error: null };
   }
@@ -99,6 +113,15 @@ export const POST: APIRoute = async ({ request }) => {
     });
   }
 
+  async function getCardBrand(paymentMethodId: string): Promise<string | null> {
+    const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+    const cardBrand = paymentMethod.card?.brand;
+    if (!cardBrand) {
+      return null;
+    }
+    return cardBrand;
+  }
+
   switch (event.type) {
     case "payment_intent.succeeded":
       const paymentIntentSucceeded = event.data.object;
@@ -109,6 +132,25 @@ export const POST: APIRoute = async ({ request }) => {
           status: 400,
         });
       }
+      const paymentMethodId = paymentIntentSucceeded.payment_method;
+      if (!paymentMethodId) {
+        console.log("Payment method ID not found in payment intent");
+        return new Response(
+          `Payment method ID not found in payment intent`,
+          {
+            status: 400,
+          },
+        );
+      }
+
+      const cardBrand = await getCardBrand(paymentMethodId.toString());
+      if (!cardBrand) {
+        console.log("Card brand not found in payment method");
+        return new Response(`Card brand not found in payment method`, {
+          status: 400,
+        });
+      }
+
       const numberOrderId = parseInt(orderId);
       if (isNaN(numberOrderId)) {
         console.log("Order ID is not a number");
@@ -119,7 +161,7 @@ export const POST: APIRoute = async ({ request }) => {
 
       console.log(`Order ID: ${numberOrderId}`);
       console.log("Updating order...");
-      const { data, error } = await updateOrder(numberOrderId);
+      const { data, error } = await updateOrder(numberOrderId, cardBrand);
 
       if (error) {
         console.error(error.message);

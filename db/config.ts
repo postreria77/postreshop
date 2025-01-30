@@ -84,6 +84,7 @@ export type SystemOrder = {
   colonia: string; //empty,
   municipio: string; //empty,
   referencia: string; //empty,
+  forma_pago_id: string; //0 = visa, 1 = mastercard, 2 = amex,
 };
 
 const Sucursales = defineTable({
