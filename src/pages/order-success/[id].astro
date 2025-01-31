@@ -1,0 +1,49 @@
+---
+export const prerender = false;
+
+import Layout from "@/layouts/Layout.astro";
+import Section from "@/components/Section.astro";
+import Button from "@/components/ui/Button.astro";
+
+import { db, eq, Orders, Pasteles } from "astro:db";
+import type { OrderProduct } from "db/config";
+
+const { id } = Astro.params;
+const numberId = Number(id);
+
+const orden = await db.select().from(Orders).where(eq(Orders.id, numberId));
+// const productosOrden = JSON.parse(
+//   orden[0].productos as string,
+// ) as OrderProduct[];
+---
+
+<Layout
+  title="Orden Realizada"
+  description="Gracias por tu pedido. Por favor revisa los datos de tu pedido."
+>
+  <Section>
+    <div
+      class="grid items-start gap-16 py-16 sm:grid-cols-2 md:grid-cols-[2fr_1fr]"
+    >
+      <div>
+        <h1
+          class="text-balance font-medium leading-none tracking-tighter ~text-2xl/3xl"
+        >
+          Orden Realizada
+        </h1>
+        <p class="mb-8">Gracias por tu pedido.</p>
+
+        <h2 class="mb-2 font-medium leading-tight tracking-tight ~text-lg/xl">
+          Detalles de la orden.
+        </h2>
+        <ul class="mb-8 list-inside list-disc">
+          <li><b>ID:</b> {id}</li>
+          <li><b>Status:</b> {orden[0].estado}</li>
+          <li><b>Nombre:</b> {orden[0].nombre}</li>
+          <li><b>Teléfono:</b> {orden[0].tel}</li>
+          <li><b>Fecha:</b> {new Date(orden[0].fecha).toLocaleDateString()}</li>
+        </ul>
+      </div>
+    </div>
+  </Section>
+</Layout>
