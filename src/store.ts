@@ -4,6 +4,7 @@ export const cartOpen = atom(false);
 
 export type CartItem = {
   id: string;
+  id_pasteleria: string;
   price: {
     id: string;
     amount: number;
@@ -25,6 +26,7 @@ export const cartItems = map<Record<string, CartItem>>({
 
 export function addCartItem({
   id,
+  id_pasteleria,
   price,
   name,
   size,
@@ -39,7 +41,15 @@ export function addCartItem({
     });
     localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
   } else {
-    cartItems.setKey(price.id, { id, name, image, quantity, price, size });
+    cartItems.setKey(price.id, {
+      id,
+      id_pasteleria,
+      name,
+      image,
+      quantity,
+      price,
+      size,
+    });
     localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
   }
 }

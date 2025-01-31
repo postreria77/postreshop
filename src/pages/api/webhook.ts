@@ -8,7 +8,7 @@ import type { OrderProduct, SystemOrder } from "db/config";
 
 const updateOrder = async (
   orderId: number,
-  cardBrand: string
+  cardBrand: string,
 ): Promise<{ data: SystemOrder | null; error: Error | null }> => {
   const order = await db
     .update(Orders)
@@ -22,6 +22,8 @@ const updateOrder = async (
     const productos = JSON.parse(
       order[0].productos as string,
     ) as OrderProduct[];
+
+    // Check the card brand and assign the corresponding code
     let cardCode = "";
     switch (cardBrand) {
       case "visa":
@@ -34,8 +36,20 @@ const updateOrder = async (
         cardCode = "2";
         break;
     }
-    const systemOrder: SystemOrder = {
-      productos: productos.map((producto) => ({
+
+    let sentProducts;
+    if (order[0].sucursal === "520" || order[0].sucursal === "536") {
+      sentProducts = productos.map((producto) => ({
+        producto: producto.id_pasteleria,
+        cantidad: producto.cantidad,
+        presentacion: producto.presentacion === "tradicional" ? "198" : "199",
+        precioProducto: 0,
+        precioPresentacion:
+          producto.presentacion === "tradicional" ? 1250 : 590,
+        comentarios: "",
+      }));
+    } else {
+      sentProducts = productos.map((producto) => ({
         producto: producto.id,
         cantidad: producto.cantidad,
         presentacion: producto.presentacion === "tradicional" ? "68" : "1069",
@@ -43,7 +57,11 @@ const updateOrder = async (
         precioPresentacion:
           producto.presentacion === "tradicional" ? 1250 : 590,
         comentarios: "",
-      })),
+      }));
+    }
+
+    const systemOrder: SystemOrder = {
+      productos: sentProducts,
       telefono: order[0].tel,
       nombre: order[0].nombre,
       sucursalId: order[0].sucursal,
@@ -55,7 +73,7 @@ const updateOrder = async (
       colonia: "",
       municipio: "",
       referencia: "",
-      forma_pago_id: cardCode
+      forma_pago_id: cardCode,
     };
     return { data: systemOrder, error: null };
   }
@@ -132,12 +150,9 @@ export const POST: APIRoute = async ({ request }) => {
       const paymentMethodId = paymentIntentSucceeded.payment_method;
       if (!paymentMethodId) {
         console.log("Payment method ID not found in payment intent");
-        return new Response(
-          `Payment method ID not found in payment intent`,
-          {
-            status: 400,
-          },
-        );
+        return new Response(`Payment method ID not found in payment intent`, {
+          status: 400,
+        });
       }
 
       const cardBrand = await getCardBrand(paymentMethodId.toString());

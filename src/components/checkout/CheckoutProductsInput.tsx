@@ -7,6 +7,7 @@ export default function CheckoutProductsInput() {
 
   const orderProducts: OrderProduct[] = Object.values($items).map((item) => ({
     id: item.id,
+    id_pasteleria: item.id_pasteleria,
     cantidad: item.quantity,
     stripePriceId: item.price.id,
     presentacion: item.size,

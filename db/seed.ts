@@ -5,6 +5,7 @@ export default async function seed() {
   await db.insert(Pasteles).values([
     {
       id: "358",
+      id_pasteleria: "98",
       nombre: "Ferrero",
       descripcion:
         "Pan de chocolate relleno de Nutella, betún de chocolate y ganache. Decorado con Ferrero Rocher.",
@@ -19,6 +20,7 @@ export default async function seed() {
     },
     {
       id: "565",
+      id_pasteleria: "100",
       nombre: "Pecan Pie Cake",
       descripcion:
         "Pan de vainilla con relleno de pie de nuez, betún de vainilla, capa de dulce de leche y nuez caramelizada.",

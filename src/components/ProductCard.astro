@@ -11,6 +11,7 @@ type Props = {
 const { pastel } = Astro.props;
 const {
   id,
+  id_pasteleria,
   nombre,
   descripcion,
   imagen,
@@ -47,6 +48,7 @@ const slug = slugify(nombre);
   <div class="flex items-center justify-between">
     <AddToCart
       id={id}
+      id_pasteleria={id_pasteleria}
       price={precio ? { id: precio, amount: 125000 } : { id: "", amount: 0 }}
       name={nombre}
       size="tradicional"
@@ -58,6 +60,7 @@ const slug = slugify(nombre);
       precioAnytime && (
         <AddToCart
           id={id}
+          id_pasteleria={id_pasteleria}
           price={
             precioAnytime
               ? { id: precioAnytime, amount: 59000 }

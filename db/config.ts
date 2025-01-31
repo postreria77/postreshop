@@ -4,6 +4,7 @@ import { defineDb, defineTable, column } from "astro:db";
 const Pasteles = defineTable({
   columns: {
     id: column.text({ primaryKey: true, autoIncrement: true }),
+    id_pasteleria: column.text({ optional: true }),
     nombre: column.text(),
     descripcion: column.text(),
     precio: column.text(),
@@ -18,6 +19,7 @@ const Pasteles = defineTable({
 
 export type Pastel = {
   id: string;
+  id_pasteleria: string;
   nombre: string;
   descripcion: string;
   precio: string;
@@ -57,6 +59,7 @@ export type Order = {
 
 export type OrderProduct = {
   id: string;
+  id_pasteleria: string;
   cantidad: number;
   stripePriceId: string;
   presentacion: string;

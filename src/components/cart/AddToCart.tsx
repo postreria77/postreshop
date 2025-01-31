@@ -36,13 +36,14 @@ const button = cva("button", {
 
 export interface ButtonProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "disabled">,
-  VariantProps<typeof button> {
+    VariantProps<typeof button> {
   intent?: "primary";
   buttonSize?: "small" | "medium" | "large";
 }
 
 export default function AddToCart({
   id,
+  id_pasteleria,
   price,
   name,
   size,
@@ -53,7 +54,7 @@ export default function AddToCart({
 }: CartItem & ButtonProps) {
   const handleAddToCart = () => {
     cartOpen.set(true);
-    addCartItem({ id, price, name, size, image, quantity });
+    addCartItem({ id, id_pasteleria, price, name, size, image, quantity });
   };
 
   return (
