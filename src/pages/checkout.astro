@@ -28,12 +28,42 @@ const disabledDates = await db
           Realizar Pedido
         </h1>
         <CartList client:only />
+        <ol class="ml-4 mt-8 list-decimal space-y-4 text-xs opacity-60">
+          <li>
+            <strong> Compras y pagos: </strong>
+            Todas las compras realizadas a través de nuestra tienda en línea son
+            finales. No se aceptan cancelaciones una vez confirmado el pedido.
+          </li>
+          <li>
+            <strong>Entrega y Recepción de Pedidos: </strong>
+            Todos los pedidos deben ser recolectados por el cliente en la fecha,
+            hora y sucursal seleccionadas al momento de la compra. No se permiten
+            cambios de fecha ni de sucursal una vez realizado el pedido.
+          </li>
+          <li>
+            <strong>Política de Cambios y Devoluciones: </strong>
+            No se realizan cambios ni devoluciones bajo ninguna circunstancia. Te
+            recomendamos verificar bien tu pedido antes de finalizar la compra.
+          </li>
+          <li>
+            <strong>Responsabilidad del Cliente: </strong>
+            <ul>
+              Es responsabilidad del cliente recolectar el pedido en la fecha,
+              lugar y horario acordados. Si el pedido no es recolectado por el
+              cliente en el día especificado, se considerará como entregado y no
+              habrá reembolso. Al realizar una compra en nuestra tienda en
+              línea, el cliente acepta estos términos y condiciones.
+            </ul>
+          </li>
+        </ol>
       </div>
-      <CheckoutForm
-        disabledDates={disabledDates}
-        sucursales={sucursales}
-        client:load
-      />
+      <div>
+        <CheckoutForm
+          disabledDates={disabledDates}
+          sucursales={sucursales}
+          client:load
+        />
+      </div>
     </div>
   </Section>
 </Layout>
