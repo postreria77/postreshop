@@ -5,9 +5,15 @@ import Layout from "@/layouts/Layout.astro";
 import Section from "@/components/Section.astro";
 import CartList from "@/components/cart/CartList";
 import { CheckoutForm } from "@/components/checkout/CheckoutForm";
-import { db, Sucursales } from "astro:db";
+import { db, Sucursales, DisabledDateTimes, eq } from "astro:db";
 
 const sucursales = await db.select().from(Sucursales);
+const disabledDates = await db
+  .select()
+  .from(DisabledDateTimes)
+  .where(eq(DisabledDateTimes.dayDisabled, true));
+
+console.log(disabledDates);
 ---
 
 <Layout
@@ -25,7 +31,11 @@ const sucursales = await db.select().from(Sucursales);
         </h1>
         <CartList client:only />
       </div>
-      <CheckoutForm sucursales={sucursales} client:load />
+      <CheckoutForm
+        disabledDates={disabledDates}
+        sucursales={sucursales}
+        client:load
+      />
     </div>
   </Section>
 </Layout>

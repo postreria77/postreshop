@@ -106,10 +106,27 @@ export type Sucursal = {
   connectedStripeAccount: string;
 };
 
+const DisabledDateTimes = {
+  columns: {
+    id: column.text({ primaryKey: true }),
+    date: column.text(),
+    dayDisabled: column.boolean({ default: false }),
+    time: column.text({ optional: true }),
+  },
+};
+
+export type DisabledDateTime = {
+  id: string;
+  date: string;
+  dayDisabled: boolean;
+  time: string | null;
+};
+
 export default defineDb({
   tables: {
     Orders,
     Pasteles,
     Sucursales,
+    DisabledDateTimes,
   },
 });

@@ -1,4 +1,4 @@
-import { db, Pasteles, Sucursales } from "astro:db";
+import { db, Pasteles, Sucursales, DisabledDateTimes } from "astro:db";
 
 // https://astro.build/db/seed
 export default async function seed() {
@@ -47,4 +47,16 @@ export default async function seed() {
       connectedStripeAccount: "acct_1Qg3Dy2N0hejjjHD",
     },
   ]);
+  await db.insert(DisabledDateTimes).values([
+    {
+      id: "1",
+      date: "2025-02-13",
+      dayDisabled: true,
+    },
+    {
+      id: "2",
+      date: "2025-02-14",
+      time: "12:00,13:00,14:00",
+    }
+  ])
 }

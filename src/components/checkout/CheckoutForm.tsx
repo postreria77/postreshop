@@ -5,7 +5,7 @@ import { experimental_withState as withState } from "@astrojs/react/actions";
 
 import CheckoutProductsInput from "@/components/checkout/CheckoutProductsInput";
 import FormInputError from "@/components/checkout/FormInputError";
-import type { Sucursal } from "db/config";
+import type { Sucursal, DisabledDateTime } from "db/config";
 
 import {
   Input,
@@ -15,9 +15,19 @@ import {
   TimeInput,
   Spinner,
 } from "@heroui/react";
-import { today, getLocalTimeZone, Time } from "@internationalized/date";
+import {
+  today,
+  getLocalTimeZone,
+  Time,
+  type DateValue,
+} from "@internationalized/date";
 
-export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
+type CheckoutFormProps = {
+  sucursales: Sucursal[];
+  disabledDates: DisabledDateTime[];
+};
+
+export function CheckoutForm({ sucursales, disabledDates }: CheckoutFormProps) {
   const [{ data, error }, action, isPending] = useActionState(
     withState(actions.orders.create),
     {
@@ -32,15 +42,14 @@ export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
   if (data?.url && !error) {
     return navigate(data.url);
   }
-
-  // const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-  //   event.preventDefault();
-  //   const data = Object.fromEntries(new FormData(event.currentTarget));
-  //   console.log(data);
-  // };
+  let isDateUnavailable = (date: DateValue): boolean => {
+    return disabledDates.some((disabledDate) => {
+      return disabledDate.date === date.toString();
+    });
+  };
 
   return (
-    <form className="space-y-4 sticky top-32" method="POST" action={action}>
+    <form className="sticky top-32 space-y-4" method="POST" action={action}>
       <CheckoutProductsInput />
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -110,6 +119,7 @@ export function CheckoutForm({ sucursales }: { sucursales: Sucursal[] }) {
             label="Fecha"
             maxValue={today(getLocalTimeZone()).add({ days: 30 })}
             minValue={today(getLocalTimeZone()).add({ days: 2 })}
+            isDateUnavailable={isDateUnavailable}
             isRequired
             radius="sm"
           />
