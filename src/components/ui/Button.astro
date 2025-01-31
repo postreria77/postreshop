@@ -11,7 +11,15 @@ const button = cva(
       intent: {
         primary: ["border", "border-light/25"],
         secondary: [],
-        cart: ["w-full", "flex", "items-center", "justify-center", "mt-8"],
+        cart: [
+          "w-full",
+          "flex",
+          "items-center",
+          "justify-center",
+          "mt-8",
+          "border",
+          "border-light/25",
+        ],
       },
       size: {
         zero: ["p-2", "rounded-md"],
@@ -19,7 +27,7 @@ const button = cva(
         medium: ["~px-2/4", "~text-xs/sm", "py-1", "rounded-md"],
       },
       icon: {
-        cart: ["flex", "items-center", "gap-2"],
+        cart: ["flex", "items-center", "gap-2", "mb-4"],
       },
       disabled: {
         false: null,
