@@ -39,25 +39,77 @@ const updateOrder = async (
 
     let sentProducts;
     if (order[0].sucursal === "520" || order[0].sucursal === "536") {
-      sentProducts = productos.map((producto) => ({
-        producto: producto.id_pasteleria,
-        cantidad: producto.cantidad,
-        presentacion: producto.presentacion === "tradicional" ? "198" : "199",
-        precioProducto: 0,
-        precioPresentacion:
-          producto.presentacion === "tradicional" ? 1250 : 590,
-        comentarios: "",
-      }));
+      sentProducts = productos.map((producto) => {
+
+        let presentacion;
+        let precioPresentacion;
+
+        // Using switch for better readability
+        switch (producto.presentacion) {
+          case "tradicional":
+            presentacion = "198";
+            precioPresentacion = 1250;
+            break;
+          case "anytime":
+            presentacion = "199";
+            precioPresentacion = 590;
+            break;
+          case "gift":
+            presentacion = "359";
+            precioPresentacion = 330;
+            break;
+          default:
+            presentacion = "198"; // Fallback for any other case
+            precioPresentacion = 1250;  // Fallback price
+            break;
+        }
+
+        return {
+          producto: producto.id_pasteleria,
+          cantidad: producto.cantidad,
+          presentacion: presentacion,
+          precioProducto: 0,
+          precioPresentacion: precioPresentacion,
+          comentarios: "",
+        }
+
+      });
     } else {
-      sentProducts = productos.map((producto) => ({
-        producto: producto.id,
-        cantidad: producto.cantidad,
-        presentacion: producto.presentacion === "tradicional" ? "68" : "1069",
-        precioProducto: 0,
-        precioPresentacion:
-          producto.presentacion === "tradicional" ? 1250 : 590,
-        comentarios: "",
-      }));
+      sentProducts = productos.map((producto) => {
+
+        let presentacion;
+        let precioPresentacion;
+
+        // Using switch for better readability
+        switch (producto.presentacion) {
+          case "tradicional":
+            presentacion = "68";
+            precioPresentacion = 1250;
+            break;
+          case "anytime":
+            presentacion = "1069";
+            precioPresentacion = 590;
+            break;
+          case "gift":
+            presentacion = "1284";
+            precioPresentacion = 330;
+            break;
+          default:
+            presentacion = "198"; // Fallback for any other case
+            precioPresentacion = 1250;  // Fallback price
+            break;
+        }
+
+        return {
+          producto: producto.id,
+          cantidad: producto.cantidad,
+          presentacion: producto.presentacion === "tradicional" ? "68" : "1069",
+          precioProducto: 0,
+          precioPresentacion:
+            producto.presentacion === "tradicional" ? 1250 : 590,
+          comentarios: "",
+        };
+      });
     }
 
     const systemOrder: SystemOrder = {

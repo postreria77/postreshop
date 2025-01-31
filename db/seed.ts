@@ -19,7 +19,7 @@ export default async function seed() {
       archived: false,
     },
     {
-      id: "565",
+      id: "484",
       id_pasteleria: "100",
       nombre: "Pecan Pie Cake",
       descripcion:
@@ -27,6 +27,23 @@ export default async function seed() {
       precio: "price_1QdBI8B2G7gLVqvPcoxRrLqV",
       imagen:
         "https://lapasteleriadelapostreria.com/images/menu/pecan-pie.webp",
+      categoria: "Pasteles",
+      nuevo: false,
+      archived: false,
+    },
+    {
+      id: "565",
+      id_pasteleria: "103",
+      nombre: "Red Velvet",
+      descripcion:
+        "Pan de vainilla con relleno de pie de nuez, betün de vainilla, capa de dulce de leche y nuez caramelizada.",
+      precio: "price_1QdBI8B2G7gLVqvPcoxRrLqV",
+      imagen:
+        "https://lapasteleriadelapostreria.com/images/menu/red-velvet.webp",
+      precioAnytime: "price_1QiMwU2N0hejjjHDrE8YOXqF",
+      precioGift: "price_1QiMwU2N0hejjjHDrE8YOXqF",
+      imagenGift:
+        "https://files.stripe.com/links/MDB8YWNjdF8xUWczRHkyTjBoZWpqakhEfGZsX3Rlc3RfQzBBRUNKc2JVeEt5enJSdnhpQTU5bkRM00cZMuHfKr",
       categoria: "Pasteles",
       nuevo: false,
       archived: false,
@@ -57,6 +74,6 @@ export default async function seed() {
       id: "2",
       date: "2025-02-14",
       time: "12:00,13:00,14:00",
-    }
-  ])
+    },
+  ]);
 }

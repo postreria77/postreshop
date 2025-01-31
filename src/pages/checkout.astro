@@ -12,8 +12,6 @@ const disabledDates = await db
   .select()
   .from(DisabledDateTimes)
   .where(eq(DisabledDateTimes.dayDisabled, true));
-
-console.log(disabledDates);
 ---
 
 <Layout

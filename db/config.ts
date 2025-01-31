@@ -11,6 +11,8 @@ const Pasteles = defineTable({
     imagen: column.text(),
     precioAnytime: column.text({ optional: true }),
     imagenAnytime: column.text({ optional: true }),
+    precioGift: column.text({ optional: true }),
+    imagenGift: column.text({ optional: true }),
     categoria: column.text({ default: "Pasteles" }),
     nuevo: column.boolean({ default: false }),
     archived: column.boolean({ default: false }),
@@ -26,6 +28,8 @@ export type Pastel = {
   imagen: string;
   precioAnytime?: string;
   imagenAnytime?: string;
+  precioGift?: string;
+  imagenGift?: string;
   categoria: string;
   nuevo: boolean;
   archived: boolean;

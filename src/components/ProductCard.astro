@@ -18,6 +18,8 @@ const {
   precio,
   precioAnytime,
   imagenAnytime,
+  precioGift,
+  imagenGift,
 } = pastel;
 
 const slug = slugify(nombre);
@@ -45,7 +47,7 @@ const slug = slugify(nombre);
   >
     {descripcion}
   </p>
-  <div class="flex items-center justify-between">
+  <div class="flex flex-wrap items-center justify-between">
     <AddToCart
       id={id}
       id_pasteleria={id_pasteleria}
@@ -54,8 +56,8 @@ const slug = slugify(nombre);
       size="tradicional"
       image={imagen}
       quantity={1}
-      client:only
-    />
+      client:only>Trad. +</AddToCart
+    >
     {
       precioAnytime && (
         <AddToCart
@@ -71,7 +73,27 @@ const slug = slugify(nombre);
           image={imagenAnytime ? imagenAnytime : imagen}
           quantity={1}
           client:only
-        />
+        >
+          Anytime +
+        </AddToCart>
+      )
+    }
+    {
+      precioGift && (
+        <AddToCart
+          id={id}
+          id_pasteleria={id_pasteleria}
+          price={
+            precio ? { id: precioGift, amount: 33000 } : { id: "", amount: 0 }
+          }
+          name={nombre}
+          size="gift"
+          image={imagenGift ? imagenGift : imagen}
+          quantity={1}
+          client:only
+        >
+          Gift +
+        </AddToCart>
       )
     }
   </div>

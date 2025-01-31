@@ -51,6 +51,7 @@ export default function AddToCart({
   quantity,
   intent,
   buttonSize,
+  children
 }: CartItem & ButtonProps) {
   const handleAddToCart = () => {
     cartOpen.set(true);
@@ -64,7 +65,7 @@ export default function AddToCart({
         onClick={handleAddToCart}
         className={button({ intent, buttonSize })}
       >
-        {size === "tradicional" ? "Tradicional +" : "Anytime +"}
+        {children}
       </button>
     </div>
   );
