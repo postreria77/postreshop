@@ -4,7 +4,7 @@ import { defineDb, defineTable, column } from "astro:db";
 const Pasteles = defineTable({
   columns: {
     id: column.text({ primaryKey: true, autoIncrement: true }),
-    id_pasteleria: column.text({ optional: true }),
+    id_pasteleria: column.text({ default: "0" }),
     nombre: column.text(),
     descripcion: column.text(),
     precio: column.text(),

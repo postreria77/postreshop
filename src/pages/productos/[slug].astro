@@ -28,13 +28,16 @@ export const getStaticPaths = (async () => {
 
 const { pastel } = Astro.props;
 const {
+  id,
+  id_pasteleria,
   descripcion,
   imagen,
-  id,
   nombre,
   precio,
   precioAnytime,
   imagenAnytime,
+  precioGift,
+  imagenGift,
 } = pastel;
 ---
 
@@ -57,6 +60,7 @@ const {
         <div class="mt-8 flex items-center gap-4">
           <AddToCart
             id={id}
+            id_pasteleria={id_pasteleria}
             price={precio
               ? { id: precio, amount: 125000 }
               : { id: "", amount: 0 }}
@@ -65,12 +69,13 @@ const {
             image={imagen}
             quantity={1}
             client:only
-            buttonSize="large"
-          />
+            buttonSize="large">Trad. +</AddToCart
+          >
           {
             precioAnytime && (
               <AddToCart
                 id={id}
+                id_pasteleria={id_pasteleria}
                 price={
                   precioAnytime
                     ? { id: precioAnytime, amount: 59000 }
@@ -82,7 +87,30 @@ const {
                 quantity={1}
                 client:only
                 buttonSize="large"
-              />
+              >
+                Anytime +
+              </AddToCart>
+            )
+          }
+          {
+            precioGift && (
+              <AddToCart
+                id={id}
+                id_pasteleria={id_pasteleria}
+                price={
+                  precioGift
+                    ? { id: precioGift, amount: 33000 }
+                    : { id: "", amount: 0 }
+                }
+                name={nombre}
+                size="gift"
+                image={imagenGift ? imagenGift : imagen}
+                quantity={1}
+                client:only
+                buttonSize="large"
+              >
+                Gift +
+              </AddToCart>
             )
           }
         </div>
