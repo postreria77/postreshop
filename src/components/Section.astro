@@ -1,18 +1,19 @@
 ---
 type Props = {
   tag?: "section" | "header";
+  width?: "full" | "narrow";
 };
 
-const { tag = "section" } = Astro.props;
+const { tag = "section", width = "narrow" } = Astro.props;
 ---
 
 {
   tag === "header" ? (
-    <header class="~px-4/16 mx-auto max-w-7xl py-4">
+<header class=`${width === "full" ? "" : "max-w-7xl mx-auto"} ~px-4/16 py-4`>
       <slot />
     </header>
   ) : (
-    <section class="~px-4/16 mx-auto max-w-7xl py-4">
+    <section class=`${width === "full" ? "" : "max-w-7xl mx-auto"} ~px-4/16 py-4`>
       <slot />
     </section>
   )

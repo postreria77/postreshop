@@ -41,9 +41,9 @@ export default async function seed() {
       imagen:
         "https://lapasteleriadelapostreria.com/images/menu/red-velvet.webp",
       precioAnytime: "price_1QiMwU2N0hejjjHDrE8YOXqF",
+      imagenAnytime: "/images/pasteles/red-velvet-anytime.webp",
       precioGift: "price_1QiMwU2N0hejjjHDrE8YOXqF",
-      imagenGift:
-        "https://files.stripe.com/links/MDB8YWNjdF8xUWczRHkyTjBoZWpqakhEfGZsX3Rlc3RfQzBBRUNKc2JVeEt5enJSdnhpQTU5bkRM00cZMuHfKr",
+      imagenGift: "/images/pasteles/red-velvet-gift.webp",
       categoria: "Pasteles",
       nuevo: false,
       archived: false,
