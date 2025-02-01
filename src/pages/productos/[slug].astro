@@ -7,6 +7,7 @@ import { db, eq, Pasteles } from "astro:db";
 import type { GetStaticPaths } from "astro";
 import { slugify } from "@/lib/format";
 import AddToCart from "@/components/cart/AddToCart";
+import { Icon } from "astro-icon/components";
 
 export const getStaticPaths = (async () => {
   const pasteles = await db
@@ -43,7 +44,7 @@ const {
 
 <Layout title={nombre} description={descripcion}>
   <Section>
-    <div class="mt-16 grid grid-cols-2 gap-8">
+    <div class="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2">
       <Image
         src={pastel.imagen}
         alt={pastel.nombre}
@@ -52,7 +53,11 @@ const {
         class="w-full rounded-lg object-cover"
       />
       <div class="mt-8">
-        <a href="/" class="text-lg opacity-25">Volver a la tienda</a>
+        <a
+          href="/"
+          class="flex items-center text-lg opacity-25 hover:underline hover:opacity-100"
+          ><Icon name="arrow-left" class="mr-1 inline" /> Volver a la tienda</a
+        >
         <h1 class="mb-2 mt-8 text-4xl font-medium">{pastel.nombre}</h1>
         <p class="mb-2 font-light leading-relaxed opacity-60 ~text-lg/xl">
           {descripcion}
