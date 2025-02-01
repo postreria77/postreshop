@@ -9,7 +9,7 @@ export default async function seed() {
       nombre: "Ferrero",
       descripcion:
         "Pan de chocolate relleno de Nutella, betún de chocolate y ganache. Decorado con Ferrero Rocher.",
-      precio: "price_1QRC3nB2G7gLVqvPMv6x4Th2",
+      precio: "price_1Qg3bS2N0hejjjHDX8EYDGH1",
       precioAnytime: "price_1Qg3cY2N0hejjjHDbNwNqE3v",
       imagen: "https://lapasteleriadelapostreria.com/images/menu/ferrero.webp",
       imagenAnytime:
@@ -51,17 +51,10 @@ export default async function seed() {
   ]);
   await db.insert(Sucursales).values([
     {
-      id: "547",
-      name: "Formula 1",
+      id: "106",
+      name: "Villa de Santiago",
       address: "Av. La Postrería 77, Buenos Aires, Argentina",
       connectedStripeAccount: "acct_1QiyF92KiO5HpTFD",
-    },
-    {
-      id: "44",
-      name: "Serena",
-      address:
-        "Pueblo Serena, Carretera Nacional #500 Local F. Colonia Valle Alto, Monterrey, N.L.",
-      connectedStripeAccount: "acct_1Qg3Dy2N0hejjjHD",
     },
   ]);
   await db.insert(DisabledDateTimes).values([
