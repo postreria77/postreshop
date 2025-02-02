@@ -1,12 +1,21 @@
 ---
+import { Icon } from "astro-icon/components";
+
 interface Props {
   href: string;
   label: string;
+  icon?: "mail" | "phone" | "arrow";
+  external?: boolean;
 }
 
-const { href = "/", label } = Astro.props;
+const { href = "/", label, icon, external = false } = Astro.props;
 ---
 
-<li class="hover:text-brand opacity-80 hover:underline hover:opacity-100">
-  <a href={href} target="_blank">{label}</a>
+<li class="opacity-80 hover:text-brand hover:underline hover:opacity-100">
+  <a
+    href={href}
+    target={external ? "_blank" : "_self"}
+    class="flex items-center gap-1"
+    ><span>{label}</span> {icon && <Icon name={icon} />}</a
+  >
 </li>

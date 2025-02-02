@@ -3,22 +3,85 @@ import { Icon } from "astro-icon/components";
 import SimpleLink from "@components/ui/SimpleLink.astro";
 ---
 
-<footer class="border-light mt-16 border-t border-opacity-25 bg-black">
+<footer class="mt-16 border-t border-light border-opacity-25 bg-black">
   <div
-    class="~px-4/16 mx-auto flex max-w-7xl flex-col items-start justify-between gap-8 pb-8 pt-12 sm:flex-row sm:items-end"
+    class="mx-auto grid max-w-7xl gap-10 py-16 ~px-4/16 sm:grid-cols-[2fr_1fr]"
   >
-    <div>
-      <a href="/"><Icon name="logo" class="aspect-[12/1]" /></a>
-      <ul class="mt-6 flex flex-wrap gap-8 gap-y-2">
-        <SimpleLink href="https://laopstreria77.com" label="La Postreria 77" />
-        <SimpleLink
-          href="https://lapasteleriadelaopstreria77.com"
-          label="La Pasteleria de La Postreria 77"
-        />
-        <SimpleLink href="/login" label="Iniciar Sesión" />
-        <SimpleLink href="/signup" label="Crear Cuenta" />
-      </ul>
+    <div class="flex flex-col gap-10">
+      <a href="/"><Icon name="logo" class="aspect-[12/1] h-6 w-56" /></a>
+
+      <div>
+        <h5 class="mb-4 font-medium">Navegación</h5>
+        <menu class="flex flex-wrap gap-8 gap-y-2">
+          <SimpleLink
+            href="https://lapostreria77.com"
+            label="La Postreria 77"
+            external={true}
+            icon="arrow"
+          />
+          <SimpleLink
+            href="https://lapasteleriadelapostreria77.com"
+            label="La Pasteleria de La Postreria 77"
+            external={true}
+            icon="arrow"
+          />
+          <SimpleLink href="/login" label="Iniciar Sesión" icon="arrow" />
+          <SimpleLink
+            href="/aviso-de-privacidad"
+            label="Aviso de Privacidad"
+            external={true}
+            icon="arrow"
+          />
+        </menu>
+      </div>
+
+      <div>
+        <h5 class="mb-4 font-medium">Contacto</h5>
+        <menu class="flex flex-wrap gap-8 gap-y-2">
+          <SimpleLink
+            href="mailto:contacto@lapostreria77.com"
+            label="Contacto General"
+            icon="mail"
+          />
+          <SimpleLink
+            href="mailto:mercadotecnia@lapostreria77.com"
+            label="Mercadotecnia"
+            icon="mail"
+          />
+          <SimpleLink
+            href="mailto:facturación@lapostreria77.com"
+            label="Facturación"
+            icon="mail"
+          />
+          <SimpleLink
+            href="mailto:compras@lapostreria77.com"
+            label="Compras"
+            icon="mail"
+          />
+          <SimpleLink
+            href="mailto:rh@lapostreria77.com"
+            label="Recursos Humanos"
+            icon="mail"
+          />
+        </menu>
+      </div>
     </div>
-    <p class="text-gray-400">All rights reserved &copy; La Postreria 77 2024</p>
+
+    <div class="flex flex-col justify-end gap-4 sm:items-end">
+      <div class="flex gap-8">
+        <a href="https://instagram.com/lapostreria77"
+          ><Icon name="social/instagram" class="size-6" /></a
+        >
+        <a href="https://facebook.com/lapostreria77"
+          ><Icon name="social/facebook" class="size-6" /></a
+        >
+        <a href="https://facebook.com/lapostreria77"
+          ><Icon name="social/tiktok" class="size-6" /></a
+        >
+      </div>
+      <p class="text-gray-400 ~text-xs/base sm:text-end">
+        La Postreria 77 2025 © Todos los Derechos Reservados
+      </p>
+    </div>
   </div>
 </footer>

@@ -4,17 +4,44 @@ export const prerender = false;
 import Layout from "@/layouts/Layout.astro";
 import Section from "@/components/Section.astro";
 import Button from "@/components/ui/Button.astro";
+import { Image } from "astro:assets";
 
-import { db, eq, Orders, Pasteles } from "astro:db";
+import { db, eq, Orders, Pasteles, inArray } from "astro:db";
 import type { OrderProduct } from "db/config";
 
 const { id } = Astro.params;
 const numberId = Number(id);
 
 const orden = await db.select().from(Orders).where(eq(Orders.id, numberId));
-// const productosOrden = JSON.parse(
-//   orden[0].productos as string,
-// ) as OrderProduct[];
+const productosOrden = JSON.parse(
+  orden[0].productos as string,
+) as OrderProduct[];
+
+const pasteles = await db
+  .select()
+  .from(Pasteles)
+  .where(
+    inArray(
+      Pasteles.id,
+      productosOrden.map((p) => p.id),
+    ),
+  );
+
+type OrderDetailsProduct = OrderProduct & {
+  nombre: string;
+  precio: number;
+  imagen: string;
+};
+
+const productos = productosOrden.map((p) => {
+  const pastel = pasteles.find((pastel) => pastel.id === p.id);
+  return {
+    ...p,
+    nombre: pastel?.nombre || "",
+    precio: pastel?.precio || 0,
+    imagen: pastel?.imagen || "",
+  } as OrderDetailsProduct;
+});
 ---
 
 <Layout
@@ -23,7 +50,7 @@ const orden = await db.select().from(Orders).where(eq(Orders.id, numberId));
 >
   <Section>
     <div
-      class="grid items-start gap-16 py-16 sm:grid-cols-2 md:grid-cols-[2fr_1fr]"
+      class="max-w- grid items-start gap-16 py-16 sm:grid-cols-2 md:grid-cols-[2fr_1fr]"
     >
       <div>
         <h1
@@ -42,6 +69,33 @@ const orden = await db.select().from(Orders).where(eq(Orders.id, numberId));
           <li><b>Nombre:</b> {orden[0].nombre}</li>
           <li><b>Teléfono:</b> {orden[0].tel}</li>
           <li><b>Fecha:</b> {new Date(orden[0].fecha).toLocaleDateString()}</li>
+        </ul>
+        <ul class="mb-4 border-b border-light border-opacity-25">
+          {
+            productos.map((p) => (
+              <li class="group relative flex gap-4 border-b border-dashed border-light border-opacity-15 py-3 first:pt-0 last:border-0">
+                <img
+                  src={p.imagen}
+                  alt={p.nombre}
+                  width={80}
+                  height={80}
+                  class="aspect-square overflow-clip rounded-md border border-light border-opacity-10 object-cover"
+                />
+                <div class="py-2">
+                  <h3 class="~text-md/lg font-medium leading-none tracking-tighter">
+                    {p.nombre}
+                  </h3>
+                  <p class="mb-1 text-xs capitalize opacity-60">
+                    {p.presentacion}
+                  </p>
+                  {/* Conditional rendering based on presentacion */}
+                  {p.presentacion === "tradicional" && <span>$1,250</span>}
+                  {p.presentacion === "anytime" && <span>$590</span>}
+                  {p.presentacion === "gift" && <span>$330</span>}
+                </div>
+              </li>
+            ))
+          }
         </ul>
       </div>
     </div>
