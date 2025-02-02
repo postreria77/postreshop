@@ -108,7 +108,7 @@ export const orders = {
         })
         .returning();
 
-      if (!order) {
+      if (order.length === 0) {
         console.log("Error al crear la orden.");
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
