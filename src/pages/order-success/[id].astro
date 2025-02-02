@@ -3,11 +3,13 @@ export const prerender = false;
 
 import Layout from "@/layouts/Layout.astro";
 import Section from "@/components/Section.astro";
-import Button from "@/components/ui/Button.astro";
 import { Image } from "astro:assets";
+
+import receiptIcon from "@/assets/receipt-icon.png";
 
 import { db, eq, Orders, Pasteles, inArray } from "astro:db";
 import type { OrderProduct } from "db/config";
+import { Sucursales } from "astro:db";
 
 const { id } = Astro.params;
 const numberId = Number(id);
@@ -31,17 +33,47 @@ type OrderDetailsProduct = OrderProduct & {
   nombre: string;
   precio: number;
   imagen: string;
+  importe: number;
 };
 
 const productos = productosOrden.map((p) => {
+  let importe: number;
+
+  switch (p.presentacion) {
+    case "tradicional":
+      importe = 1250;
+      break;
+    case "anytime":
+      importe = 590;
+      break;
+    case "gift":
+      importe = 330;
+      break;
+    default:
+      importe = 1250; // Fallback price
+      break;
+  }
+
   const pastel = pasteles.find((pastel) => pastel.id === p.id);
   return {
     ...p,
     nombre: pastel?.nombre || "",
     precio: pastel?.precio || 0,
     imagen: pastel?.imagen || "",
+    importe: importe,
   } as OrderDetailsProduct;
 });
+const sucursal = await db
+  .select()
+  .from(Sucursales)
+  .where(eq(Sucursales.id, orden[0].sucursal));
+
+const total = new Intl.NumberFormat("es-MX", {
+  style: "currency",
+  currency: "MXN",
+}).format(
+  productos.reduce((acc, item) => acc + item.importe * item.cantidad, 0),
+);
 ---
 
 <Layout
@@ -49,55 +81,75 @@ const productos = productosOrden.map((p) => {
   description="Gracias por tu pedido. Por favor revisa los datos de tu pedido."
 >
   <Section>
-    <div
-      class="max-w- grid items-start gap-16 py-16 sm:grid-cols-2 md:grid-cols-[2fr_1fr]"
-    >
-      <div>
-        <h1
-          class="text-balance font-medium leading-none tracking-tighter ~text-2xl/3xl"
-        >
-          Orden Realizada
-        </h1>
-        <p class="mb-8">Gracias por tu pedido.</p>
-
-        <h2 class="mb-2 font-medium leading-tight tracking-tight ~text-lg/xl">
-          Detalles de la orden.
+    <div class="py-16 text-base">
+      <h1 class="mx-auto mb-4 text-center">
+        Comprobante de compra. Toma una captura de pantalla!
+      </h1>
+      <div class="mx-auto max-w-xl space-y-6 rounded-lg bg-light p-6 text-dark">
+        <!-- Receipt Header -->
+        <div class="flex items-center justify-between">
+          <Image src={receiptIcon} alt="Postre Shop Icon" class="size-16" />
+          <div class="text-right">
+            <h3 class="text-medium">
+              {new Date(orden[0].creado).toLocaleDateString()}
+            </h3>
+            <p class="text-xs opacity-60"><span>ID:</span> {orden[0].id}</p>
+          </div>
+        </div>
+        <!-- Receipt Body -->
+        <h2 class="text-2xl font-medium capitalize tracking-tight">
+          {orden[0].nombre}
         </h2>
-        <ul class="mb-8 list-inside list-disc">
-          <li><b>ID:</b> {id}</li>
-          <li><b>Status:</b> {orden[0].estado}</li>
-          <li><b>Nombre:</b> {orden[0].nombre}</li>
-          <li><b>Teléfono:</b> {orden[0].tel}</li>
-          <li><b>Fecha:</b> {new Date(orden[0].fecha).toLocaleDateString()}</li>
-        </ul>
-        <ul class="mb-4 border-b border-light border-opacity-25">
+        <div>
+          <ul class="space-y-2">
+            <li><b class="font-medium">Teléfono:</b> {orden[0].tel}</li>
+            <li><b class="font-medium">Estado:</b> {orden[0].estado}</li>
+            <li>
+              <b class="font-medium">Fecha de Entrega:</b>
+              {new Date(orden[0].fecha).toLocaleDateString()}
+            </li>
+            <li>
+              <b class="font-medium">Sucursal de Entrega:</b>
+              {sucursal[0].name}
+            </li>
+          </ul>
+        </div>
+        <ul class="border-dark-/60 space-y-2 border-y py-2">
           {
             productos.map((p) => (
-              <li class="group relative flex gap-4 border-b border-dashed border-light border-opacity-15 py-3 first:pt-0 last:border-0">
-                <img
-                  src={p.imagen}
-                  alt={p.nombre}
-                  width={80}
-                  height={80}
-                  class="aspect-square overflow-clip rounded-md border border-light border-opacity-10 object-cover"
-                />
-                <div class="py-2">
-                  <h3 class="~text-md/lg font-medium leading-none tracking-tighter">
-                    {p.nombre}
-                  </h3>
-                  <p class="mb-1 text-xs capitalize opacity-60">
-                    {p.presentacion}
-                  </p>
-                  {/* Conditional rendering based on presentacion */}
-                  {p.presentacion === "tradicional" && <span>$1,250</span>}
-                  {p.presentacion === "anytime" && <span>$590</span>}
-                  {p.presentacion === "gift" && <span>$330</span>}
+              <li class="flex items-center justify-between border-b border-dashed border-dark/30 pb-2 last:border-0 last:pb-0">
+                <div class="flex items-center gap-2">
+                  <Image
+                    src={p.imagen}
+                    width={64}
+                    height={64}
+                    alt={p.nombre}
+                    class="rounded-sm"
+                  />
+                  <div class="flex flex-col">
+                    <h3 class="font-medium">{p.nombre}</h3>
+                    <p class="text-xs capitalize opacity-60">
+                      {p.presentacion}
+                    </p>
+                  </div>
                 </div>
+                <p class="font-medium">
+                  <span class="text-xs font-light">1x</span> ${p.importe}
+                </p>
               </li>
             ))
           }
         </ul>
+        <div class="flex justify-between text-2xl font-medium">
+          <h4 class="tracking-tight">Total</h4>
+          <strong class="font-sans">{total}</strong>
+        </div>
       </div>
     </div>
   </Section>
 </Layout>
+
+<script>
+  import { clearCart } from "@/store";
+  clearCart();
+</script>

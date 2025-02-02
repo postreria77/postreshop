@@ -19,14 +19,12 @@ export default async function seed() {
       archived: false,
     },
     {
-      id: "484",
-      id_pasteleria: "100",
-      nombre: "Pecan Pie Cake",
-      descripcion:
-        "Pan de vainilla con relleno de pie de nuez, betún de vainilla, capa de dulce de leche y nuez caramelizada.",
-      precio: "price_1QdBI8B2G7gLVqvPcoxRrLqV",
-      imagen:
-        "https://lapasteleriadelapostreria.com/images/menu/pecan-pie.webp",
+      id: "1219",
+      id_pasteleria: "299",
+      nombre: "Mostachón de Fresa y Plátano",
+      descripcion: "Mostachón de nuez, arándanos y un toque de pistaches, con una capa de New York style cheesecake, platano y fresa fresca, decorado con un betún cremoso de caramelo, mousse de queso crema con lechera, nuez y arándanos.",
+      precio: "price_1Qg5Dw2N0hejjjHDiY16NYda",
+      imagen: "/images/pasteles/mostachon-platano.webp",
       categoria: "Pasteles",
       nuevo: false,
       archived: false,
@@ -37,12 +35,12 @@ export default async function seed() {
       nombre: "Red Velvet",
       descripcion:
         "Pan de vainilla con relleno de pie de nuez, betün de vainilla, capa de dulce de leche y nuez caramelizada.",
-      precio: "price_1QdBI8B2G7gLVqvPcoxRrLqV",
+      precio: "price_1Qg57s2N0hejjjHD6e1l5fyx",
       imagen:
         "https://lapasteleriadelapostreria.com/images/menu/red-velvet.webp",
       precioAnytime: "price_1QiMwU2N0hejjjHDrE8YOXqF",
       imagenAnytime: "/images/pasteles/red-velvet-anytime.webp",
-      precioGift: "price_1QiMwU2N0hejjjHDrE8YOXqF",
+      precioGift: "price_1QnMhv2N0hejjjHD3dcETUfG",
       imagenGift: "/images/pasteles/red-velvet-gift.webp",
       categoria: "Pasteles",
       nuevo: false,
@@ -56,6 +54,12 @@ export default async function seed() {
       address: "Av. La Postrería 77, Buenos Aires, Argentina",
       connectedStripeAccount: "acct_1QiyF92KiO5HpTFD",
     },
+    {
+      id: "44",
+      name: "Serena",
+      address: "Something here",
+      connectedStripeAccount: "acct_1Qg3Dy2N0hejjjHD",
+    }
   ]);
   await db.insert(DisabledDateTimes).values([
     {

@@ -2,7 +2,7 @@ import { getSecret } from "astro:env/server";
 import Stripe from "stripe";
 
 export const stripe = new Stripe(getSecret("STRIPE_SECRET_KEY")!, {
-  apiVersion: "2024-12-18.acacia",
+  apiVersion: "2025-01-27.acacia",
 });
 
 export type Product = {
@@ -49,7 +49,7 @@ export async function createStripeCheckout(
     };
   }
   return stripe.checkout.sessions.create({
-    success_url: "https://shop.lapostreria77.com/order-success/",
+    success_url: `${getSecret("STRIPE_SUCCESS_URL")}/${order_id}`,
     line_items,
     mode: "payment",
     payment_intent_data: payment_intent_data,
