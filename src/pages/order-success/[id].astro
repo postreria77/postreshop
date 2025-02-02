@@ -117,7 +117,7 @@ const total = new Intl.NumberFormat("es-MX", {
         <ul class="border-dark-/60 space-y-2 border-y py-2">
           {
             productos.map((p) => (
-              <li class="flex items-center justify-between border-b border-dashed border-dark/30 pb-2 last:border-0 last:pb-0">
+              <li class="flex items-center justify-between gap-2 border-b border-dashed border-dark/30 pb-2 last:border-0 last:pb-0">
                 <div class="flex items-center gap-2">
                   <Image
                     src={p.imagen}
@@ -133,9 +133,10 @@ const total = new Intl.NumberFormat("es-MX", {
                     </p>
                   </div>
                 </div>
-                <p class="font-medium">
-                  <span class="text-xs font-light">1x</span> ${p.importe}
-                </p>
+                <div class="flex items-end gap-1 font-medium">
+                  <span class="text-xs font-light leading-none">1x</span>
+                  <strong class="leading-none">${p.importe}</strong>
+                </div>
               </li>
             ))
           }
