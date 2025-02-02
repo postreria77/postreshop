@@ -103,10 +103,9 @@ const updateOrder = async (
         return {
           producto: producto.id,
           cantidad: producto.cantidad,
-          presentacion: producto.presentacion === "tradicional" ? "68" : "1069",
+          presentacion: presentacion,
           precioProducto: 0,
-          precioPresentacion:
-            producto.presentacion === "tradicional" ? 1250 : 590,
+          precioPresentacion: precioPresentacion,
           comentarios: "",
         };
       });
