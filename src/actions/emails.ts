@@ -1,19 +1,18 @@
 import { ActionError, defineAction } from "astro:actions";
+import { getSecret } from "astro:env/server";
 import { Resend } from "resend";
 
-const key = process.env.RESEND_SECRET_KEY;
-
-const resend = new Resend(key);
+const resend = new Resend(getSecret("RESEND_SECRET_KEY"));
 
 export const emails = {
   send: defineAction({
-    accept: "form",
     handler: async () => {
+      console.log("Sending email");
       const { data, error } = await resend.emails.send({
-        from: "Postreshop <onboarding@resend.dev>",
-        to: ["emireles.rosas@gmail.com"],
-        subject: "Postreshop Confirmation",
-        html: "<p>This is a test email :)</p>",
+        from: 'onboarding@resend.dev',
+        to: 'ecom@lapostreria77.com',
+        subject: 'Hello World',
+        html: '<h1>Hello World. This is a custom email, I think?</h1>',
       });
 
       if (error) {
