@@ -110,14 +110,14 @@ export type Sucursal = {
   connectedStripeAccount: string;
 };
 
-const DisabledDateTimes = {
+const DisabledDateTimes = defineTable({
   columns: {
     id: column.text({ primaryKey: true }),
     date: column.text(),
     dayDisabled: column.boolean({ default: false }),
     time: column.text({ optional: true }),
   },
-};
+});
 
 export type DisabledDateTime = {
   id: string;
@@ -126,11 +126,47 @@ export type DisabledDateTime = {
   time: string | null;
 };
 
+const Users = defineTable({
+  columns: {
+    id: column.number({ primaryKey: true, autoIncrement: true, unique: true }),
+    nombre: column.text(),
+    apellido: column.text({ optional: true }),
+    telefono: column.text({ unique: true }),
+    email: column.text({ unique: true }),
+    contraseña: column.text(),
+  },
+});
+
+export type User = {
+  id: number;
+  nombre: string;
+  apellido?: string;
+  telefono: string;
+  email: string;
+  contraseña: string;
+};
+
+const Sessions = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true, unique: true }),
+    userId: column.number({ references: () => Users.columns.id }),
+    expiresAt: column.date(),
+  },
+});
+
+export type Session = {
+  id: string;
+  userId: number;
+  expiresAt: Date;
+};
+
 export default defineDb({
   tables: {
     Orders,
     Pasteles,
     Sucursales,
     DisabledDateTimes,
+    Users,
+    Sessions,
   },
 });

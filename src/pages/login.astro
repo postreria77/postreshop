@@ -1,0 +1,12 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import Section from "@/components/Section.astro";
+
+import SignupForm from "@/components/users/SignupForm";
+---
+
+<Layout title="Crear Cuenta" description="Crea una cuenta en La Postre Shop">
+  <Section>
+    <SignupForm client:load />
+  </Section>
+</Layout>
