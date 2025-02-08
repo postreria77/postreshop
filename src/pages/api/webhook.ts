@@ -5,11 +5,17 @@ import { stripe } from "@lib/stripe";
 import { db, eq, Orders } from "astro:db";
 import { getSecret } from "astro:env/server";
 import type { OrderProduct, SystemOrder } from "db/config";
+import { actions } from "astro:actions";
+import { emails } from "@/actions/emails";
 
 const updateOrder = async (
   orderId: number,
   cardBrand: string,
-): Promise<{ data: SystemOrder | null; error: Error | null }> => {
+): Promise<{
+  data: SystemOrder | null;
+  error: Error | null;
+  email: string | null;
+}> => {
   const order = await db
     .update(Orders)
     .set({
@@ -40,7 +46,6 @@ const updateOrder = async (
     let sentProducts;
     if (order[0].sucursal === "520" || order[0].sucursal === "536") {
       sentProducts = productos.map((producto) => {
-
         let presentacion;
         let precioPresentacion;
 
@@ -60,7 +65,7 @@ const updateOrder = async (
             break;
           default:
             presentacion = "198"; // Fallback for any other case
-            precioPresentacion = 1250;  // Fallback price
+            precioPresentacion = 1250; // Fallback price
             break;
         }
 
@@ -71,12 +76,10 @@ const updateOrder = async (
           precioProducto: 0,
           precioPresentacion: precioPresentacion,
           comentarios: "",
-        }
-
+        };
       });
     } else {
       sentProducts = productos.map((producto) => {
-
         let presentacion;
         let precioPresentacion;
 
@@ -96,7 +99,7 @@ const updateOrder = async (
             break;
           default:
             presentacion = "198"; // Fallback for any other case
-            precioPresentacion = 1250;  // Fallback price
+            precioPresentacion = 1250; // Fallback price
             break;
         }
 
@@ -126,9 +129,9 @@ const updateOrder = async (
       referencia: "",
       forma_pago_id: cardCode,
     };
-    return { data: systemOrder, error: null };
+    return { data: systemOrder, error: null, email: order[0].email };
   }
-  return { data: null, error: Error("Order not found") };
+  return { data: null, error: Error("Order not found"), email: null };
 };
 
 const uploadOrderToSystem = async (
@@ -158,7 +161,7 @@ if (!endpointSecret) {
   throw new Error("STRIPE_WEBHOOK_SECRET is not defined");
 }
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, callAction }) => {
   const requestBody = await request.text();
   const sig = request.headers.get("stripe-signature");
 
@@ -224,7 +227,7 @@ export const POST: APIRoute = async ({ request }) => {
 
       console.log(`Order ID: ${numberOrderId}`);
       console.log("Updating order...");
-      const { data, error } = await updateOrder(numberOrderId, cardBrand);
+      let { data, error, email } = await updateOrder(numberOrderId, cardBrand);
 
       if (error) {
         console.error(error.message);
@@ -242,7 +245,22 @@ export const POST: APIRoute = async ({ request }) => {
           console.log(JSON.stringify(orderData, null, 2)); // log the data);
           break;
         }
+        console.log("Sending email...");
         break;
+      }
+
+      if (email) {
+        const { data, error } = await callAction(emails.send, {
+          id: numberOrderId,
+          email,
+        });
+
+        if (error) {
+          console.error(error.message);
+          break;
+        }
+
+        console.log("Email sent to: " + email + " with data: " + data);
       }
 
     default:

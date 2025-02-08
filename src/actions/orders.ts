@@ -37,6 +37,7 @@ export const orders = {
         .refine((tel) => tel !== null, {
           message: "Ingresa un teléfono.",
         }),
+      email: z.string().email().nonempty({ message: "Ingresa un correo." }),
       sucursal: z
         .string()
         .min(1, { message: "Selecciona una sucursal." })
@@ -60,7 +61,8 @@ export const orders = {
         }),
     }),
     handler: async (input) => {
-      const { productos, tel, nombre, apellido, sucursal, fecha, hora } = input;
+      const { productos, tel, email, nombre, apellido, sucursal, fecha, hora } =
+        input;
 
       const line_items = JSON.parse(productos).map(
         (producto: OrderProduct) => ({
@@ -82,12 +84,16 @@ export const orders = {
       const inputDate = new Date(fecha);
       const targetDate = new Date("2025-02-13");
 
-      if (JSON.parse(productos).some(
-        (producto: OrderProduct) => producto.presentacion === "gift",
-      ) && inputDate < targetDate) {
+      if (
+        JSON.parse(productos).some(
+          (producto: OrderProduct) => producto.presentacion === "gift",
+        ) &&
+        inputDate < targetDate
+      ) {
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Los pasteles Gift no están disponibles hasta el 13 de Febrero.",
+          message:
+            "Los pasteles Gift no están disponibles hasta el 13 de Febrero.",
         });
       }
 
@@ -99,6 +105,7 @@ export const orders = {
         .values({
           productos,
           tel,
+          email,
           nombre: nombreCompleto,
           sucursal,
           fecha: fechaCompleta,

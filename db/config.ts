@@ -40,6 +40,7 @@ const Orders = defineTable({
     id: column.number({ primaryKey: true, autoIncrement: true }),
     productos: column.json(),
     tel: column.text(),
+    email: column.text({ default: "" }),
     nombre: column.text(),
     sucursal: column.text(),
     fecha: column.text(),
@@ -53,6 +54,7 @@ export type Order = {
   id: number;
   productos: string;
   tel: string;
+  email: string;
   nombre: string;
   sucursal: string;
   fecha: string;

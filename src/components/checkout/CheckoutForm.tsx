@@ -95,6 +95,20 @@ export function CheckoutForm({ sucursales, disabledDates }: CheckoutFormProps) {
         )}
       </div>
       <div>
+        <Input
+          type="email"
+          name="email"
+          id="email"
+          aria-describedby="error-email"
+          label="Email"
+          isRequired
+          radius="sm"
+        />
+        {inputErrors.email && (
+          <FormInputError error={inputErrors.email} name="email" />
+        )}
+      </div>
+      <div>
         <Select
           name="sucursal"
           label="Selecciona una Sucursal"

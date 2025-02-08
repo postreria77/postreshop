@@ -12,8 +12,9 @@ export const emails = {
   send: defineAction({
     input: z.object({
       id: z.number(),
+      email: z.string().email().nonempty(),
     }),
-    handler: async ({ id }) => {
+    handler: async ({ id, email }) => {
       console.log("Sending email");
 
       const order = await getReceiptInformation(id);
@@ -27,7 +28,7 @@ export const emails = {
 
       const { data, error } = await resend.emails.send({
         from: "no-reply@shop.lapostreria77.com",
-        to: "ecom@lapostreria77.com",
+        to: email,
         subject: `Recibo de Compra #${order.id}`,
         react: Receipt({ order }),
       });
