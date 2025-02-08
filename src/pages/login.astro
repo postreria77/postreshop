@@ -1,12 +1,25 @@
 ---
+export const prerender = false;
+
+const session = Astro.locals.session;
+const user = Astro.locals.user;
+
+if (session !== null) {
+  if (user?.admin) {
+    return Astro.redirect("/dashboard");
+  } else {
+    return Astro.redirect("/");
+  }
+}
+
 import Layout from "@/layouts/Layout.astro";
 import Section from "@/components/Section.astro";
 
-import SignupForm from "@/components/users/SignupForm";
+import LoginForm from "@/components/users/LoginForm";
 ---
 
 <Layout title="Crear Cuenta" description="Crea una cuenta en La Postre Shop">
   <Section>
-    <SignupForm client:load />
+    <LoginForm client:load />
   </Section>
 </Layout>

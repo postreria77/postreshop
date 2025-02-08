@@ -1,4 +1,4 @@
-import { db, Pasteles, Sucursales, DisabledDateTimes } from "astro:db";
+import { db, Pasteles, Sucursales, DisabledDateTimes, Users } from "astro:db";
 
 // https://astro.build/db/seed
 export default async function seed() {
@@ -22,7 +22,8 @@ export default async function seed() {
       id: "1219",
       id_pasteleria: "299",
       nombre: "Mostachón de Fresa y Plátano",
-      descripcion: "Mostachón de nuez, arándanos y un toque de pistaches, con una capa de New York style cheesecake, platano y fresa fresca, decorado con un betún cremoso de caramelo, mousse de queso crema con lechera, nuez y arándanos.",
+      descripcion:
+        "Mostachón de nuez, arándanos y un toque de pistaches, con una capa de New York style cheesecake, platano y fresa fresca, decorado con un betún cremoso de caramelo, mousse de queso crema con lechera, nuez y arándanos.",
       precio: "price_1Qg5Dw2N0hejjjHDiY16NYda",
       imagen: "/images/pasteles/mostachon-platano.webp",
       categoria: "Pasteles",
@@ -59,7 +60,7 @@ export default async function seed() {
       name: "Serena",
       address: "Something here",
       connectedStripeAccount: "acct_1Qg3Dy2N0hejjjHD",
-    }
+    },
   ]);
   await db.insert(DisabledDateTimes).values([
     {
@@ -71,6 +72,17 @@ export default async function seed() {
       id: "2",
       date: "2025-02-14",
       time: "12:00,13:00,14:00",
+    },
+  ]);
+  await db.insert(Users).values([
+    {
+      id: 1001,
+      nombre: "Erick",
+      apellido: "Mireles",
+      telefono: "1234567890",
+      email: "user@email.com",
+      contraseña:
+        "$2a$10$W8WQDhZMmRG/d5r596S4ceizQIkpCqd4fW7uYwM3zBzFEA6Q9y5q6",
     },
   ]);
 }

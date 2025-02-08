@@ -1,6 +1,6 @@
 import { z } from "astro/zod";
 import { ActionError, defineAction } from "astro:actions";
-import { db, Users } from "astro:db";
+import { db, eq, Users } from "astro:db";
 import bcrypt from "bcryptjs";
 import { setSessionTokenCookie } from "@/lib/server/cookies";
 import { createSession, generateSessionToken } from "@/lib/server/sessions";
@@ -59,6 +59,45 @@ export const users = {
       return {
         message: "Usuario registrado correctamente.",
       };
+    },
+  }),
+  iniciarSesion: defineAction({
+    accept: "form",
+    input: z.object({
+      email: z.string().email(),
+      contraseña: z
+        .string()
+        .min(8, { message: "La contraseña debe tener al menos 8 caracteres." }),
+    }),
+    async handler({ email, contraseña }, context) {
+      const user = await db
+        .select()
+        .from(Users)
+        .where(eq(Users.email, email))
+        .get();
+
+      if (!user) {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Email o contraseña incorrectos.",
+        });
+      }
+
+      const isValidPassword = await bcrypt.compare(contraseña, user.contraseña);
+
+      if (!isValidPassword) {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Email o contraseña incorrectos.",
+        });
+      }
+
+      context.cookies.set("session", generateSessionToken());
+      const token = generateSessionToken();
+      const session = await createSession(token, user.id);
+      setSessionTokenCookie(context as APIContext, token, session.expiresAt);
+
+      return { message: "Sesión iniciada correctamente." };
     },
   }),
 };

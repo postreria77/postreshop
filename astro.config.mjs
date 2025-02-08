@@ -1,15 +1,15 @@
 // @ts-check
-import { defineConfig } from 'astro/config';
+import { defineConfig } from "astro/config";
 
-import tailwind from '@astrojs/tailwind';
+import tailwind from "@astrojs/tailwind";
 
-import vercel from '@astrojs/vercel';
+import vercel from "@astrojs/vercel";
 
-import icon from 'astro-icon';
+import icon from "astro-icon";
 
-import react from '@astrojs/react';
+import react from "@astrojs/react";
 
-import db from '@astrojs/db';
+import db from "@astrojs/db";
 
 // https://astro.build/config
 export default defineConfig({
@@ -19,17 +19,17 @@ export default defineConfig({
   vite: {
     resolve: {
       alias: {
-        '@': '/src',
-        '@components': '/src/components',
-        '@ui': '/src/components/ui',  
-        '@layouts': '/src/layouts',
-        '@stores': '/src/stores',
-        '@lib': '/src/lib',
-        '@actions': '/src/actions',
-        '@assets': '/src/assets',
-        '@svgs': '/src/assets/svgs',
-        '@utils': '/src/lib/utils'
-      }
-    }
+        "@": "/src",
+        "@components": "/src/components",
+        "@ui": "/src/components/ui",
+        "@layouts": "/src/layouts",
+        "@stores": "/src/stores",
+        "@lib": "/src/lib",
+        "@actions": "/src/actions",
+        "@assets": "/src/assets",
+        "@svgs": "/src/assets/svgs",
+        "@utils": "/src/lib/utils",
+      },
+    },
   },
 });

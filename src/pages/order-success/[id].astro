@@ -134,7 +134,9 @@ const total = new Intl.NumberFormat("es-MX", {
                   </div>
                 </div>
                 <div class="flex items-end gap-1 font-medium">
-                  <span class="text-xs font-light leading-none">1x</span>
+                  <span class="text-xs font-light leading-none">
+                    {p.cantidad}x
+                  </span>
                   <strong class="leading-none">${p.importe}</strong>
                 </div>
               </li>

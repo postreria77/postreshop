@@ -1,18 +1,35 @@
+import { z } from "astro/zod";
 import { ActionError, defineAction } from "astro:actions";
 import { getSecret } from "astro:env/server";
 import { Resend } from "resend";
+
+import Receipt from "@/emails/Receipt";
+import { getReceiptInformation } from "@/lib/orders";
 
 const resend = new Resend(getSecret("RESEND_SECRET_KEY"));
 
 export const emails = {
   send: defineAction({
-    handler: async () => {
+    input: z.object({
+      id: z.number(),
+    }),
+    handler: async ({ id }) => {
       console.log("Sending email");
+
+      const order = await getReceiptInformation(id);
+
+      if (!order) {
+        throw new ActionError({
+          code: "NOT_FOUND",
+          message: "Order not found",
+        });
+      }
+
       const { data, error } = await resend.emails.send({
-        from: 'onboarding@resend.dev',
-        to: 'ecom@lapostreria77.com',
-        subject: 'Hello World',
-        html: '<h1>Hello World. This is a custom email, I think?</h1>',
+        from: "no-reply@shop.lapostreria77.com",
+        to: "ecom@lapostreria77.com",
+        subject: `Recibo de Compra #${order.id}`,
+        react: Receipt({ order }),
       });
 
       if (error) {

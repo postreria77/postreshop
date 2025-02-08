@@ -10,9 +10,10 @@ interface Props {
   title: string;
   description: string;
   showCart?: boolean;
+  index?: boolean;
 }
 
-const { title, description, showCart = true } = Astro.props;
+const { title, description, showCart = true, index = true } = Astro.props;
 ---
 
 <html lang="en" class="scroll-smooth">
@@ -29,6 +30,7 @@ const { title, description, showCart = true } = Astro.props;
         },
       }}
     />
+    {index === false && <meta name="robots" content="noindex, nofollow" />}
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

@@ -134,6 +134,7 @@ const Users = defineTable({
     telefono: column.text({ unique: true }),
     email: column.text({ unique: true }),
     contraseña: column.text(),
+    admin: column.boolean({ default: false }),
   },
 });
 
@@ -144,6 +145,7 @@ export type User = {
   telefono: string;
   email: string;
   contraseña: string;
+  admin: boolean;
 };
 
 const Sessions = defineTable({
