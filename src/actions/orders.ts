@@ -4,6 +4,7 @@ import { db, eq, Orders, Sucursales } from "astro:db";
 import { createStripeCheckout } from "@/lib/stripe";
 
 import type { OrderProduct } from "db/config";
+import { checkSaltilloTime } from "@/lib/orderConditions";
 
 export const orders = {
   create: defineAction({
@@ -83,6 +84,14 @@ export const orders = {
       // Temporary check to see if any product has gift as it's presentacion value
       const inputDate = new Date(fecha);
       const targetDate = new Date("2025-02-13");
+
+      // Check if the sucursal is blocked
+      if (checkSaltilloTime(fecha, sucursal)) {
+        throw new ActionError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Esta sucursal no recibe pedidos los domingos.",
+        });
+      }
 
       if (
         JSON.parse(productos).some(

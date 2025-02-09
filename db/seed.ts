@@ -61,6 +61,13 @@ export default async function seed() {
       address: "Something here",
       connectedStripeAccount: "acct_1Qg3Dy2N0hejjjHD",
     },
+    {
+      id: "109",
+      name: "Parque Centro (Saltillo)",
+      address:
+        "Edificio MAIA, Blvd. Parque Centro #1425 local CM-A Parque Centro, 25240. Saltillo, Coahuila.",
+      connectedStripeAccount: "acct_1Qg3Dy2N0hejjjHD",
+    },
   ]);
   await db.insert(DisabledDateTimes).values([
     {
