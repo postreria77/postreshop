@@ -58,6 +58,7 @@ export const users = {
 
       return {
         message: "Usuario registrado correctamente.",
+        url: "/"
       };
     },
   }),
@@ -97,7 +98,7 @@ export const users = {
       const session = await createSession(token, user.id);
       setSessionTokenCookie(context as APIContext, token, session.expiresAt);
 
-      return { message: "Sesión iniciada correctamente." };
+      return { message: "Sesión iniciada correctamente.", url: "/" };
     },
   }),
 };

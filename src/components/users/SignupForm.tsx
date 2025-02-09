@@ -4,12 +4,13 @@ import { experimental_withState as withState } from "@astrojs/react/actions";
 
 import { Form, Input } from "@heroui/react";
 import Button from "@/components/ui/Button";
+import { navigate } from "astro:transitions/client";
 
 export default function SignupForm() {
   const [{ data, error }, action, isPending] = useActionState(
     withState(actions.users.createUser),
     {
-      data: { message: "" },
+      data: { message: "", url: "" },
       error: undefined,
     },
   );
@@ -17,6 +18,7 @@ export default function SignupForm() {
   if (error) console.log(error);
 
   if (data?.message) console.log(data.message);
+  if (data?.url) navigate(data.url);
 
   return (
     <div className="mx-auto max-w-xl">

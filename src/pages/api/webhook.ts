@@ -5,7 +5,6 @@ import { stripe } from "@lib/stripe";
 import { db, eq, Orders } from "astro:db";
 import { getSecret } from "astro:env/server";
 import type { OrderProduct, SystemOrder } from "db/config";
-import { actions } from "astro:actions";
 import { emails } from "@/actions/emails";
 
 const updateOrder = async (

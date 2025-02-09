@@ -147,10 +147,10 @@ export function CheckoutForm({ sucursales, disabledDates }: CheckoutFormProps) {
             id="hora"
             aria-describedby="error-hora"
             label="Hora"
-            minValue={new Time(12)}
+            minValue={new Time(13)}
             maxValue={new Time(22)}
             granularity="hour"
-            defaultValue={new Time(12)}
+            defaultValue={new Time(13)}
             isRequired
             radius="sm"
           />

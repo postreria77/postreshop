@@ -52,7 +52,7 @@ const Orders = defineTable({
 
 export type Order = {
   id: number;
-  productos: string;
+  productos: unknown;
   tel: string;
   email: string;
   nombre: string;
