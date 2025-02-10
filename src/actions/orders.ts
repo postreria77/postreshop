@@ -86,7 +86,7 @@ export const orders = {
       const targetDate = new Date("2025-02-13");
 
       // Check if the sucursal is blocked
-      if (checkSaltilloTime(fecha, sucursal)) {
+      if (checkSaltilloTime(fecha, sucursal) === false) {
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Esta sucursal no recibe pedidos los domingos.",
