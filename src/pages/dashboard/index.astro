@@ -4,33 +4,33 @@ export const prerender = false;
 const user = Astro.locals.user;
 const session = Astro.locals.session;
 
+import { validateSessionToken } from "@/lib/server/sessions";
+
 if (session === null) {
-  Astro.redirect("/login");
+  return Astro.redirect("/login");
+}
+
+const validSession = await validateSessionToken(session?.id);
+
+if (!validSession) {
+  return Astro.redirect("/login");
 }
 
 if (!user?.admin) {
-  Astro.redirect("/");
+  return Astro.redirect("/");
 }
 
 import Layout from "@/layouts/Layout.astro";
 import Section from "@/components/Section.astro";
-import OrdersTable from "@/components/admin/OrdersTable";
 
 import { db, eq, Orders } from "astro:db";
-
-const orders = await db
-  .select()
-  .from(Orders)
-  .where(eq(Orders.estado, "Pagado"));
 ---
 
-<Layout title="Dashboard" description="Dashboard">
+<Layout title="Dashboard" description="Dashboard" showCart={false}>
   <Section>
     <h1 class="text-2xl font-medium tracking-tight ~mt-4/16 ~mb-2/8">
       Bienvenid@ {user?.nombre}
     </h1>
-    <div>
-      <OrdersTable orders={orders} client:load />
-    </div>
+    <div></div>
   </Section>
 </Layout>

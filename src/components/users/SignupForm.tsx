@@ -1,10 +1,11 @@
-import { actions } from "astro:actions";
+import { actions, isInputError } from "astro:actions";
 import { useActionState } from "react";
 import { experimental_withState as withState } from "@astrojs/react/actions";
 
 import { Form, Input } from "@heroui/react";
 import Button from "@/components/ui/Button";
 import { navigate } from "astro:transitions/client";
+import FormInputError from "../checkout/FormInputError";
 
 export default function SignupForm() {
   const [{ data, error }, action, isPending] = useActionState(
@@ -15,7 +16,8 @@ export default function SignupForm() {
     },
   );
 
-  if (error) console.log(error);
+  const inputErrors = isInputError(error) ? error.fields : {};
+  const actionError = !isInputError(error) ? error : undefined;
 
   if (data?.message) console.log(data.message);
   if (data?.url) navigate(data.url);
@@ -25,7 +27,7 @@ export default function SignupForm() {
       <h1 className="mb-4 mt-16 text-3xl font-medium tracking-tighter">
         Crear Cuenta
       </h1>
-      <Form className="space-y-2" method="post" action={action}>
+      <form className="space-y-2" method="POST" action={action}>
         <Input
           id="nombre"
           name="nombre"
@@ -34,7 +36,11 @@ export default function SignupForm() {
           label="Nombre"
           radius="sm"
           required
+          aria-describedby="error-nombre"
         />
+        {inputErrors?.nombre && (
+          <FormInputError error={inputErrors?.nombre} name="nombre" />
+        )}
         <Input
           id="apellido"
           name="apellido"
@@ -42,7 +48,11 @@ export default function SignupForm() {
           placeholder="Doe"
           label="Apellido"
           radius="sm"
+          aria-describedby="error-apellido"
         />
+        {inputErrors?.apellido && (
+          <FormInputError error={inputErrors?.apellido} name="apellido" />
+        )}
         <Input
           id="telefono"
           name="telefono"
@@ -51,7 +61,11 @@ export default function SignupForm() {
           label="Teléfono"
           radius="sm"
           required
+          aria-describedby="error-telefono"
         />
+        {inputErrors?.telefono && (
+          <FormInputError error={inputErrors?.telefono} name="telefono" />
+        )}
         <Input
           id="email"
           name="email"
@@ -60,7 +74,11 @@ export default function SignupForm() {
           label="Email"
           radius="sm"
           required
+          aria-describedby="error-email"
         />
+        {inputErrors?.email && (
+          <FormInputError error={inputErrors?.email} name="email" />
+        )}
         <Input
           id="contraseña"
           name="contraseña"
@@ -69,7 +87,12 @@ export default function SignupForm() {
           label="Contraseña"
           radius="sm"
           required
+          aria-describedby="error-contraseña"
         />
+        {inputErrors?.contraseña && (
+          <FormInputError error={inputErrors?.contraseña} name="contraseña" />
+        )}
+        {actionError && <FormInputError error={actionError.message} name="form" />}
         <Button label="Crear Cuenta" isPending={isPending} />
         <p className="w-full text-center">
           <span className="opacity-60">Ya tienes una cuenta? </span>
@@ -77,7 +100,7 @@ export default function SignupForm() {
             Inicia Sesión
           </a>
         </p>
-      </Form>
+      </form>
     </div>
   );
 }
