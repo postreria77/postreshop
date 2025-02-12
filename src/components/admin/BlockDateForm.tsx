@@ -5,7 +5,7 @@ import { getLocalTimeZone, today } from "@internationalized/date";
 import { actions, isInputError } from "astro:actions";
 import { useActionState } from "react";
 import { experimental_withState as withState } from "@astrojs/react/actions";
-import FormInputError from "../checkout/FormInputError";
+import FormInputError, { FormSuccessMessage } from "../checkout/FormInputError";
 
 export default function BlockDateForm() {
   const [{ data, error }, action, isPending] = useActionState(
@@ -54,6 +54,9 @@ export default function BlockDateForm() {
           <span>Bloquear Fecha</span>
         )}
       </button>
+      {data?.message &&
+        <FormSuccessMessage message={data?.message} />
+      }
     </form>
   );
 }

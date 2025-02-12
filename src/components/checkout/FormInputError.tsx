@@ -17,7 +17,7 @@ export default function FormInputError({ error, name }: FormInputErrorProps) {
   );
 }
 
-export function FormSuccessMessage(message: string) {
+export function FormSuccessMessage({ message }: { message: string }) {
   return (
     <p
       id="form-success"
