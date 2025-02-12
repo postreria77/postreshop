@@ -1,5 +1,5 @@
-import { db, eq, inArray, Orders, Pasteles, Sucursales } from "astro:db";
-import type { Order, OrderProduct, Sucursal } from "db/config";
+import { db, eq, inArray, Orders, Pasteles, Sucursales, DisabledDateTimes } from "astro:db";
+import type { Order, OrderProduct, Sucursal, DisabledDateTime } from "db/config";
 
 export type ReceiptInformation = Omit<Order, "sucursal" | "productos"> & {
   productos: ReceiptDetailsProduct[];
@@ -89,4 +89,31 @@ export async function getReceiptInformation(
     total,
     sucursal: sucursal[0],
   };
+}
+
+interface BlockedDateResponse {
+  disabledDate: DisabledDateTime;
+  message: string;
+}
+
+export async function blockOrderDate(date: string): Promise<BlockedDateResponse> {
+  const existingEntry = await db.select().from(DisabledDateTimes).where(eq(DisabledDateTimes.id, date)).limit(1);
+
+  if (existingEntry[0]) {
+    return {
+      disabledDate: existingEntry[0],
+      message: `La fecha ${date} ya ha sido bloqueada.`,
+    }
+  }
+
+  const disabledDate = await db.insert(DisabledDateTimes).values({
+    id: date,
+    date,
+    dayDisabled: true,
+  }).returning();
+
+  return {
+    disabledDate: disabledDate[0],
+    message: `La fecha ${date} fue bloqueada correctamente.`,
+  }
 }

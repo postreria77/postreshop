@@ -5,6 +5,7 @@ import { createStripeCheckout } from "@/lib/stripe";
 
 import type { OrderProduct } from "db/config";
 import { checkSaltilloTime } from "@/lib/orderConditions";
+import { blockOrderDate } from "@/lib/orders";
 
 export const orders = {
   create: defineAction({
@@ -167,6 +168,32 @@ export const orders = {
       return {
         message: "Checkout session created for order: " + id,
         url: session.url,
+      };
+    },
+  }),
+  lockDate: defineAction({
+    input: z.object({
+      fecha: z
+        .string()
+        .min(1, { message: "Selecciona una fecha." })
+        .nullable()
+        .refine((fecha) => fecha !== null, {
+          message: "Selecciona una fecha.",
+        }),
+    }),
+    accept: "form",
+    handler: async ({ fecha }) => {
+      if (typeof fecha !== "string") {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Error al bloquear la fecha. Intente nuevamente.",
+        });
+      }
+
+      const { message } = await blockOrderDate(fecha);
+
+      return {
+        message: message,
       };
     },
   }),

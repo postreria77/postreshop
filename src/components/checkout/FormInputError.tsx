@@ -16,3 +16,17 @@ export default function FormInputError({ error, name }: FormInputErrorProps) {
     </p>
   );
 }
+
+export function FormSuccessMessage(message: string) {
+  return (
+    <p
+      id="form-success"
+      className="ml-2 inline -translate-y-1 text-[8px] text-green-500"
+    >
+      <span className="mr-1 inline-flex size-[10px] items-center justify-center rounded-full bg-green-500 text-light">
+        i
+      </span>
+      {message}
+    </p>
+  );
+}
