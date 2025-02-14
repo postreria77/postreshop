@@ -5,9 +5,10 @@ import CartIndicator from "@/components/cart/CartIndicator";
 
 interface Props {
   showCart: boolean;
+  sessionControls?: boolean;
 }
 
-const { showCart } = Astro.props;
+const { showCart, sessionControls } = Astro.props;
 ---
 
 <nav class="sticky top-0 z-40 border-b border-light border-opacity-25 bg-black">
@@ -22,11 +23,19 @@ const { showCart } = Astro.props;
         </Button>
       )
     }
+    {
+      sessionControls && (
+        <Button intent="secondary" size="zero" id="session-controls">
+          Cerrar Sesión
+        </Button>
+      )
+    }
   </div>
 </nav>
 
 <script>
   import { cartOpen } from "@/store";
+  import { actions } from "astro:actions";
 
   // Set the store to true when the button is clicked
   function openDialog() {
@@ -40,4 +49,28 @@ const { showCart } = Astro.props;
   ) as HTMLButtonElement;
 
   cartButton?.addEventListener("click", openDialog);
+
+  const sessionButton = document.getElementById(
+    "session-controls",
+  ) as HTMLButtonElement;
+
+  const cookies = document.cookie.split("; ");
+  const session = cookies.find((row) => row.startsWith("session="));
+
+  const sessionCookie = session?.split("=")[1];
+
+  sessionButton?.addEventListener("click", async () => {
+    console.log("Clicked Session Control");
+    if (sessionCookie) {
+      const { data, error } = await actions.users.cerrarSesion({
+        session: sessionCookie,
+      });
+
+      if (error) alert(error.message);
+
+      if (data) {
+        document.location.href = data.url;
+      }
+    }
+  });
 </script>

@@ -11,9 +11,16 @@ interface Props {
   description: string;
   showCart?: boolean;
   index?: boolean;
+  sessionControls?: boolean;
 }
 
-const { title, description, showCart = true, index = true } = Astro.props;
+const {
+  title,
+  description,
+  showCart = true,
+  index = true,
+  sessionControls,
+} = Astro.props;
 ---
 
 <html lang="en" class="scroll-smooth">
@@ -40,7 +47,7 @@ const { title, description, showCart = true, index = true } = Astro.props;
   <body
     class="relative flex min-h-screen flex-col bg-dark text-sm text-light dark"
   >
-    <Navbar showCart={showCart} />
+    <Navbar showCart={showCart} sessionControls={sessionControls} />
     <main class="flex-grow">
       <slot />
     </main>

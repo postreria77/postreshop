@@ -60,7 +60,12 @@ export async function validateSessionToken(
       .where(eq(Sessions.id, sessionId));
   }
 
-  return { session, user };
+  return {
+    session, user: {
+      ...user,
+      apellido: user.apellido === null ? undefined : user.apellido
+    }
+  };
 }
 
 export async function invalidateSession(sessionId: string): Promise<void> {

@@ -2,8 +2,15 @@ import { z } from "astro/zod";
 import { ActionError, defineAction } from "astro:actions";
 import { db, eq, Users } from "astro:db";
 import bcrypt from "bcryptjs";
-import { setSessionTokenCookie } from "@/lib/server/cookies";
-import { createSession, generateSessionToken } from "@/lib/server/sessions";
+import {
+  deleteSessionTokenCookie,
+  setSessionTokenCookie,
+} from "@/lib/server/cookies";
+import {
+  createSession,
+  generateSessionToken,
+  invalidateSession,
+} from "@/lib/server/sessions";
 import type { APIContext } from "astro";
 
 export const users = {
@@ -58,7 +65,7 @@ export const users = {
 
       return {
         message: "Usuario registrado correctamente.",
-        url: "/"
+        url: "/",
       };
     },
   }),
@@ -99,6 +106,20 @@ export const users = {
       setSessionTokenCookie(context as APIContext, token, session.expiresAt);
 
       return { message: "Sesión iniciada correctamente.", url: "/" };
+    },
+  }),
+  cerrarSesion: defineAction({
+    input: z.object({
+      session: z.string(),
+    }),
+    handler: async ({ session }, context) => {
+      invalidateSession(session);
+      deleteSessionTokenCookie(context as APIContext);
+
+      return {
+        message: "Sesión cerrada correctamente.",
+        url: "/",
+      };
     },
   }),
 };
