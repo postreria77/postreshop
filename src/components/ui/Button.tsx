@@ -1,15 +1,16 @@
 import { Spinner } from "@heroui/react";
 
-type ButtonProps = {
+interface ButtonProps extends React.HTMLAttributes<HTMLButtonElement> {
   label: string;
-  isPending: boolean;
-};
+  isPending?: boolean;
+}
 
-export default function({ isPending, label }: ButtonProps) {
+export default function ({ isPending = false, label, ...props }: ButtonProps) {
   return (
     <button
       type="submit"
       className={`${isPending ? "bg-brand bg-opacity-25" : "bg-light bg-opacity-5"} relative mt-4 w-full rounded-sm border border-light border-opacity-25 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand`}
+      {...props}
     >
       {isPending ? (
         <div className="mr-4 flex items-center justify-center gap-2">

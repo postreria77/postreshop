@@ -20,8 +20,8 @@ if (!user?.admin) {
   return Astro.redirect("/");
 }
 
+import BlockDateForm from "@/components/dashboard/BlockDateForm";
 import DashboardLayout from "@/layouts/DashboardLayout.astro";
-import OrdersTable from "@/components/dashboard/OrdersTable";
 ---
 
 <DashboardLayout
@@ -31,5 +31,5 @@ import OrdersTable from "@/components/dashboard/OrdersTable";
   showCart={false}
   sessionControls={true}
 >
-  <OrdersTable client:load />
+  <BlockDateForm client:load />
 </DashboardLayout>

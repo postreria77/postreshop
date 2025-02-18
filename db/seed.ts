@@ -86,10 +86,11 @@ export default async function seed() {
       id: 1001,
       nombre: "Erick",
       apellido: "Mireles",
-      telefono: "1234567890",
-      email: "user@email.com",
+      telefono: "9983736200",
+      email: "emireles.rosas@gmail.com",
       contraseña:
-        "$2a$10$W8WQDhZMmRG/d5r596S4ceizQIkpCqd4fW7uYwM3zBzFEA6Q9y5q6",
+        "$2a$10$x3LjWklO84gXSCL/lKxqruITSe9FK2O6CSlS2cpGTWM3uNf1qbJGW",
+      admin: true,
     },
   ]);
 }

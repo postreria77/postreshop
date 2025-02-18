@@ -2,7 +2,7 @@ import { actions, isInputError } from "astro:actions";
 import { useActionState } from "react";
 import { experimental_withState as withState } from "@astrojs/react/actions";
 
-import { Form, Input } from "@heroui/react";
+import { Input } from "@heroui/react";
 import Button from "@/components/ui/Button";
 import { navigate } from "astro:transitions/client";
 import FormInputError from "../checkout/FormInputError";
