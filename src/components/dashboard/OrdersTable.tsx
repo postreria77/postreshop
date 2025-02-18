@@ -44,10 +44,18 @@ export default function OrdersTable() {
     }
   };
 
+  const handleLastPage = () => {
+    setCurrentPage(totalPages);
+  };
+
   const handlePrevPage = () => {
     if (currentPage > 1) {
       setCurrentPage((prev) => prev - 1);
     }
+  };
+
+  const handleFirstPage = () => {
+    setCurrentPage(1);
   };
 
   return (
@@ -78,134 +86,40 @@ export default function OrdersTable() {
           </TableBody>
         </Table>
       )}
-      <div className="mt-4 flex justify-between">
-        <button
-          className="relative rounded-sm border border-light border-opacity-25 bg-light/5 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
-          onClick={handlePrevPage}
-          disabled={currentPage === 1}
-        >
-          Previous
-        </button>
-        <button
-          className="relative rounded-sm border border-light border-opacity-25 bg-light/5 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
-          onClick={handleNextPage}
-          disabled={currentPage === totalPages}
-        >
-          Next
-        </button>
+      <div className="mt-4 flex justify-between pb-4">
+        <div className="flex gap-4">
+          <button
+            className="relative rounded-sm border border-light border-opacity-25 bg-light/5 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={handleFirstPage}
+            disabled={currentPage === 1}
+          >
+            Inicio
+          </button>
+          <button
+            className="relative rounded-sm border border-light border-opacity-25 bg-light/5 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={handlePrevPage}
+            disabled={currentPage === 1}
+          >
+            Anterior
+          </button>
+        </div>
+        <div className="flex gap-4">
+          <button
+            className="relative rounded-sm border border-light border-opacity-25 bg-light/5 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={handleNextPage}
+            disabled={currentPage === totalPages}
+          >
+            Siguiente
+          </button>
+          <button
+            className="relative rounded-sm border border-light border-opacity-25 bg-light/5 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
+            onClick={handleLastPage}
+            disabled={currentPage === totalPages}
+          >
+            Último
+          </button>
+        </div>
       </div>
     </div>
   );
-}
-
-{
-  /* <table className="border border-light/15"> */
-}
-{
-  /*   <thead> */
-}
-{
-  /*     <tr className="border border-light/15 bg-dark-2"> */
-}
-{
-  /*       <th className="px-4 py-2 font-normal">ID</th> */
-}
-{
-  /*       <th className="px-4 py-2 font-normal">Nombre</th> */
-}
-{
-  /*       <th className="px-4 py-2 font-normal">Teléfono</th> */
-}
-{
-  /*       <th className="px-4 py-2 font-normal">Email</th> */
-}
-{
-  /*       <th className="px-4 py-2 font-normal">Sucursal</th> */
-}
-{
-  /*       <th className="px-4 py-2 font-normal">Fecha</th> */
-}
-{
-  /*     </tr> */
-}
-{
-  /*   </thead> */
-}
-{
-  /*   <tbody> */
-}
-{
-  /*     {orders && */
-}
-{
-  /*       orders.map((order: Order) => ( */
-}
-{
-  /*         <tr key={order.id}> */
-}
-{
-  /*           <td className="border-y border-light/5 px-4 py-2"> */
-}
-{
-  /*             {order.id} */
-}
-{
-  /*           </td> */
-}
-{
-  /*           <td className="border-y border-light/5 px-4 py-2"> */
-}
-{
-  /*             {order.nombre} */
-}
-{
-  /*           </td> */
-}
-{
-  /*           <td className="border-y border-light/5 px-4 py-2"> */
-}
-{
-  /*             {order.tel} */
-}
-{
-  /*           </td> */
-}
-{
-  /*           <td className="border-y border-light/5 px-4 py-2"> */
-}
-{
-  /*             {order.email} */
-}
-{
-  /*           </td> */
-}
-{
-  /*           <td className="border-y border-light/5 px-4 py-2"> */
-}
-{
-  /*             {order.sucursal} */
-}
-{
-  /*           </td> */
-}
-{
-  /*           <td className="border-y border-light/5 px-4 py-2"> */
-}
-{
-  /*             {order.fecha} */
-}
-{
-  /*           </td> */
-}
-{
-  /*         </tr> */
-}
-{
-  /*       ))} */
-}
-{
-  /*   </tbody> */
-}
-{
-  /* </table> */
 }
