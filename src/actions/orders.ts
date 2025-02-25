@@ -82,28 +82,11 @@ export const orders = {
         });
       }
 
-      // Temporary check to see if any product has gift as it's presentacion value
-      const inputDate = new Date(fecha);
-      const targetDate = new Date("2025-02-13");
-
       // Check if the sucursal is blocked
       if (checkSaltilloTime(fecha, sucursal) === false) {
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Esta sucursal no recibe pedidos los domingos.",
-        });
-      }
-
-      if (
-        JSON.parse(productos).some(
-          (producto: OrderProduct) => producto.presentacion === "gift",
-        ) &&
-        inputDate < targetDate
-      ) {
-        throw new ActionError({
-          code: "INTERNAL_SERVER_ERROR",
-          message:
-            "Los pasteles Gift no están disponibles hasta el 13 de Febrero.",
         });
       }
 
@@ -116,7 +99,7 @@ export const orders = {
           productos,
           tel,
           email,
-          nombre: nombreCompleto,
+          nombre: nombreCompleto.toLowerCase(),
           sucursal,
           fecha: fechaCompleta,
           estado: "Pendiente",

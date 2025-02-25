@@ -4,6 +4,7 @@ import {
   setSessionTokenCookie,
   deleteSessionTokenCookie,
 } from "./lib/server/cookies";
+import { getActionContext } from "astro:actions";
 
 const authMiddleware = defineMiddleware(async (context, next) => {
   const token = context.cookies.get("session")?.value ?? null;
@@ -22,5 +23,16 @@ const authMiddleware = defineMiddleware(async (context, next) => {
   context.locals.user = user;
   return next();
 });
+
+// const actionMiddleware = defineMiddleware(async (context, next) => {
+//   const { action, setActionResult, serializeActionResult } =
+//     getActionContext(context);
+//   if (action?.calledFrom === "form") {
+//     const result = await action.handler();
+//     // TODO: Handle action
+//     setActionResult(action.name, serializeActionResult(result));
+//   }
+//   return next();
+// });
 
 export const onRequest = sequence(authMiddleware);

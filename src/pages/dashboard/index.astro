@@ -31,5 +31,7 @@ import OrdersTable from "@/components/dashboard/OrdersTable";
   showCart={false}
   sessionControls={true}
 >
-  <OrdersTable client:load />
+  <div class="flex w-full flex-col overflow-y-visible overflow-x-scroll">
+    <OrdersTable client:load />
+  </div>
 </DashboardLayout>

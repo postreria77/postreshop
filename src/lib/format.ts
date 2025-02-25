@@ -28,3 +28,15 @@ export function slugify(text: string) {
     .replace(/^-+/, "")
     .replace(/-+$/, "");
 }
+
+export function formatDateString(dateString: string): string {
+  const date = new Date(dateString);
+
+  const formattedDate = date.toLocaleString("es-MX", {
+    year: "numeric",
+    month: "numeric",
+    day: "numeric",
+  });
+
+  return formattedDate;
+}

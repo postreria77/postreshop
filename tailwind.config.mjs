@@ -36,9 +36,10 @@ export default {
       themes: {
         dark: {
           colors: {
+            primary: "#E0AA3E",
             focus: "#E0AA3E",
-          }
-        }
+          },
+        },
       },
       layout: {
         radius: {

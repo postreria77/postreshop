@@ -6,18 +6,11 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
+  Pagination,
 } from "@heroui/react";
-import Button from "../ui/Button";
 import { useEffect, useState } from "react";
 import type { Order } from "db/config";
-
-const columns = [
-  { key: "id", label: "ID" },
-  { key: "nombre", label: "Nombre" },
-  { key: "tel", label: "Teléfono" },
-  { key: "sucursal", label: "Sucursal" },
-  { key: "fecha", label: "Fecha" },
-];
+import { formatDateString } from "@/lib/format";
 
 export default function OrdersTable() {
   const [orders, setOrders] = useState([]);
@@ -38,88 +31,69 @@ export default function OrdersTable() {
     fetchOrders();
   }, [currentPage]);
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prev) => prev + 1);
-    }
-  };
-
-  const handleLastPage = () => {
-    setCurrentPage(totalPages);
-  };
-
-  const handlePrevPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
-  };
-
-  const handleFirstPage = () => {
-    setCurrentPage(1);
-  };
-
   return (
     <div>
       {loading ? (
         <Spinner color="white" />
       ) : (
-        <Table aria-label="Orders table" removeWrapper>
+        <Table
+          aria-label="Orders table"
+          removeWrapper
+          className="w-full overflow-scroll text-xs"
+          bottomContent={
+            <div className="flex w-full justify-center">
+              <Pagination
+                isCompact
+                showControls
+                color="primary"
+                page={currentPage}
+                total={totalPages}
+                onChange={(page) => setCurrentPage(page)}
+              />
+            </div>
+          }
+        >
           <TableHeader>
             <TableColumn>ID</TableColumn>
             <TableColumn>Nombre</TableColumn>
             <TableColumn>Teléfono</TableColumn>
             <TableColumn>Email</TableColumn>
+            <TableColumn>Estado</TableColumn>
             <TableColumn>Sucursal</TableColumn>
             <TableColumn>Fecha</TableColumn>
           </TableHeader>
-          <TableBody>
+          <TableBody className="overflow-x-scroll">
             {orders.map((order: Order) => (
-              <TableRow key={order.id}>
-                <TableCell>{order.id}</TableCell>
-                <TableCell>{order.nombre}</TableCell>
-                <TableCell>{order.tel}</TableCell>
-                <TableCell>{order.email}</TableCell>
-                <TableCell>{order.sucursal}</TableCell>
-                <TableCell>{order.fecha}</TableCell>
+              <TableRow
+                key={order.id}
+                className="group cursor-pointer border-y border-light/5 first:border-t-0 hover:bg-light/5"
+              >
+                <TableCell className="">
+                  <div className="rounded-full border border-brand/50 px-[0.35rem] py-1 text-center leading-none group-hover:bg-brand/15">
+                    {order.id}
+                  </div>
+                </TableCell>
+                <TableCell className="capitalize ~text-xs/sm">
+                  {order.nombre}
+                </TableCell>
+                <TableCell className="~text-xs/sm">{order.tel}</TableCell>
+                <TableCell className="~text-xs/sm">{order.email}</TableCell>
+                <TableCell className="~text-xs/sm">
+                  <div
+                    className={`rounded-full border px-2 py-1 text-center leading-none ${order.estado === "Pagado" ? "border-green-600 text-green-600 group-hover:bg-green-600/15" : "border-yellow-600 text-yellow-600 group-hover:bg-yellow-600/15"}`}
+                  >
+                    {order.estado}
+                  </div>
+                </TableCell>
+                <TableCell className="~text-xs/sm">{order.sucursal}</TableCell>
+                <TableCell className="~text-xs/sm">
+                  {formatDateString(order.fecha)}
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       )}
-      <div className="mt-4 flex justify-between pb-4">
-        <div className="flex gap-4">
-          <button
-            className="relative rounded-sm border border-light border-opacity-25 bg-light/5 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={handleFirstPage}
-            disabled={currentPage === 1}
-          >
-            Inicio
-          </button>
-          <button
-            className="relative rounded-sm border border-light border-opacity-25 bg-light/5 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={handlePrevPage}
-            disabled={currentPage === 1}
-          >
-            Anterior
-          </button>
-        </div>
-        <div className="flex gap-4">
-          <button
-            className="relative rounded-sm border border-light border-opacity-25 bg-light/5 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={handleNextPage}
-            disabled={currentPage === totalPages}
-          >
-            Siguiente
-          </button>
-          <button
-            className="relative rounded-sm border border-light border-opacity-25 bg-light/5 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand disabled:cursor-not-allowed disabled:opacity-50"
-            onClick={handleLastPage}
-            disabled={currentPage === totalPages}
-          >
-            Último
-          </button>
-        </div>
-      </div>
     </div>
   );
 }
