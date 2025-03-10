@@ -1,0 +1,52 @@
+---
+export const prerender = false;
+
+const user = Astro.locals.user;
+const session = Astro.locals.session;
+
+import { validateSessionToken } from "@/lib/server/sessions";
+
+if (session === null) {
+  return Astro.redirect("/login");
+}
+
+const validSession = await validateSessionToken(session?.id);
+
+if (!validSession) {
+  return Astro.redirect("/login");
+}
+
+if (!user?.admin) {
+  return Astro.redirect("/");
+}
+
+import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import OrdersTable from "@/components/dashboard/OrdersTable";
+import Button from "@/components/ui/Button.astro";
+import { CheckoutForm } from "@/components/checkout/CheckoutForm";
+
+import { db, Sucursales, DisabledDateTimes, eq } from "astro:db";
+
+const sucursales = await db.select().from(Sucursales);
+const disabledDates = await db
+  .select()
+  .from(DisabledDateTimes)
+  .where(eq(DisabledDateTimes.dayDisabled, true));
+---
+
+<DashboardLayout
+  user={user}
+  title="Dashboard"
+  description="Dashboard"
+  showCart={false}
+  sessionControls={true}
+>
+  <div class="flex w-full flex-col overflow-y-visible overflow-x-scroll">
+    <CheckoutForm
+      disabledDates={disabledDates}
+      sucursales={sucursales}
+      test={true}
+      client:load
+    />
+  </div>
+</DashboardLayout>

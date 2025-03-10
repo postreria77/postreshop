@@ -25,9 +25,14 @@ import {
 type CheckoutFormProps = {
   sucursales: Sucursal[];
   disabledDates: DisabledDateTime[];
+  test?: Boolean;
 };
 
-export function CheckoutForm({ sucursales, disabledDates }: CheckoutFormProps) {
+export function CheckoutForm({
+  sucursales,
+  disabledDates,
+  test = false,
+}: CheckoutFormProps) {
   const [{ data, error }, action, isPending] = useActionState(
     withState(actions.orders.create),
     {
@@ -50,7 +55,24 @@ export function CheckoutForm({ sucursales, disabledDates }: CheckoutFormProps) {
 
   return (
     <form className="sticky top-32 space-y-4" method="POST" action={action}>
-      <CheckoutProductsInput />
+      {test ? (
+        <input
+          type="hidden"
+          hidden
+          name="productos"
+          value={JSON.stringify([
+            {
+              id: "358",
+              id_pasteleria: "98",
+              cantidad: 1,
+              stripePriceId: "price_1R1D8m2N0hejjjHDunIQsI8u",
+              presentacion: "gift",
+            },
+          ])}
+        />
+      ) : (
+        <CheckoutProductsInput />
+      )}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Input

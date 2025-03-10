@@ -244,22 +244,22 @@ export const POST: APIRoute = async ({ request, callAction }) => {
           console.log(JSON.stringify(orderData, null, 2)); // log the data);
           break;
         }
-        console.log("Sending email...");
-        break;
-      }
+        if (email) {
+          console.log("Sending email...");
+          const { data, error } = await callAction(emails.send, {
+            id: numberOrderId,
+            email,
+          });
 
-      if (email) {
-        const { data, error } = await callAction(emails.send, {
-          id: numberOrderId,
-          email,
-        });
+          if (error) {
+            console.error(error.message);
+            break;
+          }
 
-        if (error) {
-          console.error(error.message);
+          console.log("Email sent to: " + email + " with data: " + data);
           break;
         }
-
-        console.log("Email sent to: " + email + " with data: " + data);
+        break;
       }
 
     default:
