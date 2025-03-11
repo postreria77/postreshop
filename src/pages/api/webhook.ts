@@ -254,7 +254,9 @@ export const POST: APIRoute = async ({ request, callAction }) => {
               break;
             }
 
-            console.log("Email sent to: " + email + " with data: " + data);
+            console.log(
+              "Email sent to: " + email + " with Order ID: " + data?.id,
+            );
             break;
           }
           console.log("No email provided");

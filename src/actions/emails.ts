@@ -15,8 +15,6 @@ export const emails = {
       email: z.string().email().nonempty(),
     }),
     handler: async ({ id, email }) => {
-      console.log("Sending email");
-
       const order = await getReceiptInformation(id);
 
       if (!order) {
