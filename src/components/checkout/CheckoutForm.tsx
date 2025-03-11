@@ -65,7 +65,7 @@ export function CheckoutForm({
               id: "358",
               id_pasteleria: "98",
               cantidad: 1,
-              stripePriceId: "price_1R1D8m2N0hejjjHDunIQsI8u",
+              stripePriceId: "price_1R1ZPq2N0hejjjHDsXDKhJbn",
               presentacion: "gift",
             },
           ])}
