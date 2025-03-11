@@ -242,24 +242,24 @@ export const POST: APIRoute = async ({ request, callAction }) => {
           break;
         } else if (orderData) {
           console.log(JSON.stringify(orderData, null, 2)); // log the data);
-          break;
-        }
-        if (email) {
-          console.log("Sending email...");
-          const { data, error } = await callAction(emails.send, {
-            id: numberOrderId,
-            email,
-          });
+          if (email) {
+            console.log("Sending email...");
+            const { data, error } = await callAction(emails.send, {
+              id: numberOrderId,
+              email,
+            });
 
-          if (error) {
-            console.error(error.message);
+            if (error) {
+              console.error(error.message);
+              break;
+            }
+
+            console.log("Email sent to: " + email + " with data: " + data);
             break;
           }
-
-          console.log("Email sent to: " + email + " with data: " + data);
+          console.log("No email provided");
           break;
         }
-        break;
       }
 
     default:

@@ -21,8 +21,6 @@ if (!user?.admin) {
 }
 
 import DashboardLayout from "@/layouts/DashboardLayout.astro";
-import OrdersTable from "@/components/dashboard/OrdersTable";
-import Button from "@/components/ui/Button.astro";
 import { CheckoutForm } from "@/components/checkout/CheckoutForm";
 
 import { db, Sucursales, DisabledDateTimes, eq } from "astro:db";
