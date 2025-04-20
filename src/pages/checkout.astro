@@ -8,10 +8,7 @@ import { CheckoutForm } from "@/components/checkout/CheckoutForm";
 import { db, Sucursales, DisabledDateTimes, eq } from "astro:db";
 
 const sucursales = await db.select().from(Sucursales);
-const disabledDates = await db
-  .select()
-  .from(DisabledDateTimes)
-  .where(eq(DisabledDateTimes.dayDisabled, true));
+const disabledDates = await db.select().from(DisabledDateTimes);
 ---
 
 <Layout

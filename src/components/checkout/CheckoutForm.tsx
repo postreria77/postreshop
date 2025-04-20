@@ -1,6 +1,6 @@
 import { actions, isInputError } from "astro:actions";
 import { navigate } from "astro:transitions/client";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { experimental_withState as withState } from "@astrojs/react/actions";
 
 import CheckoutProductsInput from "@/components/checkout/CheckoutProductsInput";
@@ -14,6 +14,7 @@ import {
   DatePicker,
   TimeInput,
   Spinner,
+  type TimeInputValue,
 } from "@heroui/react";
 import {
   today,
@@ -41,16 +42,59 @@ export function CheckoutForm({
     },
   );
 
+  const [date, setDate] = useState<DateValue | Date | null>(null);
+
   const inputErrors = isInputError(error) ? error.fields : {};
   const actionError = !isInputError(error) ? error : undefined;
 
   if (data?.url && !error) {
     return navigate(data.url);
   }
-  let isDateUnavailable = (date: DateValue): boolean => {
+
+  const isDateUnavailable = (date: DateValue): boolean => {
     return disabledDates.some((disabledDate) => {
-      return disabledDate.date === date.toString();
+      return (
+        disabledDate.date === date.toString() &&
+        disabledDate.dayDisabled === true
+      );
     });
+  };
+
+  const validateTime = (value: TimeInputValue): true | string | string[] => {
+    if (!date) {
+      return true;
+    }
+
+    let formattedSelectedDate: string;
+    if (date instanceof Date) {
+      formattedSelectedDate = date.toISOString().split("T")[0];
+    } else {
+      // Handle DateValue from @internationalized/date
+      // Ensure month is padded with leading zero if needed
+      const month = date.month.toString().padStart(2, "0");
+      // Ensure day is padded with leading zero if needed
+      const day = date.day.toString().padStart(2, "0");
+      formattedSelectedDate = `${date.year}-${month}-${day}`;
+    }
+
+    const matchingDateEntry = disabledDates.find(
+      (dt) => dt.date === formattedSelectedDate,
+    );
+
+    if (!matchingDateEntry) return true;
+
+    if (matchingDateEntry.dayDisabled) {
+      return "La fecha está agotada";
+    }
+
+    if (matchingDateEntry.time) {
+      const disabledTimes = matchingDateEntry.time.split(",");
+      const selectedTimeStr = `${value.hour}:00`;
+      if (disabledTimes.includes(selectedTimeStr)) {
+        return "La hora está agotada";
+      }
+    }
+    return true;
   };
 
   return (
@@ -83,6 +127,7 @@ export function CheckoutForm({
             label="Nombre"
             isRequired
             radius="sm"
+            errorMessage={"Ingresa un nombre"}
           />
           {inputErrors.nombre && (
             <FormInputError error={inputErrors.nombre} name="nombre" />
@@ -111,6 +156,7 @@ export function CheckoutForm({
           label="Teléfono"
           isRequired
           radius="sm"
+          errorMessage={"Ingresa un teléfono"}
         />
         {inputErrors.tel && (
           <FormInputError error={inputErrors.tel} name="tel" />
@@ -125,6 +171,7 @@ export function CheckoutForm({
           label="Email"
           isRequired
           radius="sm"
+          errorMessage={"Ingresa un email"}
         />
         {inputErrors.email && (
           <FormInputError error={inputErrors.email} name="email" />
@@ -136,6 +183,7 @@ export function CheckoutForm({
           label="Selecciona una Sucursal"
           isRequired
           radius="sm"
+          errorMessage={"Selecciona una sucursal"}
         >
           {sucursales.map((sucursal) => (
             <SelectItem value={sucursal.id} key={sucursal.id}>
@@ -153,11 +201,14 @@ export function CheckoutForm({
             name="fecha"
             id="fecha"
             label="Fecha"
+            value={date}
+            onChange={setDate}
             maxValue={today(getLocalTimeZone()).add({ days: 30 })}
             minValue={today(getLocalTimeZone()).add({ days: 2 })}
             isDateUnavailable={isDateUnavailable}
             isRequired
             radius="sm"
+            errorMessage={"Selecciona una fecha"}
           />
           {inputErrors.fecha && (
             <FormInputError error={inputErrors.fecha} name="fecha" />
@@ -175,6 +226,7 @@ export function CheckoutForm({
             defaultValue={new Time(13)}
             isRequired
             radius="sm"
+            validate={validateTime}
           />
         </div>
       </div>

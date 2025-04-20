@@ -72,12 +72,12 @@ export default async function seed() {
   await db.insert(DisabledDateTimes).values([
     {
       id: "1",
-      date: "2025-02-13",
+      date: "2025-04-25",
       dayDisabled: true,
     },
     {
       id: "2",
-      date: "2025-02-14",
+      date: "2025-04-24",
       time: "12:00,13:00,14:00",
     },
   ]);
