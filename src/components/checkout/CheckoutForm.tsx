@@ -5,23 +5,10 @@ import { experimental_withState as withState } from "@astrojs/react/actions";
 
 import CheckoutProductsInput from "@/components/checkout/CheckoutProductsInput";
 import FormInputError from "@/components/checkout/FormInputError";
+import { DateTimeSelector } from "@/components/checkout/DateTimeSelector";
 import type { Sucursal, DisabledDateTime } from "db/config";
 
-import {
-  Input,
-  Select,
-  SelectItem,
-  DatePicker,
-  TimeInput,
-  Spinner,
-  type TimeInputValue,
-} from "@heroui/react";
-import {
-  today,
-  getLocalTimeZone,
-  Time,
-  type DateValue,
-} from "@internationalized/date";
+import { Input, Select, SelectItem, Spinner } from "@heroui/react";
 
 type CheckoutFormProps = {
   sucursales: Sucursal[];
@@ -42,7 +29,16 @@ export function CheckoutForm({
     },
   );
 
-  const [date, setDate] = useState<DateValue | Date | null>(null);
+  const [selectedSucursal, setSelectedSucursal] = useState<string>("");
+
+  const handleSucursalChange = (keys: "all" | Set<React.Key>) => {
+    if (keys !== "all" && keys.size > 0) {
+      const sucursalId = Array.from(keys)[0] as string;
+      setSelectedSucursal(sucursalId);
+    } else {
+      setSelectedSucursal("");
+    }
+  };
 
   const inputErrors = isInputError(error) ? error.fields : {};
   const actionError = !isInputError(error) ? error : undefined;
@@ -50,52 +46,6 @@ export function CheckoutForm({
   if (data?.url && !error) {
     return navigate(data.url);
   }
-
-  const isDateUnavailable = (date: DateValue): boolean => {
-    return disabledDates.some((disabledDate) => {
-      return (
-        disabledDate.date === date.toString() &&
-        disabledDate.dayDisabled === true
-      );
-    });
-  };
-
-  const validateTime = (value: TimeInputValue): true | string | string[] => {
-    if (!date) {
-      return true;
-    }
-
-    let formattedSelectedDate: string;
-    if (date instanceof Date) {
-      formattedSelectedDate = date.toISOString().split("T")[0];
-    } else {
-      // Handle DateValue from @internationalized/date
-      // Ensure month is padded with leading zero if needed
-      const month = date.month.toString().padStart(2, "0");
-      // Ensure day is padded with leading zero if needed
-      const day = date.day.toString().padStart(2, "0");
-      formattedSelectedDate = `${date.year}-${month}-${day}`;
-    }
-
-    const matchingDateEntry = disabledDates.find(
-      (dt) => dt.date === formattedSelectedDate,
-    );
-
-    if (!matchingDateEntry) return true;
-
-    if (matchingDateEntry.dayDisabled) {
-      return "La fecha está agotada";
-    }
-
-    if (matchingDateEntry.time) {
-      const disabledTimes = matchingDateEntry.time.split(",");
-      const selectedTimeStr = `${value.hour}:00`;
-      if (disabledTimes.includes(selectedTimeStr)) {
-        return "La hora está agotada";
-      }
-    }
-    return true;
-  };
 
   return (
     <form className="sticky top-32 space-y-4" method="POST" action={action}>
@@ -184,6 +134,7 @@ export function CheckoutForm({
           isRequired
           radius="sm"
           errorMessage={"Selecciona una sucursal"}
+          onSelectionChange={handleSucursalChange}
         >
           {sucursales.map((sucursal) => (
             <SelectItem value={sucursal.id} key={sucursal.id}>
@@ -195,41 +146,11 @@ export function CheckoutForm({
           <FormInputError error={inputErrors.sucursal} name="sucursal" />
         )}
       </div>
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <DatePicker
-            name="fecha"
-            id="fecha"
-            label="Fecha"
-            value={date}
-            onChange={setDate}
-            maxValue={today(getLocalTimeZone()).add({ days: 30 })}
-            minValue={today(getLocalTimeZone()).add({ days: 2 })}
-            isDateUnavailable={isDateUnavailable}
-            isRequired
-            radius="sm"
-            errorMessage={"Selecciona una fecha"}
-          />
-          {inputErrors.fecha && (
-            <FormInputError error={inputErrors.fecha} name="fecha" />
-          )}
-        </div>
-        <div>
-          <TimeInput
-            name="hora"
-            id="hora"
-            aria-describedby="error-hora"
-            label="Hora"
-            minValue={new Time(13)}
-            maxValue={new Time(22)}
-            granularity="hour"
-            defaultValue={new Time(13)}
-            isRequired
-            radius="sm"
-            validate={validateTime}
-          />
-        </div>
-      </div>
+      <DateTimeSelector
+        disabledDates={disabledDates}
+        inputErrors={inputErrors}
+        selectedSucursalId={selectedSucursal}
+      />
       {actionError?.message && (
         <FormInputError error={actionError.message} name="form" />
       )}

@@ -118,6 +118,7 @@ const DisabledDateTimes = defineTable({
     date: column.text(),
     dayDisabled: column.boolean({ default: false }),
     time: column.text({ optional: true }),
+    sucursales: column.json({ optional: true }),
   },
 });
 
@@ -126,6 +127,7 @@ export type DisabledDateTime = {
   date: string;
   dayDisabled: boolean;
   time: string | null;
+  sucursales: unknown;
 };
 
 const Users = defineTable({

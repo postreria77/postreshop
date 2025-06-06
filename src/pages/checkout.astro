@@ -5,7 +5,7 @@ import Layout from "@/layouts/Layout.astro";
 import Section from "@/components/Section.astro";
 import CartList from "@/components/cart/CartList";
 import { CheckoutForm } from "@/components/checkout/CheckoutForm";
-import { db, Sucursales, DisabledDateTimes, eq } from "astro:db";
+import { db, Sucursales, DisabledDateTimes } from "astro:db";
 
 const sucursales = await db.select().from(Sucursales);
 const disabledDates = await db.select().from(DisabledDateTimes);
