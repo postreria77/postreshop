@@ -1,11 +1,19 @@
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
-import { db, eq, Orders, Sucursales } from "astro:db";
+import { db, eq, Orders, Sucursales, DisabledDateTimes } from "astro:db";
 import { createStripeCheckout } from "@/lib/stripe";
 
 import type { OrderProduct } from "db/config";
-import { checkSaltilloTime, checkBlockedProductsForSucursal } from "@/lib/orderConditions";
-import { blockOrderDate, blockSucursalesForDate, blockProductsForDate, blockProductsForSucursalesAndDate } from "@/lib/orders";
+import {
+  checkSaltilloTime,
+  checkBlockedProductsForSucursal,
+} from "@/lib/orderConditions";
+import {
+  blockOrderDate,
+  blockSucursalesForDate,
+  blockProductsForDate,
+  blockProductsForSucursalesAndDate,
+} from "@/lib/orders";
 
 export const orders = {
   create: defineAction({
@@ -93,13 +101,18 @@ export const orders = {
 
       // Check if any products are blocked for the selected date and sucursal
       const parsedProducts = JSON.parse(productos) as OrderProduct[];
-      const blockingResult = await checkBlockedProductsForSucursal(parsedProducts, fecha, sucursal);
-      
+      const blockingResult = await checkBlockedProductsForSucursal(
+        parsedProducts,
+        fecha,
+        sucursal,
+      );
+
       if (blockingResult.blockedProducts.length > 0) {
-        const message = blockingResult.messages.length > 0 
-          ? blockingResult.messages.join(". ") 
-          : "Algunos productos no están disponibles para la fecha y sucursal seleccionadas. Por favor selecciona otra fecha u otra sucursal.";
-        
+        const message =
+          blockingResult.messages.length > 0
+            ? blockingResult.messages.join(". ")
+            : "Algunos productos no están disponibles para la fecha y sucursal seleccionadas. Por favor selecciona otra fecha u otra sucursal.";
+
         throw new ActionError({
           code: "BAD_REQUEST",
           message: message,
@@ -232,7 +245,10 @@ export const orders = {
         });
       }
 
-      const { message } = await blockSucursalesForDate(fecha, parsedSucursalIds);
+      const { message } = await blockSucursalesForDate(
+        fecha,
+        parsedSucursalIds,
+      );
 
       return {
         message: message,
@@ -308,16 +324,21 @@ export const orders = {
     }),
     accept: "form",
     handler: async ({ fecha, sucursalIds, productIds }) => {
-      if (typeof fecha !== "string" || typeof sucursalIds !== "string" || typeof productIds !== "string") {
+      if (
+        typeof fecha !== "string" ||
+        typeof sucursalIds !== "string" ||
+        typeof productIds !== "string"
+      ) {
         throw new ActionError({
           code: "BAD_REQUEST",
-          message: "Error al bloquear los productos para las sucursales. Intente nuevamente.",
+          message:
+            "Error al bloquear los productos para las sucursales. Intente nuevamente.",
         });
       }
 
       let parsedSucursalIds: string[];
       let parsedProductIds: string[];
-      
+
       try {
         parsedSucursalIds = JSON.parse(sucursalIds);
         parsedProductIds = JSON.parse(productIds);
@@ -328,7 +349,11 @@ export const orders = {
         });
       }
 
-      const { message } = await blockProductsForSucursalesAndDate(fecha, parsedSucursalIds, parsedProductIds);
+      const { message } = await blockProductsForSucursalesAndDate(
+        fecha,
+        parsedSucursalIds,
+        parsedProductIds,
+      );
 
       return {
         message: message,
@@ -344,9 +369,12 @@ export const orders = {
         .refine((fecha) => fecha !== null, {
           message: "Selecciona una fecha.",
         }),
-      blockType: z.enum(["day", "sucursales", "productos", "sucursales-productos"], {
-        message: "Selecciona un tipo de bloqueo válido.",
-      }),
+      blockType: z.enum(
+        ["day", "sucursales", "productos", "sucursales-productos"],
+        {
+          message: "Selecciona un tipo de bloqueo válido.",
+        },
+      ),
       sucursalIds: z.string().optional(),
       productIds: z.string().optional(),
     }),
@@ -366,7 +394,7 @@ export const orders = {
           case "day":
             result = await blockOrderDate(fecha);
             break;
-          
+
           case "sucursales":
             if (!sucursalIds) {
               throw new ActionError({
@@ -377,7 +405,7 @@ export const orders = {
             const parsedSucursalIds = JSON.parse(sucursalIds);
             result = await blockSucursalesForDate(fecha, parsedSucursalIds);
             break;
-          
+
           case "productos":
             if (!productIds) {
               throw new ActionError({
@@ -388,19 +416,24 @@ export const orders = {
             const parsedProductIds = JSON.parse(productIds);
             result = await blockProductsForDate(fecha, parsedProductIds);
             break;
-          
+
           case "sucursales-productos":
             if (!sucursalIds || !productIds) {
               throw new ActionError({
                 code: "BAD_REQUEST",
-                message: "Debe seleccionar al menos una sucursal y un producto.",
+                message:
+                  "Debe seleccionar al menos una sucursal y un producto.",
               });
             }
             const parsedSucursalIdsCombo = JSON.parse(sucursalIds);
             const parsedProductIdsCombo = JSON.parse(productIds);
-            result = await blockProductsForSucursalesAndDate(fecha, parsedSucursalIdsCombo, parsedProductIdsCombo);
+            result = await blockProductsForSucursalesAndDate(
+              fecha,
+              parsedSucursalIdsCombo,
+              parsedProductIdsCombo,
+            );
             break;
-          
+
           default:
             throw new ActionError({
               code: "BAD_REQUEST",
@@ -415,11 +448,59 @@ export const orders = {
         if (error instanceof ActionError) {
           throw error;
         }
-        
+
         // Handle JSON parsing errors
         throw new ActionError({
           code: "BAD_REQUEST",
-          message: "Error al procesar los datos. Verifique las selecciones e intente nuevamente.",
+          message:
+            "Error al procesar los datos. Verifique las selecciones e intente nuevamente.",
+        });
+      }
+    },
+  }),
+  deleteBlockedDate: defineAction({
+    input: z.object({
+      id: z
+        .string()
+        .min(1, { message: "ID requerido." })
+        .nullable()
+        .refine((id) => id !== null, {
+          message: "ID requerido.",
+        }),
+    }),
+    accept: "form",
+    handler: async ({ id }) => {
+      if (typeof id !== "string") {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Error al procesar el ID. Intente nuevamente.",
+        });
+      }
+
+      try {
+        const deletedEntry = await db
+          .delete(DisabledDateTimes)
+          .where(eq(DisabledDateTimes.id, id))
+          .returning();
+
+        if (deletedEntry.length === 0) {
+          throw new ActionError({
+            code: "NOT_FOUND",
+            message: "No se encontró la fecha bloqueada.",
+          });
+        }
+
+        return {
+          message: "Fecha desbloqueada exitosamente.",
+        };
+      } catch (error) {
+        if (error instanceof ActionError) {
+          throw error;
+        }
+
+        throw new ActionError({
+          code: "INTERNAL_SERVER_ERROR",
+          message: "Error al eliminar el bloqueo. Intente nuevamente.",
         });
       }
     },

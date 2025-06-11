@@ -1,5 +1,9 @@
-import { Card, CardBody, CardHeader } from "@heroui/react";
+import { Card, CardBody, CardHeader, Button, Spinner } from "@heroui/react";
 import type { DisabledDateTime } from "db/config";
+import { actions, isInputError } from "astro:actions";
+import { useActionState } from "react";
+import { experimental_withState as withState } from "@astrojs/react/actions";
+import { useState } from "react";
 
 type BlockedDatesListProps = {
   blockedDates: DisabledDateTime[];
@@ -8,6 +12,26 @@ type BlockedDatesListProps = {
 export default function BlockedDatesList({
   blockedDates,
 }: BlockedDatesListProps) {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [{ data, error }, deleteAction] = useActionState(
+    withState(actions.orders.deleteBlockedDate),
+    {
+      data: { message: "" },
+      error: undefined,
+    },
+  );
+
+  const handleDelete = async (id: string) => {
+    if (confirm("¿Está seguro de que desea eliminar este bloqueo?")) {
+      setDeletingId(id);
+      const formData = new FormData();
+      formData.set("id", id);
+      await deleteAction(formData);
+      setDeletingId(null);
+      // Refresh the page to show updated list
+      window.location.reload();
+    }
+  };
   if (blockedDates.length === 0) {
     return (
       <div className="mt-8">
@@ -105,6 +129,16 @@ export default function BlockedDatesList({
   return (
     <div className="mt-8 pb-8">
       <h3 className="mb-4 text-lg font-medium">Fechas Bloqueadas</h3>
+      {data?.message && (
+        <div className="mb-4 rounded-lg border border-green-300 bg-green-50 p-3">
+          <p className="text-sm text-green-700">{data.message}</p>
+        </div>
+      )}
+      {error && !isInputError(error) && (
+        <div className="mb-4 rounded-lg border border-red-300 bg-red-50 p-3">
+          <p className="text-sm text-red-700">{error.message}</p>
+        </div>
+      )}
       <div className="space-y-4">
         {sortedDates.map((date) => (
           <Card key={date} className="border">
@@ -128,7 +162,7 @@ export default function BlockedDatesList({
                       className={`rounded-lg border p-3 ${format.color}`}
                     >
                       <div className="flex items-start justify-between">
-                        <div>
+                        <div className="flex-1">
                           <p className="text-sm font-medium capitalize">
                             {format.type}
                           </p>
@@ -152,9 +186,25 @@ export default function BlockedDatesList({
                             </div>
                           )}
                         </div>
-                        <span className="text-xs text-gray-400">
-                          ID: {blockedDate.id}
-                        </span>
+                        <div className="flex flex-col items-end gap-2">
+                          <span className="text-xs text-gray-400">
+                            ID: {blockedDate.id}
+                          </span>
+                          <Button
+                            size="sm"
+                            color="danger"
+                            variant="ghost"
+                            onClick={() => handleDelete(blockedDate.id)}
+                            disabled={deletingId === blockedDate.id}
+                            className="h-6 min-w-16 text-xs"
+                          >
+                            {deletingId === blockedDate.id ? (
+                              <Spinner size="sm" color="current" />
+                            ) : (
+                              "Eliminar"
+                            )}
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   );
