@@ -38,9 +38,9 @@ const {
     <Navbar showCart={showCart} sessionControls={sessionControls} />
     <main class="flex-grow">
       <div
-        class="mx-auto flex max-w-7xl grid-cols-[1fr_4fr] flex-col gap-8 ~px-6/16 ~pt-4/16 sm:grid"
+        class="mx-auto flex max-w-7xl grid-cols-[1fr_4fr] flex-col place-items-start gap-8 ~px-6/16 ~pt-4/16 sm:grid"
       >
-        <div>
+        <div id="sidebar" class="sticky top-32">
           <h1 class="pb-4 text-2xl font-medium tracking-tight">
             Bienvenid@ {user?.nombre}
           </h1>

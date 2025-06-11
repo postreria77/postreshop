@@ -21,7 +21,14 @@ if (!user?.admin) {
 }
 
 import BlockDateForm from "@/components/dashboard/BlockDateForm";
+import BlockedDatesList from "@/components/dashboard/BlockedDatesList";
 import DashboardLayout from "@/layouts/DashboardLayout.astro";
+import { db, Sucursales, Pasteles, DisabledDateTimes } from "astro:db";
+import type { Pastel } from "db/config";
+
+const sucursales = await db.select().from(Sucursales);
+const pasteles = await db.select().from(Pasteles) as Pastel[];
+const blockedDates = await db.select().from(DisabledDateTimes);
 ---
 
 <DashboardLayout
@@ -31,5 +38,8 @@ import DashboardLayout from "@/layouts/DashboardLayout.astro";
   showCart={false}
   sessionControls={true}
 >
-  <BlockDateForm client:load />
+  <div class="space-y-8">
+    <BlockDateForm sucursales={sucursales} pasteles={pasteles} client:load />
+    <BlockedDatesList blockedDates={blockedDates} client:load />
+  </div>
 </DashboardLayout>

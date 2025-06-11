@@ -335,4 +335,93 @@ export const orders = {
       };
     },
   }),
+  blockDate: defineAction({
+    input: z.object({
+      fecha: z
+        .string()
+        .min(1, { message: "Selecciona una fecha." })
+        .nullable()
+        .refine((fecha) => fecha !== null, {
+          message: "Selecciona una fecha.",
+        }),
+      blockType: z.enum(["day", "sucursales", "productos", "sucursales-productos"], {
+        message: "Selecciona un tipo de bloqueo válido.",
+      }),
+      sucursalIds: z.string().optional(),
+      productIds: z.string().optional(),
+    }),
+    accept: "form",
+    handler: async ({ fecha, blockType, sucursalIds, productIds }) => {
+      if (typeof fecha !== "string") {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Error al procesar la fecha. Intente nuevamente.",
+        });
+      }
+
+      try {
+        let result;
+
+        switch (blockType) {
+          case "day":
+            result = await blockOrderDate(fecha);
+            break;
+          
+          case "sucursales":
+            if (!sucursalIds) {
+              throw new ActionError({
+                code: "BAD_REQUEST",
+                message: "Debe seleccionar al menos una sucursal.",
+              });
+            }
+            const parsedSucursalIds = JSON.parse(sucursalIds);
+            result = await blockSucursalesForDate(fecha, parsedSucursalIds);
+            break;
+          
+          case "productos":
+            if (!productIds) {
+              throw new ActionError({
+                code: "BAD_REQUEST",
+                message: "Debe seleccionar al menos un producto.",
+              });
+            }
+            const parsedProductIds = JSON.parse(productIds);
+            result = await blockProductsForDate(fecha, parsedProductIds);
+            break;
+          
+          case "sucursales-productos":
+            if (!sucursalIds || !productIds) {
+              throw new ActionError({
+                code: "BAD_REQUEST",
+                message: "Debe seleccionar al menos una sucursal y un producto.",
+              });
+            }
+            const parsedSucursalIdsCombo = JSON.parse(sucursalIds);
+            const parsedProductIdsCombo = JSON.parse(productIds);
+            result = await blockProductsForSucursalesAndDate(fecha, parsedSucursalIdsCombo, parsedProductIdsCombo);
+            break;
+          
+          default:
+            throw new ActionError({
+              code: "BAD_REQUEST",
+              message: "Tipo de bloqueo no válido.",
+            });
+        }
+
+        return {
+          message: result.message,
+        };
+      } catch (error) {
+        if (error instanceof ActionError) {
+          throw error;
+        }
+        
+        // Handle JSON parsing errors
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Error al procesar los datos. Verifique las selecciones e intente nuevamente.",
+        });
+      }
+    },
+  }),
 };
