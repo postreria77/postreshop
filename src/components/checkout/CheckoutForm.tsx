@@ -33,10 +33,10 @@ export function CheckoutForm({
 
   // Form state to persist values on error
   const [formData, setFormData] = useState({
-    nombre: "Juan",
-    apellido: "Pérez",
-    tel: "8441234567",
-    email: "juan.perez@example.com",
+    nombre: "",
+    apellido: "",
+    tel: "",
+    email: "",
   });
 
   const handleSucursalChange = (keys: "all" | Set<React.Key>) => {
