@@ -31,6 +31,14 @@ export function CheckoutForm({
 
   const [selectedSucursal, setSelectedSucursal] = useState<string>("");
 
+  // Form state to persist values on error
+  const [formData, setFormData] = useState({
+    nombre: "Juan",
+    apellido: "Pérez",
+    tel: "8441234567",
+    email: "juan.perez@example.com",
+  });
+
   const handleSucursalChange = (keys: "all" | Set<React.Key>) => {
     if (keys !== "all" && keys.size > 0) {
       const sucursalId = Array.from(keys)[0] as string;
@@ -38,6 +46,13 @@ export function CheckoutForm({
     } else {
       setSelectedSucursal("");
     }
+  };
+
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
   };
 
   const inputErrors = isInputError(error) ? error.fields : {};
@@ -78,6 +93,8 @@ export function CheckoutForm({
             isRequired
             radius="sm"
             errorMessage={"Ingresa un nombre"}
+            value={formData.nombre}
+            onChange={(e) => handleInputChange("nombre", e.target.value)}
           />
           {inputErrors.nombre && (
             <FormInputError error={inputErrors.nombre} name="nombre" />
@@ -91,9 +108,11 @@ export function CheckoutForm({
             aria-describedby="error-apellido"
             label="Apellido"
             radius="sm"
+            value={formData.apellido}
+            onChange={(e) => handleInputChange("apellido", e.target.value)}
           />
-          {inputErrors.nombre && (
-            <FormInputError error={inputErrors.nombre} name="apellido" />
+          {inputErrors.apellido && (
+            <FormInputError error={inputErrors.apellido} name="apellido" />
           )}
         </div>
       </div>
@@ -107,6 +126,8 @@ export function CheckoutForm({
           isRequired
           radius="sm"
           errorMessage={"Ingresa un teléfono"}
+          value={formData.tel}
+          onChange={(e) => handleInputChange("tel", e.target.value)}
         />
         {inputErrors.tel && (
           <FormInputError error={inputErrors.tel} name="tel" />
@@ -122,6 +143,8 @@ export function CheckoutForm({
           isRequired
           radius="sm"
           errorMessage={"Ingresa un email"}
+          value={formData.email}
+          onChange={(e) => handleInputChange("email", e.target.value)}
         />
         {inputErrors.email && (
           <FormInputError error={inputErrors.email} name="email" />

@@ -71,20 +71,27 @@ export default async function seed() {
   ]);
   await db.insert(DisabledDateTimes).values([
     {
-      id: "2025-06-09",
-      date: "2025-06-09",
+      id: "2025-06-20",
+      date: "2025-06-20",
       dayDisabled: true,
     },
     {
-      id: "2025-06-10",
-      date: "2025-06-10",
+      id: "2025-06-21",
+      date: "2025-06-21",
       dayDisabled: false,
       sucursales: ["44"],
     },
     {
-      id: "2025-06-11",
-      date: "2025-06-11",
+      id: "2025-06-22",
+      date: "2025-06-22",
       time: "12:00,13:00,14:00",
+    },
+    {
+      id: "2025-06-23",
+      date: "2025-06-23",
+      dayDisabled: false,
+      sucursales: ["44"],
+      productos: ["price_1Qg5Dw2N0hejjjHDiY16NYda"],
     },
   ]);
   await db.insert(Users).values([

@@ -60,7 +60,7 @@ export function DateTimeSelector({
         let sucursalesArray;
         if (Array.isArray(disabledDate.sucursales)) {
           sucursalesArray = disabledDate.sucursales;
-        } else if (typeof disabledDate.sucursales === 'string') {
+        } else if (typeof disabledDate.sucursales === "string") {
           try {
             sucursalesArray = JSON.parse(disabledDate.sucursales);
           } catch {
@@ -69,7 +69,7 @@ export function DateTimeSelector({
         } else {
           sucursalesArray = [];
         }
-        
+
         // Disable if the selected sucursal is in the disabled sucursales list
         return sucursalesArray.includes(selectedSucursalId);
       }

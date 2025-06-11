@@ -4,7 +4,7 @@ import { db, eq, Orders, Sucursales } from "astro:db";
 import { createStripeCheckout } from "@/lib/stripe";
 
 import type { OrderProduct } from "db/config";
-import { checkSaltilloTime } from "@/lib/orderConditions";
+import { checkSaltilloTime, checkBlockedProducts } from "@/lib/orderConditions";
 import { blockOrderDate } from "@/lib/orders";
 
 export const orders = {
@@ -66,6 +66,7 @@ export const orders = {
       const { productos, tel, email, nombre, apellido, sucursal, fecha, hora } =
         input;
 
+      // Parse items for Stripe session
       const line_items = JSON.parse(productos).map(
         (producto: OrderProduct) => ({
           price: producto.stripePriceId,
@@ -87,6 +88,17 @@ export const orders = {
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Esta sucursal no recibe pedidos los domingos.",
+        });
+      }
+
+      // Check if any products are blocked on the selected date
+      const parsedProducts = JSON.parse(productos) as OrderProduct[];
+      const blockedProducts = await checkBlockedProducts(parsedProducts, fecha);
+      
+      if (blockedProducts.length > 0) {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Algunos productos no están disponibles para la fecha seleccionada. Por favor selecciona otra fecha.",
         });
       }
 
