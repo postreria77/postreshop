@@ -4,8 +4,8 @@ import { db, eq, Orders, Sucursales } from "astro:db";
 import { createStripeCheckout } from "@/lib/stripe";
 
 import type { OrderProduct } from "db/config";
-import { checkSaltilloTime, checkBlockedProducts } from "@/lib/orderConditions";
-import { blockOrderDate } from "@/lib/orders";
+import { checkSaltilloTime, checkBlockedProductsForSucursal } from "@/lib/orderConditions";
+import { blockOrderDate, blockSucursalesForDate, blockProductsForDate, blockProductsForSucursalesAndDate } from "@/lib/orders";
 
 export const orders = {
   create: defineAction({
@@ -91,14 +91,18 @@ export const orders = {
         });
       }
 
-      // Check if any products are blocked on the selected date
+      // Check if any products are blocked for the selected date and sucursal
       const parsedProducts = JSON.parse(productos) as OrderProduct[];
-      const blockedProducts = await checkBlockedProducts(parsedProducts, fecha);
+      const blockingResult = await checkBlockedProductsForSucursal(parsedProducts, fecha, sucursal);
       
-      if (blockedProducts.length > 0) {
+      if (blockingResult.blockedProducts.length > 0) {
+        const message = blockingResult.messages.length > 0 
+          ? blockingResult.messages.join(". ") 
+          : "Algunos productos no están disponibles para la fecha y sucursal seleccionadas. Por favor selecciona otra fecha u otra sucursal.";
+        
         throw new ActionError({
           code: "BAD_REQUEST",
-          message: "Algunos productos no están disponibles para la fecha seleccionada. Por favor selecciona otra fecha.",
+          message: message,
         });
       }
 
@@ -186,6 +190,145 @@ export const orders = {
       }
 
       const { message } = await blockOrderDate(fecha);
+
+      return {
+        message: message,
+      };
+    },
+  }),
+  lockSucursalesForDate: defineAction({
+    input: z.object({
+      fecha: z
+        .string()
+        .min(1, { message: "Selecciona una fecha." })
+        .nullable()
+        .refine((fecha) => fecha !== null, {
+          message: "Selecciona una fecha.",
+        }),
+      sucursalIds: z
+        .string()
+        .min(1, { message: "Selecciona al menos una sucursal." })
+        .nullable()
+        .refine((sucursalIds) => sucursalIds !== null, {
+          message: "Selecciona al menos una sucursal.",
+        }),
+    }),
+    accept: "form",
+    handler: async ({ fecha, sucursalIds }) => {
+      if (typeof fecha !== "string" || typeof sucursalIds !== "string") {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Error al bloquear las sucursales. Intente nuevamente.",
+        });
+      }
+
+      let parsedSucursalIds: string[];
+      try {
+        parsedSucursalIds = JSON.parse(sucursalIds);
+      } catch {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Error al procesar las sucursales. Intente nuevamente.",
+        });
+      }
+
+      const { message } = await blockSucursalesForDate(fecha, parsedSucursalIds);
+
+      return {
+        message: message,
+      };
+    },
+  }),
+  lockProductsForDate: defineAction({
+    input: z.object({
+      fecha: z
+        .string()
+        .min(1, { message: "Selecciona una fecha." })
+        .nullable()
+        .refine((fecha) => fecha !== null, {
+          message: "Selecciona una fecha.",
+        }),
+      productIds: z
+        .string()
+        .min(1, { message: "Selecciona al menos un producto." })
+        .nullable()
+        .refine((productIds) => productIds !== null, {
+          message: "Selecciona al menos un producto.",
+        }),
+    }),
+    accept: "form",
+    handler: async ({ fecha, productIds }) => {
+      if (typeof fecha !== "string" || typeof productIds !== "string") {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Error al bloquear los productos. Intente nuevamente.",
+        });
+      }
+
+      let parsedProductIds: string[];
+      try {
+        parsedProductIds = JSON.parse(productIds);
+      } catch {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Error al procesar los productos. Intente nuevamente.",
+        });
+      }
+
+      const { message } = await blockProductsForDate(fecha, parsedProductIds);
+
+      return {
+        message: message,
+      };
+    },
+  }),
+  lockProductsForSucursalesAndDate: defineAction({
+    input: z.object({
+      fecha: z
+        .string()
+        .min(1, { message: "Selecciona una fecha." })
+        .nullable()
+        .refine((fecha) => fecha !== null, {
+          message: "Selecciona una fecha.",
+        }),
+      sucursalIds: z
+        .string()
+        .min(1, { message: "Selecciona al menos una sucursal." })
+        .nullable()
+        .refine((sucursalIds) => sucursalIds !== null, {
+          message: "Selecciona al menos una sucursal.",
+        }),
+      productIds: z
+        .string()
+        .min(1, { message: "Selecciona al menos un producto." })
+        .nullable()
+        .refine((productIds) => productIds !== null, {
+          message: "Selecciona al menos un producto.",
+        }),
+    }),
+    accept: "form",
+    handler: async ({ fecha, sucursalIds, productIds }) => {
+      if (typeof fecha !== "string" || typeof sucursalIds !== "string" || typeof productIds !== "string") {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Error al bloquear los productos para las sucursales. Intente nuevamente.",
+        });
+      }
+
+      let parsedSucursalIds: string[];
+      let parsedProductIds: string[];
+      
+      try {
+        parsedSucursalIds = JSON.parse(sucursalIds);
+        parsedProductIds = JSON.parse(productIds);
+      } catch {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Error al procesar los datos. Intente nuevamente.",
+        });
+      }
+
+      const { message } = await blockProductsForSucursalesAndDate(fecha, parsedSucursalIds, parsedProductIds);
 
       return {
         message: message,

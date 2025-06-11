@@ -76,7 +76,7 @@ export default async function seed() {
       dayDisabled: true,
     },
     {
-      id: "2025-06-21",
+      id: "2025-06-21-sucursales",
       date: "2025-06-21",
       dayDisabled: false,
       sucursales: ["44"],
@@ -87,11 +87,33 @@ export default async function seed() {
       time: "12:00,13:00,14:00",
     },
     {
-      id: "2025-06-23",
+      id: "2025-06-23-sucursales-productos",
       date: "2025-06-23",
       dayDisabled: false,
       sucursales: ["44"],
       productos: ["price_1Qg5Dw2N0hejjjHDiY16NYda"],
+    },
+    // Block multiple sucursales for June 24th
+    {
+      id: "2025-06-24-sucursales",
+      date: "2025-06-24",
+      dayDisabled: false,
+      sucursales: ["106", "109"],
+    },
+    // Block multiple products globally for June 25th
+    {
+      id: "2025-06-25-productos",
+      date: "2025-06-25",
+      dayDisabled: false,
+      productos: ["price_1Qg57s2N0hejjjHD6e1l5fyx", "price_1Qg3bS2N0hejjjHDX8EYDGH1"],
+    },
+    // Block specific products for specific sucursales on June 26th
+    {
+      id: "2025-06-26-sucursales-productos",
+      date: "2025-06-26",
+      dayDisabled: false,
+      sucursales: ["44", "109"],
+      productos: ["price_1Qg3bS2N0hejjjHDX8EYDGH1"],
     },
   ]);
   await db.insert(Users).values([

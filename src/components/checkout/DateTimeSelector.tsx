@@ -56,7 +56,11 @@ export function DateTimeSelector({
       }
 
       // If there's a sucursal restriction and a sucursal is selected
-      if (disabledDate.sucursales && selectedSucursalId) {
+      if (
+        disabledDate.sucursales &&
+        !disabledDate.productos &&
+        selectedSucursalId
+      ) {
         let sucursalesArray;
         if (Array.isArray(disabledDate.sucursales)) {
           sucursalesArray = disabledDate.sucursales;
