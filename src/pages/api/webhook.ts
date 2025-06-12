@@ -48,7 +48,6 @@ const updateOrder = async (
         let presentacion;
         let precioPresentacion;
 
-        // Using switch for better readability
         switch (producto.presentacion) {
           case "tradicional":
             presentacion = "198";
@@ -86,19 +85,19 @@ const updateOrder = async (
         switch (producto.presentacion) {
           case "tradicional":
             presentacion = "68";
-            precioPresentacion = 1250;
+            precioPresentacion = 1290;
             break;
           case "anytime":
             presentacion = "1069";
-            precioPresentacion = 590;
+            precioPresentacion = 620;
             break;
           case "gift":
             presentacion = "1284";
-            precioPresentacion = 330;
+            precioPresentacion = 350;
             break;
           default:
             presentacion = "198"; // Fallback for any other case
-            precioPresentacion = 1250; // Fallback price
+            precioPresentacion = 1290; // Fallback price
             break;
         }
 
