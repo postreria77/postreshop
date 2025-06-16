@@ -10,6 +10,7 @@ import receiptIcon from "@/assets/receipt-icon.png";
 import { db, eq, Orders, Pasteles, inArray } from "astro:db";
 import type { OrderProduct } from "db/config";
 import { Sucursales } from "astro:db";
+import { PRESENTACIONES_PRICE } from "@lib/pricesConfig";
 
 const { id } = Astro.params;
 const numberId = Number(id);
@@ -41,16 +42,16 @@ const productos = productosOrden.map((p) => {
 
   switch (p.presentacion) {
     case "tradicional":
-      importe = 1250;
+      importe = PRESENTACIONES_PRICE.tradicional;
       break;
     case "anytime":
-      importe = 590;
+      importe = PRESENTACIONES_PRICE.anytime;
       break;
     case "gift":
-      importe = 330;
+      importe = PRESENTACIONES_PRICE.gift;
       break;
     default:
-      importe = 1250; // Fallback price
+      importe = PRESENTACIONES_PRICE.tradicional; // Fallback price
       break;
   }
 

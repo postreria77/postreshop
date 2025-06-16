@@ -6,6 +6,7 @@ import { db, eq, Orders } from "astro:db";
 import { getSecret } from "astro:env/server";
 import type { OrderProduct, SystemOrder } from "db/config";
 import { emails } from "@/actions/emails";
+import { PRESENTACIONES_PRICE } from "@/lib/pricesConfig";
 
 const updateOrder = async (
   orderId: number,
@@ -51,19 +52,19 @@ const updateOrder = async (
         switch (producto.presentacion) {
           case "tradicional":
             presentacion = "198";
-            precioPresentacion = 1290;
+            precioPresentacion = PRESENTACIONES_PRICE.tradicional;
             break;
           case "anytime":
             presentacion = "199";
-            precioPresentacion = 620;
+            precioPresentacion = PRESENTACIONES_PRICE.anytime;
             break;
           case "gift":
             presentacion = "359";
-            precioPresentacion = 350;
+            precioPresentacion = PRESENTACIONES_PRICE.gift;
             break;
           default:
             presentacion = "198"; // Fallback for any other case
-            precioPresentacion = 1290; // Fallback price
+            precioPresentacion = PRESENTACIONES_PRICE.tradicional;
             break;
         }
 
@@ -85,19 +86,19 @@ const updateOrder = async (
         switch (producto.presentacion) {
           case "tradicional":
             presentacion = "68";
-            precioPresentacion = 1290;
+            precioPresentacion = PRESENTACIONES_PRICE.tradicional;
             break;
           case "anytime":
             presentacion = "1069";
-            precioPresentacion = 620;
+            precioPresentacion = PRESENTACIONES_PRICE.anytime;
             break;
           case "gift":
             presentacion = "1284";
-            precioPresentacion = 350;
+            precioPresentacion = PRESENTACIONES_PRICE.gift;
             break;
           default:
             presentacion = "198"; // Fallback for any other case
-            precioPresentacion = 1290; // Fallback price
+            precioPresentacion = PRESENTACIONES_PRICE.tradicional;
             break;
         }
 
