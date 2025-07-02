@@ -1,12 +1,6 @@
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { DatePicker, TimeInput } from "@heroui/react";
-import {
-  today,
-  getLocalTimeZone,
-  Time,
-  type DateValue,
-  type TimeInputValue,
-} from "@internationalized/date";
+import { today, getLocalTimeZone, Time } from "@internationalized/date";
 import type { DisabledDateTime } from "db/config";
 import FormInputError from "@/components/checkout/FormInputError";
 
@@ -14,8 +8,8 @@ type DateTimeSelectorProps = {
   disabledDates: DisabledDateTime[];
   inputErrors: Record<string, string[]>;
   selectedSucursalId?: string;
-  onDateChange?: (date: DateValue | Date | null) => void;
-  onTimeChange?: (time: TimeInputValue | null) => void;
+  onDateChange?: (date: any) => void;
+  onTimeChange?: (time: any) => void;
 };
 
 export function DateTimeSelector({
@@ -25,10 +19,66 @@ export function DateTimeSelector({
   onDateChange,
   onTimeChange,
 }: DateTimeSelectorProps) {
-  const [date, setDate] = useState<DateValue | Date | null>(null);
-  const [time, setTime] = useState<TimeInputValue | null>(new Time(13));
+  const [date, setDate] = useState<any>(null);
+  const [time, setTime] = useState<any>(new Time(13));
 
-  const formatDateToString = (date: DateValue | Date): string => {
+  // Memoized minimum date that reacts to selectedSucursalId changes
+  const minimumDate = useMemo(() => {
+    const monterreyTimeZone = "America/Monterrey";
+    const now = new Date();
+
+    // Get current time in Monterrey timezone
+    const monterreyTime = new Intl.DateTimeFormat("en-CA", {
+      timeZone: monterreyTimeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).formatToParts(now);
+
+    const currentHour = parseInt(
+      monterreyTime.find((part) => part.type === "hour")?.value || "0",
+    );
+
+    // Get current day of week in Monterrey timezone (0 = Sunday, 1 = Monday, etc.)
+    const monterreyDate = new Date().toLocaleDateString("en-CA", {
+      timeZone: monterreyTimeZone,
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+    const [year, month, day] = monterreyDate.split("-").map(Number);
+    const monterreyDateObj = new Date(year, month - 1, day);
+    const isSunday = monterreyDateObj.getDay() === 0;
+
+    let extraDays = 1;
+
+    switch (selectedSucursalId) {
+      case "536":
+      case "49":
+        extraDays = currentHour >= 20 ? 2 : 1;
+        break;
+      case "109":
+      case "50":
+      case "520":
+        // If it's Sunday, always add 2 days regardless of hour (testing)
+        if (isSunday) {
+          extraDays = 2;
+        } else {
+          extraDays = currentHour >= 15 ? 2 : 1;
+        }
+        break;
+      default:
+        // For other sucursales, use default 2 days
+        extraDays = currentHour >= 22 ? 2 : 1;
+        break;
+    }
+    return today(getLocalTimeZone()).add({ days: extraDays });
+  }, [selectedSucursalId]);
+
+  const formatDateToString = (date: any): string => {
     if (date instanceof Date) {
       return date.toISOString().split("T")[0];
     } else {
@@ -41,7 +91,7 @@ export function DateTimeSelector({
     }
   };
 
-  const isDateUnavailable = (date: DateValue | Date): boolean => {
+  const isDateUnavailable = (date: any): boolean => {
     const formattedSelectedDate = formatDateToString(date);
 
     return disabledDates.some((disabledDate) => {
@@ -82,7 +132,7 @@ export function DateTimeSelector({
     });
   };
 
-  const validateTime = (value: TimeInputValue): true | string | string[] => {
+  const validateTime = (value: any): true | string | string[] => {
     if (!date) {
       return true;
     }
@@ -109,12 +159,12 @@ export function DateTimeSelector({
     return true;
   };
 
-  const handleDateChange = (newDate: DateValue | Date | null) => {
+  const handleDateChange = (newDate: any) => {
     setDate(newDate);
     onDateChange?.(newDate);
   };
 
-  const handleTimeChange = (newTime: TimeInputValue | null) => {
+  const handleTimeChange = (newTime: any) => {
     setTime(newTime);
     onTimeChange?.(newTime);
   };
@@ -128,8 +178,8 @@ export function DateTimeSelector({
           label="Fecha"
           value={date}
           onChange={handleDateChange}
-          maxValue={today(getLocalTimeZone()).add({ days: 30 })}
-          minValue={today(getLocalTimeZone()).add({ days: 2 })}
+          maxValue={today(getLocalTimeZone()).add({ days: 30 }) as any}
+          minValue={minimumDate as any}
           isDateUnavailable={isDateUnavailable}
           isRequired
           radius="sm"
@@ -147,10 +197,10 @@ export function DateTimeSelector({
           label="Hora"
           value={time}
           onChange={handleTimeChange}
-          minValue={new Time(13)}
-          maxValue={new Time(22)}
+          minValue={new Time(13) as any}
+          maxValue={new Time(22) as any}
           granularity="hour"
-          defaultValue={new Time(13)}
+          defaultValue={new Time(13) as any}
           isRequired
           radius="sm"
           validate={validateTime}
