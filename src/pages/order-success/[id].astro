@@ -10,7 +10,7 @@ import receiptIcon from "@/assets/receipt-icon.png";
 import { db, eq, Orders, Pasteles, inArray } from "astro:db";
 import type { OrderProduct } from "db/config";
 import { Sucursales } from "astro:db";
-import { PRESENTACIONES_PRICE } from "@lib/pricesConfig";
+import { getPresentacionPrice } from "@lib/pricesConfig";
 
 const { id } = Astro.params;
 const numberId = Number(id);
@@ -38,22 +38,8 @@ type OrderDetailsProduct = OrderProduct & {
 };
 
 const productos = productosOrden.map((p) => {
-  let importe: number;
-
-  switch (p.presentacion) {
-    case "tradicional":
-      importe = PRESENTACIONES_PRICE.tradicional;
-      break;
-    case "anytime":
-      importe = PRESENTACIONES_PRICE.anytime;
-      break;
-    case "gift":
-      importe = PRESENTACIONES_PRICE.gift;
-      break;
-    default:
-      importe = PRESENTACIONES_PRICE.tradicional; // Fallback price
-      break;
-  }
+  // Use TypeScript type guard to validate and get price safely
+  const importe = getPresentacionPrice(p.presentacion);
 
   const pastel = pasteles.find((pastel) => pastel.id === p.id);
   return {
