@@ -1,14 +1,28 @@
-import { db, eq, inArray, Orders, Pasteles, Sucursales, DisabledDateTimes } from "astro:db";
-import type { Order, OrderProduct, Sucursal, DisabledDateTime } from "db/config";
+import {
+  db,
+  eq,
+  inArray,
+  Orders,
+  Pasteles,
+  Sucursales,
+  DisabledDateTimes,
+} from "astro:db";
+import type {
+  Order,
+  OrderProduct,
+  Sucursal,
+  DisabledDateTime,
+} from "db/config";
+import { getPresentacionPrice } from "./pricesConfig";
 
 /*
  * DisabledDateTimes ID Naming Strategy:
- * 
+ *
  * - "YYYY-MM-DD" = Block entire day (dayDisabled: true)
  * - "YYYY-MM-DD-sucursales" = Block specific sucursales for the date
- * - "YYYY-MM-DD-productos" = Block specific products globally for the date  
+ * - "YYYY-MM-DD-productos" = Block specific products globally for the date
  * - "YYYY-MM-DD-sucursales-productos" = Block specific products for specific sucursales
- * 
+ *
  * Examples:
  * - "2025-06-20" → Block June 20th completely
  * - "2025-06-21-sucursales" → Block sucursales ["44", "109"] on June 21st
@@ -56,22 +70,7 @@ export async function getReceiptInformation(
 
   // Cast the pasteles to the correct types
   const productos = productosOrden.map((p) => {
-    let importe: number;
-
-    switch (p.presentacion) {
-      case "tradicional":
-        importe = 1250;
-        break;
-      case "anytime":
-        importe = 590;
-        break;
-      case "gift":
-        importe = 330;
-        break;
-      default:
-        importe = 1250; // Fallback price
-        break;
-    }
+    let importe = getPresentacionPrice(p.presentacion);
 
     const pastel = pasteles.find((pastel) => pastel.id === p.id);
     return {
@@ -111,31 +110,45 @@ interface BlockedDateResponse {
   message: string;
 }
 
-export async function blockOrderDate(date: string): Promise<BlockedDateResponse> {
-  const existingEntry = await db.select().from(DisabledDateTimes).where(eq(DisabledDateTimes.date, date)).limit(1);
+export async function blockOrderDate(
+  date: string,
+): Promise<BlockedDateResponse> {
+  const existingEntry = await db
+    .select()
+    .from(DisabledDateTimes)
+    .where(eq(DisabledDateTimes.date, date))
+    .limit(1);
 
   if (existingEntry[0] && existingEntry[0].dayDisabled) {
     return {
       disabledDate: existingEntry[0],
       message: `La fecha ${date} ya ha sido bloqueada.`,
-    }
+    };
   }
 
-  const disabledDate = await db.insert(DisabledDateTimes).values({
-    id: date,
-    date,
-    dayDisabled: true,
-  }).returning();
+  const disabledDate = await db
+    .insert(DisabledDateTimes)
+    .values({
+      id: date,
+      date,
+      dayDisabled: true,
+    })
+    .returning();
 
   return {
     disabledDate: disabledDate[0],
     message: `La fecha ${date} fue bloqueada correctamente.`,
-  }
+  };
 }
 
 // Block sucursales for a specific date
-export async function blockSucursalesForDate(date: string, sucursalIds: string[]): Promise<BlockedDateResponse> {
-  const existingEntry = await db.select().from(DisabledDateTimes)
+export async function blockSucursalesForDate(
+  date: string,
+  sucursalIds: string[],
+): Promise<BlockedDateResponse> {
+  const existingEntry = await db
+    .select()
+    .from(DisabledDateTimes)
     .where(eq(DisabledDateTimes.id, `${date}-sucursales`))
     .limit(1);
 
@@ -143,25 +156,33 @@ export async function blockSucursalesForDate(date: string, sucursalIds: string[]
     return {
       disabledDate: existingEntry[0],
       message: `Ya existe un bloqueo de sucursales para la fecha ${date}.`,
-    }
+    };
   }
 
-  const disabledDate = await db.insert(DisabledDateTimes).values({
-    id: `${date}-sucursales`,
-    date,
-    dayDisabled: false,
-    sucursales: sucursalIds,
-  }).returning();
+  const disabledDate = await db
+    .insert(DisabledDateTimes)
+    .values({
+      id: `${date}-sucursales`,
+      date,
+      dayDisabled: false,
+      sucursales: sucursalIds,
+    })
+    .returning();
 
   return {
     disabledDate: disabledDate[0],
     message: `Las sucursales fueron bloqueadas correctamente para la fecha ${date}.`,
-  }
+  };
 }
 
 // Block products globally for a specific date
-export async function blockProductsForDate(date: string, productIds: string[]): Promise<BlockedDateResponse> {
-  const existingEntry = await db.select().from(DisabledDateTimes)
+export async function blockProductsForDate(
+  date: string,
+  productIds: string[],
+): Promise<BlockedDateResponse> {
+  const existingEntry = await db
+    .select()
+    .from(DisabledDateTimes)
     .where(eq(DisabledDateTimes.id, `${date}-productos`))
     .limit(1);
 
@@ -169,25 +190,34 @@ export async function blockProductsForDate(date: string, productIds: string[]): 
     return {
       disabledDate: existingEntry[0],
       message: `Ya existe un bloqueo de productos para la fecha ${date}.`,
-    }
+    };
   }
 
-  const disabledDate = await db.insert(DisabledDateTimes).values({
-    id: `${date}-productos`,
-    date,
-    dayDisabled: false,
-    productos: productIds,
-  }).returning();
+  const disabledDate = await db
+    .insert(DisabledDateTimes)
+    .values({
+      id: `${date}-productos`,
+      date,
+      dayDisabled: false,
+      productos: productIds,
+    })
+    .returning();
 
   return {
     disabledDate: disabledDate[0],
     message: `Los productos fueron bloqueados correctamente para la fecha ${date}.`,
-  }
+  };
 }
 
 // Block specific products for specific sucursales on a specific date
-export async function blockProductsForSucursalesAndDate(date: string, sucursalIds: string[], productIds: string[]): Promise<BlockedDateResponse> {
-  const existingEntry = await db.select().from(DisabledDateTimes)
+export async function blockProductsForSucursalesAndDate(
+  date: string,
+  sucursalIds: string[],
+  productIds: string[],
+): Promise<BlockedDateResponse> {
+  const existingEntry = await db
+    .select()
+    .from(DisabledDateTimes)
     .where(eq(DisabledDateTimes.id, `${date}-sucursales-productos`))
     .limit(1);
 
@@ -195,19 +225,22 @@ export async function blockProductsForSucursalesAndDate(date: string, sucursalId
     return {
       disabledDate: existingEntry[0],
       message: `Ya existe un bloqueo de productos para sucursales específicas en la fecha ${date}.`,
-    }
+    };
   }
 
-  const disabledDate = await db.insert(DisabledDateTimes).values({
-    id: `${date}-sucursales-productos`,
-    date,
-    dayDisabled: false,
-    sucursales: sucursalIds,
-    productos: productIds,
-  }).returning();
+  const disabledDate = await db
+    .insert(DisabledDateTimes)
+    .values({
+      id: `${date}-sucursales-productos`,
+      date,
+      dayDisabled: false,
+      sucursales: sucursalIds,
+      productos: productIds,
+    })
+    .returning();
 
   return {
     disabledDate: disabledDate[0],
     message: `Los productos fueron bloqueados correctamente para las sucursales especificadas en la fecha ${date}.`,
-  }
+  };
 }

@@ -11,3 +11,19 @@ export const PRESENTACIONES_PRICE: PresentacionesPrice = {
   anytime: 620,
   gift: 350,
 };
+
+function isPresentacionValid(
+  presentacion: any,
+): presentacion is PresentacionesType {
+  return (
+    presentacion &&
+    Object.prototype.hasOwnProperty.call(PRESENTACIONES_PRICE, presentacion)
+  );
+}
+
+export function getPresentacionPrice(presentacion: any): number {
+  if (isPresentacionValid(presentacion)) {
+    return PRESENTACIONES_PRICE[presentacion];
+  }
+  return PRESENTACIONES_PRICE.tradicional; // Fallback price
+}
