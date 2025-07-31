@@ -42,6 +42,10 @@ export function DateTimeSelector({
       monterreyTime.find((part) => part.type === "hour")?.value || "0",
     );
 
+    const currentMinute = parseInt(
+      monterreyTime.find((part) => part.type === "minute")?.value || "0",
+    );
+
     // Get current day of week in Monterrey timezone (0 = Sunday, 1 = Monday, etc.)
     const monterreyDate = new Date().toLocaleDateString("en-CA", {
       timeZone: monterreyTimeZone,
@@ -63,7 +67,6 @@ export function DateTimeSelector({
       case "109":
       case "50":
       case "520":
-        // If it's Sunday, always add 2 days regardless of hour (testing)
         if (isSunday) {
           extraDays = 2;
         } else {
@@ -71,8 +74,10 @@ export function DateTimeSelector({
         }
         break;
       default:
-        // For other sucursales, use default 2 days
-        extraDays = currentHour >= 22 ? 2 : 1;
+        extraDays =
+          currentHour > 21 || (currentHour === 21 && currentMinute >= 30)
+            ? 2
+            : 1;
         break;
     }
     return today(getLocalTimeZone()).add({ days: extraDays });
