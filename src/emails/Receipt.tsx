@@ -18,7 +18,6 @@ import {
 interface ReceiptProps {
   order: ReceiptInformation;
 }
-
 const baseUrl = "https://shop.lapostreria77.com";
 
 export function Receipt({ order }: ReceiptProps) {
@@ -68,6 +67,12 @@ export function Receipt({ order }: ReceiptProps) {
                 <Text className="m-0">
                   <b className="font-medium">Fecha de Entrega:</b>{" "}
                   {new Date(order.fecha).toLocaleDateString()}
+                </Text>
+              </Row>
+              <Row className="m-0 font-medium">
+                <Text className="m-0">
+                  <b className="font-medium">Hora de Entrega:</b>{" "}
+                  {order.fecha.split("T")[1].split(":")[0] + ":00"}
                 </Text>
               </Row>
               <Row className="m-0 font-medium">

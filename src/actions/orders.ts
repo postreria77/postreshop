@@ -7,6 +7,7 @@ import type { OrderProduct } from "db/config";
 import {
   checkSaltilloTime,
   checkBlockedProductsForSucursal,
+  checkGiftOnPasteleria,
 } from "@/lib/orderConditions";
 import {
   blockOrderDate,
@@ -116,6 +117,19 @@ export const orders = {
         throw new ActionError({
           code: "BAD_REQUEST",
           message: message,
+        });
+      }
+
+      const isGiftOnPasteleria = await checkGiftOnPasteleria(
+        parsedProducts,
+        sucursal,
+      );
+
+      if (!isGiftOnPasteleria) {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message:
+            "Solo se pueden realizar pedidos de Gift Cake en sucursales de La Pastelería.",
         });
       }
 

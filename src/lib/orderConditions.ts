@@ -363,3 +363,25 @@ export async function checkBlockedProductsForSucursal(
 
   return { blockedProducts, messages: [...new Set(messages)] }; // Remove duplicate messages
 }
+/**
+ * Check to see if the order contains a Gift Cake and is on a Pasteleria Sucursal.
+ *
+ * @param products - Array of products in the order
+ * @param sucursalId - ID of the sucursal (branch) where the order is being placed
+ */
+export const checkGiftOnPasteleria = async (
+  products: OrderProduct[],
+  sucursalId: string,
+): Promise<boolean> => {
+  const sucursalesPasteleria = ["520", "536"];
+  const giftProducts = products.filter((p) => p.presentacion === "gift");
+  if (giftProducts.length === 0) {
+    return true;
+  }
+
+  if (!sucursalesPasteleria.includes(sucursalId) && giftProducts.length > 0) {
+    return false;
+  }
+
+  return true;
+};

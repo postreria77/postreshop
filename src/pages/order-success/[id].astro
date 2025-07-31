@@ -15,10 +15,13 @@ import { getPresentacionPrice } from "@lib/pricesConfig";
 const { id } = Astro.params;
 const numberId = Number(id);
 
-const orden = await db.select().from(Orders).where(eq(Orders.id, numberId));
-const productosOrden = JSON.parse(
-  orden[0].productos as string,
-) as OrderProduct[];
+const ordenesConId = await db
+  .select()
+  .from(Orders)
+  .where(eq(Orders.id, numberId))
+  .limit(1);
+const orden = ordenesConId[0];
+const productosOrden = JSON.parse(orden.productos as string) as OrderProduct[];
 
 const pasteles = await db
   .select()
@@ -53,7 +56,7 @@ const productos = productosOrden.map((p) => {
 const sucursal = await db
   .select()
   .from(Sucursales)
-  .where(eq(Sucursales.id, orden[0].sucursal));
+  .where(eq(Sucursales.id, orden.sucursal));
 
 const total = new Intl.NumberFormat("es-MX", {
   style: "currency",
@@ -78,22 +81,26 @@ const total = new Intl.NumberFormat("es-MX", {
           <Image src={receiptIcon} alt="Postre Shop Icon" class="size-16" />
           <div class="text-right">
             <h3 class="text-medium">
-              {new Date(orden[0].creado).toLocaleDateString()}
+              {new Date(orden.creado).toLocaleDateString()}
             </h3>
-            <p class="text-xs opacity-60"><span>ID:</span> {orden[0].id}</p>
+            <p class="text-xs opacity-60"><span>ID:</span> {orden.id}</p>
           </div>
         </div>
         <!-- Receipt Body -->
         <h2 class="text-2xl font-medium capitalize tracking-tight">
-          {orden[0].nombre}
+          {orden.nombre}
         </h2>
         <div>
           <ul class="space-y-2">
-            <li><b class="font-medium">Teléfono:</b> {orden[0].tel}</li>
-            <li><b class="font-medium">Estado:</b> {orden[0].estado}</li>
+            <li><b class="font-medium">Teléfono:</b> {orden.tel}</li>
+            <li><b class="font-medium">Estado:</b> {orden.estado}</li>
             <li>
               <b class="font-medium">Fecha de Entrega:</b>
-              {new Date(orden[0].fecha).toLocaleDateString()}
+              {new Date(orden.fecha).toLocaleDateString()}
+            </li>
+            <li>
+              <b class="font-medium">Hora de Entrega:</b>
+              {orden.fecha.split("T")[1].split(":", 1)[0] + ":00"}
             </li>
             <li>
               <b class="font-medium">Sucursal de Entrega:</b>

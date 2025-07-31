@@ -37,6 +37,7 @@ export function addCartItem({
   if (existingEntry) {
     cartItems.setKey(price.id, {
       ...existingEntry,
+      price,
       quantity: existingEntry.quantity + quantity,
     });
     localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));

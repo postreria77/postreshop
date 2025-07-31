@@ -53,5 +53,6 @@ export async function createStripeCheckout(
     line_items,
     mode: "payment",
     payment_intent_data: payment_intent_data,
+    expires_at: Math.floor(Date.now() / 1000) + 1800,
   });
 }
