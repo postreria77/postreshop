@@ -137,7 +137,7 @@ if (sucursal === idSantaCatarina) {
 // Check if any products are blocked for the selected date and sucursal
 const parsedProducts = JSON.parse(productos) as OrderProduct[];
       // Check if any products are blocked for the selected date and sucursal
-      const parsedProducts = JSON.parse(productos) as OrderProduct[];
+     
       const blockingResult = await checkBlockedProductsForSucursal(
         parsedProducts,
         fecha,
