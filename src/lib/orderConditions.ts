@@ -2,10 +2,17 @@ import { db, eq, DisabledDateTimes } from "astro:db";
 import type { OrderProduct } from "db/config";
 
 export function checkSaltilloTime(date: string, sucursalId: string): boolean {
-  const blockedSucursales = [{ id: "109" }, { id: "520" }, { id: "50" }, { id: "99" },{ id: "75" }];
+  const blockedSucursales = [
+    { id: "109" },
+    { id: "520" },
+    { id: "50" },
+    { id: "99" },
+    { id: "75" },
+  ];
+const normalizedId = String(sucursalId).trim();
 
   const isBlockedSucursal = blockedSucursales.some(
-    (sucursal) => sucursal.id === sucursalId,
+    (sucursal) => sucursal.id === normalizedId
   );
 
   if (isBlockedSucursal) {
