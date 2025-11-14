@@ -96,46 +96,86 @@ export function DateTimeSelector({
     }
   };
 
-  const isDateUnavailable = (date: any): boolean => {
-    const formattedSelectedDate = formatDateToString(date);
+ const isDateUnavailable = (date: any): boolean => {
+  const formattedSelectedDate = formatDateToString(date);
 
-    return disabledDates.some((disabledDate) => {
-      // Check if this date matches
-      if (disabledDate.date !== formattedSelectedDate) {
-        return false;
-      }
+  // 1) Reglas normales: fechas deshabilitadas desde la BD
+  const isDisabledByDb = disabledDates.some((disabledDate) => {
+    // Si no coincide la fecha, no aplica esta regla
+    if (disabledDate.date !== formattedSelectedDate) {
+      return false;
+    }
 
-      // If the entire day is disabled, disable it regardless of sucursal
-      if (disabledDate.dayDisabled === true) {
-        return true;
-      }
+    // Día completo bloqueado
+    if (disabledDate.dayDisabled === true) {
+      return true;
+    }
 
-      // If there's a sucursal restriction and a sucursal is selected
-      if (
-        disabledDate.sucursales &&
-        !disabledDate.productos &&
-        selectedSucursalId
-      ) {
-        let sucursalesArray;
-        if (Array.isArray(disabledDate.sucursales)) {
-          sucursalesArray = disabledDate.sucursales;
-        } else if (typeof disabledDate.sucursales === "string") {
-          try {
-            sucursalesArray = JSON.parse(disabledDate.sucursales);
-          } catch {
-            sucursalesArray = [];
-          }
-        } else {
+    // Bloqueo por sucursal (sin productos específicos)
+    if (
+      disabledDate.sucursales &&
+      !disabledDate.productos &&
+      selectedSucursalId
+    ) {
+      let sucursalesArray: string[] = [];
+
+      if (Array.isArray(disabledDate.sucursales)) {
+        sucursalesArray = disabledDate.sucursales as string[];
+      } else if (typeof disabledDate.sucursales === "string") {
+        try {
+          sucursalesArray = JSON.parse(disabledDate.sucursales as string);
+        } catch {
           sucursalesArray = [];
         }
-
-        // Disable if the selected sucursal is in the disabled sucursales list
-        return sucursalesArray.includes(selectedSucursalId);
       }
 
-      return false;
-    });
-  };
+      // Deshabilita si la sucursal seleccionada está en la lista
+      return sucursalesArray.includes(selectedSucursalId);
+    }
+
+    return false;
+  });
+
+  // Si ya está bloqueado por la lógica normal, salimos
+  if (isDisabledByDb) {
+    return true;
+  }
+
+  // 2) Regla especial Santa Catarina:
+  // No permitir pedir para MAÑANA después de las 3 PM
+  const idSantaCatarina = "75";
+
+  if (selectedSucursalId === idSantaCatarina) {
+    const now = new Date();
+    const currentHour = now.getHours(); // hora local de la compu del usuario
+
+    // Usamos la fecha formateada para construir un Date
+    const dateParts = formattedSelectedDate.split("-");
+    if (dateParts.length === 3) {
+      const year = parseInt(dateParts[0]);
+      const month = parseInt(dateParts[1]) - 1; // JS cuenta meses desde 0
+      const day = parseInt(dateParts[2]);
+      const selectedDate = new Date(year, month, day);
+
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+
+      const isTomorrow =
+        selectedDate.getFullYear() === tomorrow.getFullYear() &&
+        selectedDate.getMonth() === tomorrow.getMonth() &&
+        selectedDate.getDate() === tomorrow.getDate();
+
+      // Si ya son las 3 PM o más y la fecha elegida es mañana → deshabilitar
+      if (currentHour >= 15 && isTomorrow) {
+        return true;
+      }
+    }
+  }
+
+  // En cualquier otro caso, la fecha sí está disponible
+  return false;
+};
+
 
   const validateTime = (value: any): true | string | string[] => {
     if (!date) {
