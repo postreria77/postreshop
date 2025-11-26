@@ -15,6 +15,30 @@ import {
   blockProductsForDate,
   blockProductsForSucursalesAndDate,
 } from "@/lib/orders";
+type SpecialWindow = {
+  from: string; // "HH:mm"
+  to: string;   // "HH:mm"
+};
+
+// Función que regresa ventana especial según fecha
+function getSpecialPickupWindow(fecha: string): SpecialWindow | null {
+  const [_, month, day] = fecha.split("-");
+  const mmdd = `${month}-${day}`;
+
+  if (mmdd === "12-24" || mmdd === "12-31") {
+    return { from: "13:00", to: "17:00" };
+  }
+
+  if (mmdd === "12-25" || mmdd === "01-01") {
+    return { from: "15:00", to: "19:00" };
+  }
+
+  return null;
+}
+
+function isTimeWithinWindow(time: string, from: string, to: string): boolean {
+  return time >= from && time <= to;
+}
 
 export const orders = {
   create: defineAction({
@@ -74,6 +98,19 @@ export const orders = {
     handler: async (input) => {
       const { productos, tel, email, nombre, apellido, sucursal, fecha, hora } =
         input;
+// 🔔 Validación de horarios para fechas especiales (Navidad / Año Nuevo)
+const specialWindow = getSpecialPickupWindow(fecha);
+
+if (specialWindow) {
+  const { from, to } = specialWindow;
+
+  if (!isTimeWithinWindow(hora, from, to)) {
+    throw new ActionError({
+      code: "BAD_REQUEST",
+      message: `En esta fecha especial solo puedes agendar tu pedido entre ${from} y ${to}.`,
+    });
+  }
+}
 
       // Parse items for Stripe session
       const line_items = JSON.parse(productos).map(
