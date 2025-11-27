@@ -95,6 +95,27 @@ export function DateTimeSelector({
       return `${date.year}-${month}-${day}`;
     }
   };
+  const getSpecialTimeWindow = (selectedDate: any):
+    | { min: Time; max: Time }
+    | null => {
+    if (!selectedDate) return null;
+
+    const formattedSelectedDate = formatDateToString(selectedDate);
+    const [, month, day] = formattedSelectedDate.split("-");
+    const mmdd = `${month}-${day}`;
+
+    // 24 y 31 de diciembre → 1 pm a 5 pm
+    if (mmdd === "12-24" || mmdd === "12-31") {
+      return { min: new Time(13), max: new Time(17) };
+    }
+
+    // 25 de diciembre y 1 de enero → 3 pm a 7 pm
+    if (mmdd === "12-25" || mmdd === "01-01") {
+      return { min: new Time(15), max: new Time(19) };
+    }
+
+    return null;
+  };
 
   const isDateUnavailable = (date: any): boolean => {
     const formattedSelectedDate = formatDateToString(date);
@@ -167,13 +188,17 @@ export function DateTimeSelector({
   const handleDateChange = (newDate: any) => {
     setDate(newDate);
     onDateChange?.(newDate);
+    
   };
 
   const handleTimeChange = (newTime: any) => {
     setTime(newTime);
     onTimeChange?.(newTime);
   };
-
+ // 🔔 Calcular ventana de horarios según la fecha seleccionada
+  const specialTimeWindow = getSpecialTimeWindow(date);
+  const minTime = specialTimeWindow ? specialTimeWindow.min : new Time(13);
+  const maxTime = specialTimeWindow ? specialTimeWindow.max : new Time(22);
   return (
     <div className="grid grid-cols-2 gap-4">
       <div>
@@ -202,11 +227,10 @@ export function DateTimeSelector({
           label="Hora"
           value={time}
           onChange={handleTimeChange}
-          minValue={new Time(13) as any}
-          maxValue={new Time(22) as any}
+        minValue={minTime as any}        // 👉 antes: new Time(13)
+          maxValue={maxTime as any}        // 👉 antes: new Time(22)
           granularity="hour"
-          defaultValue={new Time(13) as any}
-          isRequired
+defaultValue={minTime as any}    // 👉 antes: new Time(13)          isRequired
           radius="sm"
           validate={validateTime}
         />
