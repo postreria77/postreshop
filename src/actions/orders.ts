@@ -1,3 +1,4 @@
+
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { db, eq, Orders, Sucursales, DisabledDateTimes } from "astro:db";
@@ -329,6 +330,7 @@ handler: async ({ fecha, productIds }) => {
   };
 },
 },
+
   lockProductsForSucursalesAndDate: defineAction({
     input: z.object({
       fecha: z
