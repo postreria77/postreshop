@@ -536,4 +536,4 @@ handler: async ({ fecha, productIds }) => {
       }
     },
   }),
-};
+
