@@ -38,6 +38,8 @@ export function CheckoutForm({
     tel: "",
     email: "",
   });
+const [selectedDate, setSelectedDate] = useState<any>(null);
+const [pistacheError, setPistacheError] = useState<string | null>(null);
 
   const handleSucursalChange = (keys: "all" | Set<React.Key>) => {
     if (keys !== "all" && keys.size > 0) {
@@ -47,14 +49,16 @@ export function CheckoutForm({
       setSelectedSucursal("");
     }
   };
-
-  const handleInputChange = (field: keyof typeof formData, value: string) => {
+    const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
-
+const handleDateChangeFromSelector = (newDate: any) => {
+  setSelectedDate(newDate);
+  setPistacheError(null);
+};
   const inputErrors = isInputError(error) ? error.fields : {};
   const actionError = !isInputError(error) ? error : undefined;
 
@@ -79,9 +83,15 @@ export function CheckoutForm({
             },
           ])}
         />
-      ) : (
-        <CheckoutProductsInput />
-      )}
+          ) : (
+      <CheckoutProductsInput
+        selectedDate={selectedDate}
+        onPistacheBlocked={() =>
+          setPistacheError("El Pastel Pistache no está disponible para esta fecha.")
+        }
+      />
+    )}
+
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Input
@@ -169,11 +179,18 @@ export function CheckoutForm({
           <FormInputError error={inputErrors.sucursal} name="sucursal" />
         )}
       </div>
-      <DateTimeSelector
-        disabledDates={disabledDates}
-        inputErrors={inputErrors}
-        selectedSucursalId={selectedSucursal}
-      />
+     <DateTimeSelector
+  disabledDates={disabledDates}
+  inputErrors={inputErrors}
+  selectedSucursalId={selectedSucursalId}
+  onDateChange={handleDateChangeFromSelector}
+/>
+
+      
+      {pistacheError && (
+  <FormInputError error={pistacheError} name="pistache" />
+)}
+
       {actionError?.message && (
         <FormInputError error={actionError.message} name="form" />
       )}
