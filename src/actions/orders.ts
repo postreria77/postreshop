@@ -41,8 +41,8 @@ export const orders = {
         }),
       tel: z
         .string()
-        .min(10, { message: "El teléfono debe tener 10 dígitos." })
-        .max(10, { message: "El teléfono debe tener 10 dígitos." })
+        .min(10, { message: "El teléfono debe tener 10 dígitos." })
+        .max(10, { message: "El teléfono debe tener 10 dígitos." })
         .nonempty({ message: "Ingresa un teléfono." })
         .nullable()
         .refine((tel) => tel !== null, {
@@ -205,7 +205,7 @@ const parsedProducts = JSON.parse(productos) as OrderProduct[];
       if (!connectedStripeAccount) {
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Error al crear la sesión de pago. Intente nuevamente.",
+          message: "Error al crear la sesión de pago. Intente nuevamente.",
         });
       }
 
@@ -223,7 +223,7 @@ const parsedProducts = JSON.parse(productos) as OrderProduct[];
           .where(eq(Orders.id, id));
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Error al crear la sesión de pago. Intente nuevamente.",
+          message: "Error al crear la sesión de pago. Intente nuevamente.",
         });
       }
 
@@ -329,7 +329,6 @@ handler: async ({ fecha, productIds }) => {
   };
 },
 },
-
   lockProductsForSucursalesAndDate: defineAction({
     input: z.object({
       fecha: z
