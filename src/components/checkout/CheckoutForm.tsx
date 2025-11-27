@@ -66,32 +66,14 @@ const handleDateChangeFromSelector = (newDate: any) => {
     return navigate(data.url);
   }
 
-  return (
-    <form className="sticky top-32 space-y-4" method="POST" action={action}>
-      {test ? (
-        <input
-          type="hidden"
-          hidden
-          name="productos"
-          value={JSON.stringify([
-            {
-              id: "358",
-              id_pasteleria: "98",
-              cantidad: 1,
-              stripePriceId: "price_1R1ZPq2N0hejjjHDsXDKhJbn",
-              presentacion: "gift",
-            },
-          ])}
-        />
-          ) : (
-      <CheckoutProductsInput
-        selectedDate={selectedDate}
-        onPistacheBlocked={() =>
-          setPistacheError("El Pastel Pistache no está disponible para esta fecha.")
-        }
-      />
-    )}
-
+ return (
+  <form className="sticky top-32 space-y-4" method="POST" action={action}>
+<CheckoutProductsInput
+  selectedDate={selectedDate}
+  onPistacheBlocked={() =>
+    setPistacheError("El Pastel Pistache no está disponible para esta fecha.")
+  }
+/>
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Input
