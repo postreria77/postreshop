@@ -322,47 +322,14 @@ const parsedProducts = JSON.parse(productos) as OrderProduct[];
           message: "Selecciona al menos un producto.",
         }),
     }),
-    accept: "form",
-    handler: async ({ fecha, productIds }) => {
-       // Validación de la fecha
-  if (typeof fecha !== "string") {
-    throw new ActionError({
-      code: "BAD_REQUEST",
-      message: "Error al bloquear la fecha. Intente nuevamente.",
-    });
-  }
+   accept: "form",
+handler: async ({ fecha, productIds }) => {
+  return {
+    message: "",
+  };
+},
+},
 
-  let parsedProductIds: string[];
-
-  // Manejo flexible de productIds
-  if (typeof productIds === "string") {
-    try {
-      const parsed = JSON.parse(productIds);
-
-      if (Array.isArray(parsed)) {
-        parsedProductIds = parsed;
-      } else {
-        parsedProductIds = [String(parsed)];
-      }
-    } catch {
-      parsedProductIds = productIds
-        .split(",")
-        .map((id) => id.trim())
-        .filter(Boolean);
-    }
-  } else {
-    throw new ActionError({
-      code: "BAD_REQUEST",
-      message: "Error al procesar los productos. Intente nuevamente.",
-    });
-  }
-      const { message } = await blockProductsForDate(fecha, parsedProductIds);
-
-      return {
-        message: message,
-      };
-    },
-  }),
   lockProductsForSucursalesAndDate: defineAction({
     input: z.object({
       fecha: z
