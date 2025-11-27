@@ -22,12 +22,11 @@ export function DateTimeSelector({
   const [date, setDate] = useState<any>(null);
   const [time, setTime] = useState<any>(new Time(13));
 
-  // Memoized minimum date that reacts to selectedSucursalId changes
+  // 📅 Fecha mínima según sucursal y hora actual (horario normal)
   const minimumDate = useMemo(() => {
     const monterreyTimeZone = "America/Monterrey";
     const now = new Date();
 
-    // Get current time in Monterrey timezone
     const monterreyTime = new Intl.DateTimeFormat("en-CA", {
       timeZone: monterreyTimeZone,
       year: "numeric",
@@ -41,18 +40,17 @@ export function DateTimeSelector({
     const currentHour = parseInt(
       monterreyTime.find((part) => part.type === "hour")?.value || "0",
     );
-
     const currentMinute = parseInt(
       monterreyTime.find((part) => part.type === "minute")?.value || "0",
     );
 
-    // Get current day of week in Monterrey timezone (0 = Sunday, 1 = Monday, etc.)
     const monterreyDate = new Date().toLocaleDateString("en-CA", {
       timeZone: monterreyTimeZone,
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
     });
+
     const [year, month, day] = monterreyDate.split("-").map(Number);
     const monterreyDateObj = new Date(year, month - 1, day);
     const isSunday = monterreyDateObj.getDay() === 0;
@@ -80,6 +78,7 @@ export function DateTimeSelector({
             : 1;
         break;
     }
+
     return today(getLocalTimeZone()).add({ days: extraDays });
   }, [selectedSucursalId]);
 
@@ -87,103 +86,76 @@ export function DateTimeSelector({
     if (date instanceof Date) {
       return date.toISOString().split("T")[0];
     } else {
-      // Handle DateValue from @internationalized/date
-      // Ensure month is padded with leading zero if needed
       const month = date.month.toString().padStart(2, "0");
-      // Ensure day is padded with leading zero if needed
       const day = date.day.toString().padStart(2, "0");
       return `${date.year}-${month}-${day}`;
     }
   };
 
- const isDateUnavailable = (date: any): boolean => {
-  const formattedSelectedDate = formatDateToString(date);
+  // 🔔 Ventana especial de horarios para 24, 25, 31 dic y 1 ene
+  const getSpecialTimeWindow = (
+    selectedDate: any,
+  ): { min: Time; max: Time } | null => {
+    if (!selectedDate) return null;
 
-  // 1) Reglas normales: fechas deshabilitadas desde la BD
-  const isDisabledByDb = disabledDates.some((disabledDate) => {
-    // Si no coincide la fecha, no aplica esta regla
-    if (disabledDate.date !== formattedSelectedDate) {
-      return false;
+    const formattedSelectedDate = formatDateToString(selectedDate);
+    const [, month, day] = formattedSelectedDate.split("-");
+    const mmdd = `${month}-${day}`;
+
+    // 24 y 31 de diciembre → 1 pm a 5 pm
+    if (mmdd === "12-24" || mmdd === "12-31") {
+      return { min: new Time(13), max: new Time(17) };
     }
 
-    // Día completo bloqueado
-    if (disabledDate.dayDisabled === true) {
-      return true;
+    // 25 de diciembre y 1 de enero → 3 pm a 7 pm
+    if (mmdd === "12-25" || mmdd === "01-01") {
+      return { min: new Time(15), max: new Time(19) };
     }
 
-    // Bloqueo por sucursal (sin productos específicos)
-    if (
-      disabledDate.sucursales &&
-      !disabledDate.productos &&
-      selectedSucursalId
-    ) {
-      let sucursalesArray: string[] = [];
+    return null;
+  };
 
-      if (Array.isArray(disabledDate.sucursales)) {
-        sucursalesArray = disabledDate.sucursales as string[];
-      } else if (typeof disabledDate.sucursales === "string") {
-        try {
-          sucursalesArray = JSON.parse(disabledDate.sucursales as string);
-        } catch {
-          sucursalesArray = [];
-        }
-      }
-
-      // Deshabilita si la sucursal seleccionada está en la lista
-      return sucursalesArray.includes(selectedSucursalId);
-    }
-
-    return false;
-  });
-
-  // Si ya está bloqueado por la lógica normal, salimos
-  if (isDisabledByDb) {
-    return true;
-  }
-
-  // 2) Regla especial Santa Catarina:
-  // No permitir pedir para MAÑANA después de las 3 PM
-  const idSantaCatarina = "75";
-
-  if (selectedSucursalId === idSantaCatarina) {
-    const now = new Date();
-    const currentHour = now.getHours(); // hora local de la compu del usuario
-
-    // Usamos la fecha formateada para construir un Date
-    const dateParts = formattedSelectedDate.split("-");
-    if (dateParts.length === 3) {
-      const year = parseInt(dateParts[0]);
-      const month = parseInt(dateParts[1]) - 1; // JS cuenta meses desde 0
-      const day = parseInt(dateParts[2]);
-      const selectedDate = new Date(year, month, day);
-
-      const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
-
-      const isTomorrow =
-        selectedDate.getFullYear() === tomorrow.getFullYear() &&
-        selectedDate.getMonth() === tomorrow.getMonth() &&
-        selectedDate.getDate() === tomorrow.getDate();
-
-      // Si ya son las 3 PM o más y la fecha elegida es mañana → deshabilitar
-      if (currentHour >= 15 && isTomorrow) {
-        return true;
-      }
-    }
-  }
-
-  // En cualquier otro caso, la fecha sí está disponible
-  return false;
-};
-
-
-  const validateTime = (value: any): true | string | string[] => {
-    if (!date) {
-      return true;
-    }
-
+  const isDateUnavailable = (date: any): boolean => {
     const formattedSelectedDate = formatDateToString(date);
 
+    return disabledDates.some((disabledDate) => {
+      if (disabledDate.date !== formattedSelectedDate) {
+        return false;
+      }
+
+      if (disabledDate.dayDisabled === true) {
+        return true;
+      }
+
+      if (
+        disabledDate.sucursales &&
+        !disabledDate.productos &&
+        selectedSucursalId
+      ) {
+        let sucursalesArray;
+        if (Array.isArray(disabledDate.sucursales)) {
+          sucursalesArray = disabledDate.sucursales;
+        } else if (typeof disabledDate.sucursales === "string") {
+          try {
+            sucursalesArray = JSON.parse(disabledDate.sucursales);
+          } catch {
+            sucursalesArray = [];
+          }
+        } else {
+          sucursalesArray = [];
+        }
+
+        return sucursalesArray.includes(selectedSucursalId);
+      }
+
+      return false;
+    });
+  };
+
+  const validateTime = (value: any): true | string | string[] => {
+    if (!date) return true;
+
+    const formattedSelectedDate = formatDateToString(date);
     const matchingDateEntry = disabledDates.find(
       (dt) => dt.date === formattedSelectedDate,
     );
@@ -201,6 +173,7 @@ export function DateTimeSelector({
         return "La hora está agotada";
       }
     }
+
     return true;
   };
 
@@ -213,6 +186,11 @@ export function DateTimeSelector({
     setTime(newTime);
     onTimeChange?.(newTime);
   };
+
+  // ⏰ Elegir min y max según fecha especial o normal
+  const specialTimeWindow = getSpecialTimeWindow(date);
+  const minTime = specialTimeWindow ? specialTimeWindow.min : new Time(13);
+  const maxTime = specialTimeWindow ? specialTimeWindow.max : new Time(22);
 
   return (
     <div className="grid grid-cols-2 gap-4">
@@ -242,10 +220,10 @@ export function DateTimeSelector({
           label="Hora"
           value={time}
           onChange={handleTimeChange}
-          minValue={new Time(13) as any}
-          maxValue={new Time(22) as any}
+          minValue={minTime as any}
+          maxValue={maxTime as any}
           granularity="hour"
-          defaultValue={new Time(13) as any}
+          defaultValue={minTime as any}
           isRequired
           radius="sm"
           validate={validateTime}
