@@ -324,23 +324,38 @@ const parsedProducts = JSON.parse(productos) as OrderProduct[];
     }),
     accept: "form",
     handler: async ({ fecha, productIds }) => {
-      if (typeof fecha !== "string" || typeof productIds !== "string") {
-        throw new ActionError({
-          code: "BAD_REQUEST",
-          message: "Error al bloquear los productos. Intente nuevamente.",
-        });
-      }
+       // Validación de la fecha
+  if (typeof fecha !== "string") {
+    throw new ActionError({
+      code: "BAD_REQUEST",
+      message: "Error al bloquear la fecha. Intente nuevamente.",
+    });
+  }
 
-      let parsedProductIds: string[];
-      try {
-        parsedProductIds = JSON.parse(productIds);
-      } catch {
-        throw new ActionError({
-          code: "BAD_REQUEST",
-          message: "Error al procesar los productos. Intente nuevamente.",
-        });
-      }
+  let parsedProductIds: string[];
 
+  // Manejo flexible de productIds
+  if (typeof productIds === "string") {
+    try {
+      const parsed = JSON.parse(productIds);
+
+      if (Array.isArray(parsed)) {
+        parsedProductIds = parsed;
+      } else {
+        parsedProductIds = [String(parsed)];
+      }
+    } catch {
+      parsedProductIds = productIds
+        .split(",")
+        .map((id) => id.trim())
+        .filter(Boolean);
+    }
+  } else {
+    throw new ActionError({
+      code: "BAD_REQUEST",
+      message: "Error al procesar los productos. Intente nuevamente.",
+    });
+  }
       const { message } = await blockProductsForDate(fecha, parsedProductIds);
 
       return {
