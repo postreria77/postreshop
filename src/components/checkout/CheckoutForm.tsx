@@ -38,8 +38,6 @@ export function CheckoutForm({
     tel: "",
     email: "",
   });
-const [selectedDate, setSelectedDate] = useState<any>(null);
-const [pistacheError, setPistacheError] = useState<string | null>(null);
 
   const handleSucursalChange = (keys: "all" | Set<React.Key>) => {
     if (keys !== "all" && keys.size > 0) {
@@ -49,16 +47,14 @@ const [pistacheError, setPistacheError] = useState<string | null>(null);
       setSelectedSucursal("");
     }
   };
-    const handleInputChange = (field: keyof typeof formData, value: string) => {
+
+  const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
     }));
   };
-const handleDateChangeFromSelector = (newDate: any) => {
-  setSelectedDate(newDate);
-  setPistacheError(null);
-};
+
   const inputErrors = isInputError(error) ? error.fields : {};
   const actionError = !isInputError(error) ? error : undefined;
 
@@ -66,14 +62,26 @@ const handleDateChangeFromSelector = (newDate: any) => {
     return navigate(data.url);
   }
 
- return (
-  <form className="sticky top-32 space-y-4" method="POST" action={action}>
-<CheckoutProductsInput
-  selectedDate={selectedDate}
-  onPistacheBlocked={() =>
-    setPistacheError("El Pastel Pistache no está disponible para esta fecha.")
-  }
-/>
+  return (
+    <form className="sticky top-32 space-y-4" method="POST" action={action}>
+      {test ? (
+        <input
+          type="hidden"
+          hidden
+          name="productos"
+          value={JSON.stringify([
+            {
+              id: "358",
+              id_pasteleria: "98",
+              cantidad: 1,
+              stripePriceId: "price_1R1ZPq2N0hejjjHDsXDKhJbn",
+              presentacion: "gift",
+            },
+          ])}
+        />
+      ) : (
+        <CheckoutProductsInput />
+      )}
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Input
@@ -161,24 +169,17 @@ const handleDateChangeFromSelector = (newDate: any) => {
           <FormInputError error={inputErrors.sucursal} name="sucursal" />
         )}
       </div>
-     <DateTimeSelector
-  disabledDates={disabledDates}
-  inputErrors={inputErrors}
-  selectedSucursalId={selectedSucursalId}
-  onDateChange={handleDateChangeFromSelector}
-/>
-
-      
-      {pistacheError && (
-  <FormInputError error={pistacheError} name="pistache" />
-)}
-
+      <DateTimeSelector
+        disabledDates={disabledDates}
+        inputErrors={inputErrors}
+        selectedSucursalId={selectedSucursal}
+      />
       {actionError?.message && (
         <FormInputError error={actionError.message} name="form" />
       )}
       <button
         type="submit"
-        className={`${isPending ? "bg-brand bg-opacity-25" : "bg-light bg-opacity-5"} relative mt-4 w-full rounded-sm border border-light border-opacity-25 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand`}
+        className={⁠ ${isPending ? "bg-brand bg-opacity-25" : "bg-light bg-opacity-5"} relative mt-4 w-full rounded-sm border border-light border-opacity-25 py-3 text-center leading-none transition duration-75 ease-out ~px-2/4 hover:border-brand hover:border-opacity-50 hover:bg-brand hover:bg-opacity-15 hover:text-brand-2 focus:outline-brand ⁠}
       >
         {isPending ? (
           <div className="mr-4 flex items-center justify-center gap-2">
