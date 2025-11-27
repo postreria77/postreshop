@@ -328,9 +328,7 @@ handler: async ({ fecha, productIds }) => {
   return {
     message: "",
   };
-}),
 },
-
   lockProductsForSucursalesAndDate: defineAction({
     input: z.object({
       fecha: z
