@@ -9,7 +9,7 @@ export interface PresentacionesPrice {
 export const PRESENTACIONES_PRICE: PresentacionesPrice = {
   tradicional: 1340,
   anytime: 650,
-  gift: 369,
+  gift: 370,
 };
 
 function isPresentacionValid(
