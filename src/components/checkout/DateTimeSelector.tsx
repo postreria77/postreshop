@@ -22,12 +22,11 @@ export function DateTimeSelector({
   const [date, setDate] = useState<any>(null);
   const [time, setTime] = useState<any>(new Time(13));
 
-  // Memoized minimum date that reacts to selectedSucursalId changes
+  // 📅 Fecha mínima según sucursal y hora actual (horario normal)
   const minimumDate = useMemo(() => {
     const monterreyTimeZone = "America/Monterrey";
     const now = new Date();
 
-    // Get current time in Monterrey timezone
     const monterreyTime = new Intl.DateTimeFormat("en-CA", {
       timeZone: monterreyTimeZone,
       year: "numeric",
@@ -41,18 +40,17 @@ export function DateTimeSelector({
     const currentHour = parseInt(
       monterreyTime.find((part) => part.type === "hour")?.value || "0",
     );
-
     const currentMinute = parseInt(
       monterreyTime.find((part) => part.type === "minute")?.value || "0",
     );
 
-    // Get current day of week in Monterrey timezone (0 = Sunday, 1 = Monday, etc.)
     const monterreyDate = new Date().toLocaleDateString("en-CA", {
       timeZone: monterreyTimeZone,
       year: "numeric",
       month: "2-digit",
       day: "2-digit",
     });
+
     const [year, month, day] = monterreyDate.split("-").map(Number);
     const monterreyDateObj = new Date(year, month - 1, day);
     const isSunday = monterreyDateObj.getDay() === 0;
@@ -80,6 +78,7 @@ export function DateTimeSelector({
             : 1;
         break;
     }
+
     return today(getLocalTimeZone()).add({ days: extraDays });
   }, [selectedSucursalId]);
 
@@ -87,10 +86,7 @@ export function DateTimeSelector({
     if (date instanceof Date) {
       return date.toISOString().split("T")[0];
     } else {
-      // Handle DateValue from @internationalized/date
-      // Ensure month is padded with leading zero if needed
       const month = date.month.toString().padStart(2, "0");
-      // Ensure day is padded with leading zero if needed
       const day = date.day.toString().padStart(2, "0");
       return `${date.year}-${month}-${day}`;
     }
@@ -117,21 +113,41 @@ export function DateTimeSelector({
     return null;
   };
 
+  // 🔔 Ventana especial de horarios para 24, 25, 31 dic y 1 ene
+  const getSpecialTimeWindow = (
+    selectedDate: any,
+  ): { min: Time; max: Time } | null => {
+    if (!selectedDate) return null;
+
+    const formattedSelectedDate = formatDateToString(selectedDate);
+    const [, month, day] = formattedSelectedDate.split("-");
+    const mmdd = `${month}-${day}`;
+
+    // 24 y 31 de diciembre → 1 pm a 5 pm
+    if (mmdd === "12-24" || mmdd === "12-31") {
+      return { min: new Time(13), max: new Time(17) };
+    }
+
+    // 25 de diciembre y 1 de enero → 3 pm a 7 pm
+    if (mmdd === "12-25" || mmdd === "01-01") {
+      return { min: new Time(15), max: new Time(19) };
+    }
+
+    return null;
+  };
+
   const isDateUnavailable = (date: any): boolean => {
     const formattedSelectedDate = formatDateToString(date);
 
     return disabledDates.some((disabledDate) => {
-      // Check if this date matches
       if (disabledDate.date !== formattedSelectedDate) {
         return false;
       }
 
-      // If the entire day is disabled, disable it regardless of sucursal
       if (disabledDate.dayDisabled === true) {
         return true;
       }
 
-      // If there's a sucursal restriction and a sucursal is selected
       if (
         disabledDate.sucursales &&
         !disabledDate.productos &&
@@ -150,7 +166,6 @@ export function DateTimeSelector({
           sucursalesArray = [];
         }
 
-        // Disable if the selected sucursal is in the disabled sucursales list
         return sucursalesArray.includes(selectedSucursalId);
       }
 
@@ -159,12 +174,9 @@ export function DateTimeSelector({
   };
 
   const validateTime = (value: any): true | string | string[] => {
-    if (!date) {
-      return true;
-    }
+    if (!date) return true;
 
     const formattedSelectedDate = formatDateToString(date);
-
     const matchingDateEntry = disabledDates.find(
       (dt) => dt.date === formattedSelectedDate,
     );
@@ -182,6 +194,7 @@ export function DateTimeSelector({
         return "La hora está agotada";
       }
     }
+
     return true;
   };
 
@@ -227,10 +240,11 @@ export function DateTimeSelector({
           label="Hora"
           value={time}
           onChange={handleTimeChange}
-        minValue={minTime as any}        // 👉 antes: new Time(13)
-          maxValue={maxTime as any}        // 👉 antes: new Time(22)
+          minValue={minTime as any}
+          maxValue={maxTime as any}
           granularity="hour"
-defaultValue={minTime as any}    // 👉 antes: new Time(13)          isRequired
+          defaultValue={minTime as any}
+          isRequired
           radius="sm"
           validate={validateTime}
         />

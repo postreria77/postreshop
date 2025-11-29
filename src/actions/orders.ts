@@ -41,8 +41,8 @@ export const orders = {
         }),
       tel: z
         .string()
-        .min(10, { message: "El teléfono debe tener 10 dígitos." })
-        .max(10, { message: "El teléfono debe tener 10 dígitos." })
+        .min(10, { message: "El teléfono debe tener 10 dígitos." })
+        .max(10, { message: "El teléfono debe tener 10 dígitos." })
         .nonempty({ message: "Ingresa un teléfono." })
         .nullable()
         .refine((tel) => tel !== null, {
@@ -205,7 +205,7 @@ const parsedProducts = JSON.parse(productos) as OrderProduct[];
       if (!connectedStripeAccount) {
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Error al crear la sesión de pago. Intente nuevamente.",
+          message: "Error al crear la sesión de pago. Intente nuevamente.",
         });
       }
 
@@ -223,7 +223,7 @@ const parsedProducts = JSON.parse(productos) as OrderProduct[];
           .where(eq(Orders.id, id));
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
-          message: "Error al crear la sesión de pago. Intente nuevamente.",
+          message: "Error al crear la sesión de pago. Intente nuevamente.",
         });
       }
 
@@ -324,23 +324,38 @@ const parsedProducts = JSON.parse(productos) as OrderProduct[];
     }),
     accept: "form",
     handler: async ({ fecha, productIds }) => {
-      if (typeof fecha !== "string" || typeof productIds !== "string") {
-        throw new ActionError({
-          code: "BAD_REQUEST",
-          message: "Error al bloquear los productos. Intente nuevamente.",
-        });
-      }
+       // Validación de la fecha
+  if (typeof fecha !== "string") {
+    throw new ActionError({
+      code: "BAD_REQUEST",
+      message: "Error al bloquear la fecha. Intente nuevamente.",
+    });
+  }
 
-      let parsedProductIds: string[];
-      try {
-        parsedProductIds = JSON.parse(productIds);
-      } catch {
-        throw new ActionError({
-          code: "BAD_REQUEST",
-          message: "Error al procesar los productos. Intente nuevamente.",
-        });
-      }
+  let parsedProductIds: string[];
 
+  // Manejo flexible de productIds
+  if (typeof productIds === "string") {
+    try {
+      const parsed = JSON.parse(productIds);
+
+      if (Array.isArray(parsed)) {
+        parsedProductIds = parsed;
+      } else {
+        parsedProductIds = [String(parsed)];
+      }
+    } catch {
+      parsedProductIds = productIds
+        .split(",")
+        .map((id) => id.trim())
+        .filter(Boolean);
+    }
+  } else {
+    throw new ActionError({
+      code: "BAD_REQUEST",
+      message: "Error al procesar los productos. Intente nuevamente.",
+    });
+  }
       const { message } = await blockProductsForDate(fecha, parsedProductIds);
 
       return {
