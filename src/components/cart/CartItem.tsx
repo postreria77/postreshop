@@ -50,7 +50,7 @@ export default function CartItem({
       </div>
       <button
         onClick={handleRemoveItem}
-        className="absolute right-0 top-[40%] text-transparent opacity-50 hover:opacity-100 group-hover:text-red-500"
+        className="absolute bottom-3 right-0 text-transparent opacity-50 hover:opacity-100 group-hover:text-red-500"
       >
         Eliminar
       </button>

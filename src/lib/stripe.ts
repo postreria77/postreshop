@@ -43,7 +43,7 @@ export async function createStripeCheckout(
   connectedStripeAccount: string,
   order_id: number,
   line_items: Stripe.Checkout.SessionCreateParams.LineItem[],
-  discounts: Discount[],
+  // discounts: Discount[],
 ): Promise<Stripe.Checkout.Session> {
   let payment_intent_data: Stripe.Checkout.SessionCreateParams.PaymentIntentData;
   if (connectedStripeAccount === "acct_1Qg3Dy2N0hejjjHD") {
@@ -65,7 +65,7 @@ export async function createStripeCheckout(
   return stripe.checkout.sessions.create({
     success_url: `${getSecret("STRIPE_SUCCESS_URL")}/${order_id}`,
     line_items,
-    discounts,
+    // discounts,
     mode: "payment",
     payment_intent_data: payment_intent_data,
     expires_at: Math.floor(Date.now() / 1000) + 1800,
