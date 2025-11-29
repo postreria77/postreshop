@@ -211,13 +211,13 @@ export const orders = {
         });
       }
 
-      const discounts = await generateDiscountArray(parsedProducts);
+      // const discounts = await generateDiscountArray(parsedProducts);
 
       const session = await createStripeCheckout(
         connectedStripeAccount,
         id,
         line_items,
-        discounts,
+        // discounts,
       );
 
       if (!session) {
