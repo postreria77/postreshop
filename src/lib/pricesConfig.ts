@@ -12,6 +12,12 @@ export const PRESENTACIONES_PRICE: PresentacionesPrice = {
   gift: 370,
 };
 
+export const PRESENTACIONES_DISCOUNT: PresentacionesPrice = {
+  tradicional: 350,
+  anytime: 100,
+  gift: 80,
+};
+
 function isPresentacionValid(
   presentacion: any,
 ): presentacion is PresentacionesType {

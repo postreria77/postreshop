@@ -1,9 +1,11 @@
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
 import { db, eq, Orders, Sucursales, DisabledDateTimes } from "astro:db";
-import { createStripeCheckout } from "@/lib/stripe";
+import { createStripeCheckout, generateDiscountArray } from "@/lib/stripe";
 
 import type { OrderProduct } from "db/config";
+import type { Discount } from "@/lib/stripe";
+
 import {
   checkSaltilloTime,
   checkBlockedProductsForSucursal,
@@ -99,45 +101,45 @@ export const orders = {
           message: "Esta sucursal no recibe pedidos los domingos.",
         });
       }
-// 🔒 Regla especial Santa Catarina
-const idSantaCatarina = "75";
+      // 🔒 Regla especial Santa Catarina
+      const idSantaCatarina = "75";
 
-if (sucursal === idSantaCatarina) {
-  const limitHour = 15; // 3 PM
+      if (sucursal === idSantaCatarina) {
+        const limitHour = 15; // 3 PM
 
-  const now = new Date();
-  const currentHour = now.getHours();
+        const now = new Date();
+        const currentHour = now.getHours();
 
-  // Fecha seleccionada por el usuario
-  const dateParts = fecha.split("-");
-  const year = parseInt(dateParts[0]);
-  const month = parseInt(dateParts[1]) - 1;
-  const day = parseInt(dateParts[2]);
-  const selectedDate = new Date(year, month, day);
+        // Fecha seleccionada por el usuario
+        const dateParts = fecha.split("-");
+        const year = parseInt(dateParts[0]);
+        const month = parseInt(dateParts[1]) - 1;
+        const day = parseInt(dateParts[2]);
+        const selectedDate = new Date(year, month, day);
 
-  // Fecha de mañana
-  const tomorrow = new Date();
-  tomorrow.setDate(tomorrow.getDate() + 1);
+        // Fecha de mañana
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
 
-  const isTomorrow =
-    selectedDate.getFullYear() === tomorrow.getFullYear() &&
-    selectedDate.getMonth() === tomorrow.getMonth() &&
-    selectedDate.getDate() === tomorrow.getDate();
+        const isTomorrow =
+          selectedDate.getFullYear() === tomorrow.getFullYear() &&
+          selectedDate.getMonth() === tomorrow.getMonth() &&
+          selectedDate.getDate() === tomorrow.getDate();
 
-  // Si ya son las 3 PM o más y se intenta pedir para mañana → bloquear
-  if (currentHour >= limitHour && isTomorrow) {
-    throw new ActionError({
-      code: "INVALID_TIME",
-      message:
-        "Santa Catarina ya no acepta pedidos para mañana después de las 3:00 p.m.",
-    });
-  }
-}
+        // Si ya son las 3 PM o más y se intenta pedir para mañana → bloquear
+        if (currentHour >= limitHour && isTomorrow) {
+          throw new ActionError({
+            code: "BAD_REQUEST",
+            message:
+              "Santa Catarina ya no acepta pedidos para mañana después de las 3:00 p.m.",
+          });
+        }
+      }
 
-// Check if any products are blocked for the selected date and sucursal
-const parsedProducts = JSON.parse(productos) as OrderProduct[];
       // Check if any products are blocked for the selected date and sucursal
-     
+      const parsedProducts = JSON.parse(productos) as OrderProduct[];
+      // Check if any products are blocked for the selected date and sucursal
+
       const blockingResult = await checkBlockedProductsForSucursal(
         parsedProducts,
         fecha,
@@ -209,10 +211,13 @@ const parsedProducts = JSON.parse(productos) as OrderProduct[];
         });
       }
 
+      const discounts = await generateDiscountArray(parsedProducts);
+
       const session = await createStripeCheckout(
         connectedStripeAccount,
         id,
         line_items,
+        discounts,
       );
 
       if (!session) {
@@ -324,38 +329,38 @@ const parsedProducts = JSON.parse(productos) as OrderProduct[];
     }),
     accept: "form",
     handler: async ({ fecha, productIds }) => {
-       // Validación de la fecha
-  if (typeof fecha !== "string") {
-    throw new ActionError({
-      code: "BAD_REQUEST",
-      message: "Error al bloquear la fecha. Intente nuevamente.",
-    });
-  }
-
-  let parsedProductIds: string[];
-
-  // Manejo flexible de productIds
-  if (typeof productIds === "string") {
-    try {
-      const parsed = JSON.parse(productIds);
-
-      if (Array.isArray(parsed)) {
-        parsedProductIds = parsed;
-      } else {
-        parsedProductIds = [String(parsed)];
+      // Validación de la fecha
+      if (typeof fecha !== "string") {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Error al bloquear la fecha. Intente nuevamente.",
+        });
       }
-    } catch {
-      parsedProductIds = productIds
-        .split(",")
-        .map((id) => id.trim())
-        .filter(Boolean);
-    }
-  } else {
-    throw new ActionError({
-      code: "BAD_REQUEST",
-      message: "Error al procesar los productos. Intente nuevamente.",
-    });
-  }
+
+      let parsedProductIds: string[];
+
+      // Manejo flexible de productIds
+      if (typeof productIds === "string") {
+        try {
+          const parsed = JSON.parse(productIds);
+
+          if (Array.isArray(parsed)) {
+            parsedProductIds = parsed;
+          } else {
+            parsedProductIds = [String(parsed)];
+          }
+        } catch {
+          parsedProductIds = productIds
+            .split(",")
+            .map((id) => id.trim())
+            .filter(Boolean);
+        }
+      } else {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "Error al procesar los productos. Intente nuevamente.",
+        });
+      }
       const { message } = await blockProductsForDate(fecha, parsedProductIds);
 
       return {

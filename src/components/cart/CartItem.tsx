@@ -1,6 +1,14 @@
 import { type CartItem, removeCartItem } from "@/store";
 
-export default function CartItem({ item }: { item: CartItem }) {
+export default function CartItem({
+  item,
+  getTotal,
+  getDiscountedTotal,
+}: {
+  item: CartItem;
+  getTotal: (item: CartItem) => number;
+  getDiscountedTotal: (item: CartItem) => number;
+}) {
   const handleRemoveItem = () => {
     removeCartItem(item.price);
   };
@@ -24,10 +32,20 @@ export default function CartItem({ item }: { item: CartItem }) {
         <p className="mb-1 text-xs capitalize opacity-60">{item.size}</p>
         <p className="">
           {item.quantity} x{" "}
+          <span className="relative ml-auto mr-2 text-xs font-normal text-light/50">
+            {`${new Intl.NumberFormat("es-MX", {
+              style: "currency",
+              currency: "MXN",
+            }).format(getTotal(item) / 100)}`}
+            <div
+              aria-hidden="true"
+              className="absolute -inset-x-1 top-1/2 h-[1px] bg-red-500"
+            ></div>
+          </span>
           {`${new Intl.NumberFormat("es-MX", {
             style: "currency",
             currency: "MXN",
-          }).format(item.price.amount / 100)}`}
+          }).format(getDiscountedTotal(item) / 100)}`}
         </p>
       </div>
       <button

@@ -3,6 +3,7 @@ import { Image } from "astro:assets";
 import AddToCart from "@/components/cart/AddToCart";
 import type { Pastel } from "db/config";
 import { slugify } from "@/lib/format";
+import { PRESENTACIONES_PRICE } from "@/lib/pricesConfig";
 
 type Props = {
   pastel: Pastel;
@@ -51,7 +52,9 @@ const slug = slugify(nombre);
     <AddToCart
       id={id}
       id_pasteleria={id_pasteleria}
-      price={precio ? { id: precio, amount: 134000 } : { id: "", amount: 0 }}
+      price={precio
+        ? { id: precio, amount: PRESENTACIONES_PRICE.tradicional * 100 }
+        : { id: "", amount: 0 }}
       name={nombre}
       size="tradicional"
       image={imagen}
@@ -65,7 +68,10 @@ const slug = slugify(nombre);
           id_pasteleria={id_pasteleria}
           price={
             precioAnytime
-              ? { id: precioAnytime, amount: 65000 }
+              ? {
+                  id: precioAnytime,
+                  amount: PRESENTACIONES_PRICE.anytime * 100,
+                }
               : { id: "", amount: 0 }
           }
           name={nombre}
@@ -84,7 +90,9 @@ const slug = slugify(nombre);
           id={id}
           id_pasteleria={id_pasteleria}
           price={
-            precio ? { id: precioGift, amount: 37000 } : { id: "", amount: 0 }
+            precio
+              ? { id: precioGift, amount: PRESENTACIONES_PRICE.gift * 100 }
+              : { id: "", amount: 0 }
           }
           name={nombre}
           size="gift"

@@ -1,4 +1,5 @@
 import { atom, map } from "nanostores";
+import type { PresentacionesType } from "./lib/pricesConfig";
 
 export const cartOpen = atom(false);
 
@@ -10,7 +11,7 @@ export type CartItem = {
     amount: number;
   };
   name: string;
-  size: string;
+  size: PresentacionesType;
   image: string;
   quantity: number;
 };
