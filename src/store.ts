@@ -9,6 +9,7 @@ export type CartItem = {
   price: {
     id: string;
     amount: number;
+    discount: number;
   };
   name: string;
   size: PresentacionesType;

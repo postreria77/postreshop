@@ -2,7 +2,6 @@ import { useStore } from "@nanostores/react";
 import { cartItems } from "@/store";
 import CartItem from "./CartItem";
 import type { CartItem as CartItemType } from "@/store";
-import { PRESENTACIONES_DISCOUNT } from "@/lib/pricesConfig";
 
 export default function CartList() {
   const $items = useStore(cartItems);
@@ -14,25 +13,13 @@ export default function CartList() {
   function getDiscountedTotal(item: CartItemType) {
     switch (item.size) {
       case "tradicional":
-        return (
-          (item.price.amount - PRESENTACIONES_DISCOUNT.tradicional * 100) *
-          item.quantity
-        );
+        return (item.price.amount - item.price.discount) * item.quantity;
       case "anytime":
-        return (
-          (item.price.amount - PRESENTACIONES_DISCOUNT.anytime * 100) *
-          item.quantity
-        );
+        return (item.price.amount - item.price.discount) * item.quantity;
       case "gift":
-        return (
-          (item.price.amount - PRESENTACIONES_DISCOUNT.gift * 100) *
-          item.quantity
-        );
+        return (item.price.amount - item.price.discount) * item.quantity;
       default:
-        return (
-          (item.price.amount - PRESENTACIONES_DISCOUNT.tradicional * 100) *
-          item.quantity
-        );
+        return (item.price.amount - item.price.discount) * item.quantity;
     }
   }
 

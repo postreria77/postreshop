@@ -78,7 +78,7 @@ export async function getReceiptInformation(
       nombre: pastel?.nombre || "",
       precio: pastel?.precio || 0,
       imagen: pastel?.imagen || "",
-      importe: importe,
+      importe: p.precio ?? importe,
     } as ReceiptDetailsProduct;
   });
 
