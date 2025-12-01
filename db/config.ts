@@ -68,6 +68,7 @@ export type OrderProduct = {
   id_pasteleria: string;
   cantidad: number;
   stripePriceId: string;
+  precio: number;
   presentacion: string;
 };
 

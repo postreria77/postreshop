@@ -9,6 +9,10 @@ import { DateTimeSelector } from "@/components/checkout/DateTimeSelector";
 import type { Sucursal, DisabledDateTime } from "db/config";
 
 import { Input, Select, SelectItem, Spinner } from "@heroui/react";
+import {
+  PRESENTACIONES_DISCOUNT,
+  PRESENTACIONES_PRICE,
+} from "@/lib/pricesConfig";
 
 type CheckoutFormProps = {
   sucursales: Sucursal[];
@@ -37,7 +41,7 @@ export function CheckoutForm({
     apellido: "",
     tel: "",
     email: "",
-  }); 
+  });
 
   const handleSucursalChange = (keys: "all" | Set<React.Key>) => {
     if (keys !== "all" && keys.size > 0) {
@@ -74,6 +78,9 @@ export function CheckoutForm({
               id: "358",
               id_pasteleria: "98",
               cantidad: 1,
+              precio:
+                PRESENTACIONES_PRICE.tradicional -
+                PRESENTACIONES_DISCOUNT.tradicional,
               stripePriceId: "price_1R1ZPq2N0hejjjHDsXDKhJbn",
               presentacion: "gift",
             },
@@ -177,7 +184,7 @@ export function CheckoutForm({
       {actionError?.message && (
         <FormInputError error={actionError.message} name="form" />
       )}
-    <button
+      <button
         type="submit"
         className={`${
           isPending ? "bg-brand bg-opacity-25" : "bg-light bg-opacity-5"

@@ -3,11 +3,13 @@ import { useStore } from "@nanostores/react";
 import type { OrderProduct } from "db/config";
 import { useEffect } from "react";
 
+import {
+  PRESENTACIONES_PRICE,
+  PRESENTACIONES_DISCOUNT,
+} from "@/lib/pricesConfig";
+
 // Fechas bloqueadas
-const DISABLED_DATES = [
-  "2025-12-25",
-  "2026-01-01"
-];
+const DISABLED_DATES = ["2025-12-25", "2026-01-01"];
 
 // ID de pastelería del Pistache
 const PISTACHE_ID = "101";
@@ -32,6 +34,7 @@ export default function CheckoutProductsInput({
     id: item.id,
     id_pasteleria: item.id_pasteleria,
     cantidad: item.quantity,
+    precio: (item.price.amount - item.price.discount) / 100,
     stripePriceId: item.price.id,
     presentacion: item.size,
   }));
@@ -45,7 +48,7 @@ export default function CheckoutProductsInput({
   useEffect(() => {
     if (isBlockedDate) {
       const hadPistache = orderProducts.some(
-        (p) => p.id_pasteleria === PISTACHE_ID
+        (p) => p.id_pasteleria === PISTACHE_ID,
       );
       if (hadPistache && onPistacheBlocked) {
         onPistacheBlocked();

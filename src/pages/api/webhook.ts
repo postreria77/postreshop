@@ -6,7 +6,10 @@ import { db, eq, Orders } from "astro:db";
 import { getSecret } from "astro:env/server";
 import type { OrderProduct, SystemOrder } from "db/config";
 import { emails } from "@/actions/emails";
-import { PRESENTACIONES_PRICE } from "@/lib/pricesConfig";
+import {
+  PRESENTACIONES_PRICE,
+  PRESENTACIONES_DISCOUNT,
+} from "@/lib/pricesConfig";
 
 const updateOrder = async (
   orderId: number,
@@ -52,19 +55,19 @@ const updateOrder = async (
         switch (producto.presentacion) {
           case "tradicional":
             presentacion = "198";
-            precioPresentacion = PRESENTACIONES_PRICE.tradicional;
+            precioPresentacion = producto.precio;
             break;
           case "anytime":
             presentacion = "199";
-            precioPresentacion = PRESENTACIONES_PRICE.anytime;
+            precioPresentacion = producto.precio;
             break;
           case "gift":
             presentacion = "359";
-            precioPresentacion = PRESENTACIONES_PRICE.gift;
+            precioPresentacion = producto.precio;
             break;
           default:
             presentacion = "198"; // Fallback for any other case
-            precioPresentacion = PRESENTACIONES_PRICE.tradicional;
+            precioPresentacion = producto.precio;
             break;
         }
 
@@ -86,19 +89,19 @@ const updateOrder = async (
         switch (producto.presentacion) {
           case "tradicional":
             presentacion = "68";
-            precioPresentacion = PRESENTACIONES_PRICE.tradicional;
+            precioPresentacion = producto.precio;
             break;
           case "anytime":
             presentacion = "1069";
-            precioPresentacion = PRESENTACIONES_PRICE.anytime;
+            precioPresentacion = producto.precio;
             break;
           case "gift":
             presentacion = "1284";
-            precioPresentacion = PRESENTACIONES_PRICE.gift;
+            precioPresentacion = producto.precio;
             break;
           default:
             presentacion = "198"; // Fallback for any other case
-            precioPresentacion = PRESENTACIONES_PRICE.tradicional;
+            precioPresentacion = producto.precio;
             break;
         }
 
