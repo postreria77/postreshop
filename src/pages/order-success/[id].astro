@@ -41,21 +41,18 @@ type OrderDetailsProduct = OrderProduct & {
 };
 
 const productos = productosOrden.map((p) => {
+  // Use TypeScript type guard to validate and get price safely
+  const importe = getPresentacionPrice(p.presentacion);
+
   const pastel = pasteles.find((pastel) => pastel.id === p.id);
-
-  // 👇 Usar el precio que viene de la BD (el mismo que ves en la tienda)
-  const importe =
-    pastel?.precio ?? getPresentacionPrice(p.presentacion);
-
   return {
     ...p,
     nombre: pastel?.nombre || "",
     precio: pastel?.precio || 0,
     imagen: pastel?.imagen || "",
-    importe,
+    importe: importe,
   } as OrderDetailsProduct;
 });
-
 const sucursal = await db
   .select()
   .from(Sucursales)
