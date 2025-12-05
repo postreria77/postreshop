@@ -7,8 +7,6 @@ const Pasteles = defineTable({
     id: column.text({ primaryKey: true, autoIncrement: true }),
     id_pasteleria: column.text({ default: "0" }),
     id_especiales: column.json({ optional: true, default: {} }),
-    id_especial_1: column.text({ default: "0", deprecated: true }),
-    id_especial_2: column.text({ default: "0", deprecated: true }),
     nombre: column.text(),
     descripcion: column.text(),
     precio: column.text(),
@@ -42,12 +40,12 @@ export type Pastel = {
 
 export type PastelIdsEspeciales = {
   postreria: {
-    "1": string;
-    "2": string;
+    1: string;
+    2: string;
   };
   pasteleria: {
-    "1": string;
-    "2": string;
+    1: string;
+    2: string;
   };
 };
 
