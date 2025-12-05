@@ -2,18 +2,141 @@ export const prerender = false;
 
 import type { APIRoute } from "astro";
 import { stripe } from "@lib/stripe";
-import { db, eq, Orders } from "astro:db";
+import { db, eq, inArray, Orders, Pasteles } from "astro:db";
 import { getSecret } from "astro:env/server";
-import type { OrderProduct, SystemOrder } from "db/config";
+import type {
+  OrderProduct,
+  SpecialOrderDate,
+  SystemOrder,
+  SystemOrderProduct,
+  PastelIdsEspeciales,
+} from "db/config";
 import { emails } from "@/actions/emails";
-import {
-  PRESENTACIONES_PRICE,
-  PRESENTACIONES_DISCOUNT,
-} from "@/lib/pricesConfig";
+import { PRESENTACIONES_ID } from "@/lib/pricesConfig";
 
+type CardBrandType = "visa" | "mastercard" | "amex";
+
+/**
+ * Get the card code based on the card brand.
+ * @param cardBrand - The brand of the card used for payment.
+ * @returns The card code corresponding to the card brand.
+ */
+function getCardCode(cardBrand: CardBrandType) {
+  switch (cardBrand) {
+    case "visa":
+      return "0";
+    case "mastercard":
+      return "1";
+    case "amex":
+      return "2";
+    default:
+      return "0";
+  }
+}
+
+async function checkSpecialDate(
+  dateTime: string,
+): Promise<SpecialOrderDate["type"] | null> {
+  const date = dateTime.split("T")[0];
+
+  const specialDates: SpecialOrderDate[] = [
+    { id: "1", date: "2025-12-23", type: "1" },
+    { id: "2", date: "2025-12-24", type: "2" },
+  ];
+
+  const specialDate = specialDates.find((d) => d.date === date);
+
+  if (!specialDate) {
+    return null;
+  }
+
+  return specialDate.type;
+}
+
+type Brands = "postreria" | "pasteleria";
+
+function checkBrand(sucursalId: string): Brands {
+  switch (sucursalId) {
+    case "520":
+    case "536":
+      return "pasteleria";
+    default:
+      return "postreria";
+  }
+}
+
+/**
+ * Generate the system product array from the products in the order.
+ * @param sucursal - The ID of the branch where the order was placed.
+ * @param productos - The array of products in the order.
+ * @returns The array of products ready to be sent to the system.
+ */
+function getSentProducts(
+  sucursal: string,
+  productos: OrderProduct[],
+): SystemOrderProduct[] {
+  const brand = checkBrand(sucursal);
+  if (brand === "pasteleria") {
+    return productos.map((producto) => {
+      return {
+        producto: producto.id_pasteleria,
+        cantidad: producto.cantidad,
+        presentacion: PRESENTACIONES_ID[producto.presentacion].pasteleria,
+        precioProducto: 0,
+        precioPresentacion: producto.precio,
+        comentarios: "",
+      };
+    });
+  } else {
+    return productos.map((producto) => {
+      return {
+        producto: producto.id,
+        cantidad: producto.cantidad,
+        presentacion: PRESENTACIONES_ID[producto.presentacion].postreria,
+        precioProducto: 0,
+        precioPresentacion: producto.precio,
+        comentarios: "",
+      };
+    });
+  }
+}
+
+async function getSpecialIdProducts(
+  systemProducts: SystemOrderProduct[],
+  productos: OrderProduct[],
+  brand: Brands,
+  type: SpecialOrderDate["type"],
+): Promise<SystemOrderProduct[]> {
+  const pasteles = await db
+    .select()
+    .from(Pasteles)
+    .where(
+      inArray(
+        Pasteles.id,
+        productos.map((p) => p.id),
+      ),
+    );
+
+  return systemProducts.map((product) => {
+    const productId = pasteles.find((p) => p.id === product.producto)
+      ?.id_especiales as PastelIdsEspeciales;
+    const idEspecial = productId[brand][type];
+    return {
+      ...product,
+      producto: idEspecial ?? product.producto,
+    };
+  });
+}
+
+/**
+ * Update an order's status to "Pagado" and assign the corresponding card code.
+ * @param orderId - The ID of the order to update.
+ * @param cardBrand - The brand of the card used for payment.
+ * @returns An object containing the updated order data, any error that occurred, and the email associated with the order.
+ */
 const updateOrder = async (
   orderId: number,
-  cardBrand: string,
+  cardBrand: CardBrandType,
 ): Promise<{
   data: SystemOrder | null;
   error: Error | null;
@@ -27,113 +150,49 @@ const updateOrder = async (
     .where(eq(Orders.id, orderId))
     .returning();
 
-  if (order.length > 0) {
-    const productos = JSON.parse(
-      order[0].productos as string,
-    ) as OrderProduct[];
-
-    // Check the card brand and assign the corresponding code
-    let cardCode = "";
-    switch (cardBrand) {
-      case "visa":
-        cardCode = "0";
-        break;
-      case "mastercard":
-        cardCode = "1";
-        break;
-      case "amex":
-        cardCode = "2";
-        break;
-    }
-
-    let sentProducts;
-    if (order[0].sucursal === "520" || order[0].sucursal === "536") {
-      sentProducts = productos.map((producto) => {
-        let presentacion;
-        let precioPresentacion;
-
-        switch (producto.presentacion) {
-          case "tradicional":
-            presentacion = "198";
-            precioPresentacion = producto.precio;
-            break;
-          case "anytime":
-            presentacion = "199";
-            precioPresentacion = producto.precio;
-            break;
-          case "gift":
-            presentacion = "359";
-            precioPresentacion = producto.precio;
-            break;
-          default:
-            presentacion = "198"; // Fallback for any other case
-            precioPresentacion = producto.precio;
-            break;
-        }
-
-        return {
-          producto: producto.id_pasteleria,
-          cantidad: producto.cantidad,
-          presentacion: presentacion,
-          precioProducto: 0,
-          precioPresentacion: precioPresentacion,
-          comentarios: "",
-        };
-      });
-    } else {
-      sentProducts = productos.map((producto) => {
-        let presentacion;
-        let precioPresentacion;
-
-        // Using switch for better readability
-        switch (producto.presentacion) {
-          case "tradicional":
-            presentacion = "68";
-            precioPresentacion = producto.precio;
-            break;
-          case "anytime":
-            presentacion = "1069";
-            precioPresentacion = producto.precio;
-            break;
-          case "gift":
-            presentacion = "1284";
-            precioPresentacion = producto.precio;
-            break;
-          default:
-            presentacion = "198"; // Fallback for any other case
-            precioPresentacion = producto.precio;
-            break;
-        }
-
-        return {
-          producto: producto.id,
-          cantidad: producto.cantidad,
-          presentacion: presentacion,
-          precioProducto: 0,
-          precioPresentacion: precioPresentacion,
-          comentarios: "",
-        };
-      });
-    }
-
-    const systemOrder: SystemOrder = {
-      productos: sentProducts,
-      telefono: order[0].tel,
-      nombre: order[0].nombre,
-      sucursalId: order[0].sucursal,
-      fechaPedido: order[0].fecha,
-      direccion: "",
-      calle: "",
-      numeroExterior: "",
-      numeroInterior: "",
-      colonia: "",
-      municipio: "",
-      referencia: "",
-      forma_pago_id: cardCode,
-    };
-    return { data: systemOrder, error: null, email: order[0].email };
+  if (order.length <= 0) {
+    return { data: null, error: Error("Order not found"), email: null };
   }
-  return { data: null, error: Error("Order not found"), email: null };
+
+  // Check the card brand and assign the corresponding code
+  const cardCode = getCardCode(cardBrand);
+
+  const productos = JSON.parse(order[0].productos as string) as OrderProduct[];
+  const systemProducts = getSentProducts(order[0].sucursal, productos);
+
+  const isSpecialDate = await checkSpecialDate(order[0].fecha);
+
+  let sentProducts: SystemOrderProduct[];
+
+  if (isSpecialDate !== null) {
+    const brand = checkBrand(order[0].sucursal);
+    sentProducts = await getSpecialIdProducts(
+      systemProducts,
+      productos,
+      brand,
+      isSpecialDate,
+    );
+  } else {
+    sentProducts = systemProducts;
+  }
+
+  const systemOrder: SystemOrder = {
+    productos: sentProducts,
+    telefono: order[0].tel,
+    nombre: order[0].nombre,
+    sucursalId: order[0].sucursal,
+    fechaPedido: order[0].fecha,
+    direccion: "",
+    calle: "",
+    numeroExterior: "",
+    numeroInterior: "",
+    colonia: "",
+    municipio: "",
+    referencia: "",
+    forma_pago_id: cardCode,
+  };
+
+  return { data: systemOrder, error: null, email: order[0].email };
 };
 
 const uploadOrderToSystem = async (
@@ -184,13 +243,15 @@ export const POST: APIRoute = async ({ request, callAction }) => {
     });
   }
 
-  async function getCardBrand(paymentMethodId: string): Promise<string | null> {
+  async function getCardBrand(
+    paymentMethodId: string,
+  ): Promise<CardBrandType | null> {
     const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
     const cardBrand = paymentMethod.card?.brand;
     if (!cardBrand) {
       return null;
     }
-    return cardBrand;
+    return cardBrand as CardBrandType;
   }
 
   switch (event.type) {

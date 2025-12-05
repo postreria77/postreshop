@@ -18,6 +18,18 @@ export const PRESENTACIONES_DISCOUNT: PresentacionesPrice = {
   gift: 80,
 };
 
+export interface PresentacionesIds {
+  tradicional: { postreria: string; pasteleria: string };
+  anytime: { postreria: string; pasteleria: string };
+  gift: { postreria: string; pasteleria: string };
+}
+
+export const PRESENTACIONES_ID: PresentacionesIds = {
+  tradicional: { postreria: "68", pasteleria: "198" },
+  anytime: { postreria: "1069", pasteleria: "199" },
+  gift: { postreria: "1284", pasteleria: "359" },
+};
+
 function isPresentacionValid(
   presentacion: any,
 ): presentacion is PresentacionesType {

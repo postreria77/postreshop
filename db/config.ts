@@ -1,3 +1,4 @@
+import type { PresentacionesType } from "@/lib/pricesConfig";
 import { defineDb, defineTable, column } from "astro:db";
 
 // https://astro.build/db/config
@@ -5,6 +6,9 @@ const Pasteles = defineTable({
   columns: {
     id: column.text({ primaryKey: true, autoIncrement: true }),
     id_pasteleria: column.text({ default: "0" }),
+    id_especiales: column.json({ optional: true, default: {} }),
+    id_especial_1: column.text({ default: "0", deprecated: true }),
+    id_especial_2: column.text({ default: "0", deprecated: true }),
     nombre: column.text(),
     descripcion: column.text(),
     precio: column.text(),
@@ -22,6 +26,7 @@ const Pasteles = defineTable({
 export type Pastel = {
   id: string;
   id_pasteleria: string;
+  id_especiales: unknown;
   nombre: string;
   descripcion: string;
   precio: string;
@@ -33,6 +38,17 @@ export type Pastel = {
   categoria: string;
   nuevo: boolean;
   archived: boolean;
+};
+
+export type PastelIdsEspeciales = {
+  postreria: {
+    "1": string;
+    "2": string;
+  };
+  pasteleria: {
+    "1": string;
+    "2": string;
+  };
 };
 
 const Orders = defineTable({
@@ -69,7 +85,7 @@ export type OrderProduct = {
   cantidad: number;
   stripePriceId: string;
   precio: number;
-  presentacion: string;
+  presentacion: PresentacionesType;
 };
 
 export type SystemOrderProduct = {
@@ -133,6 +149,20 @@ export type DisabledDateTime = {
   productos: unknown;
 };
 
+const SpecialOrderDates = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true }),
+    date: column.text(),
+    type: column.text({ default: "1" }),
+  },
+});
+
+export type SpecialOrderDate = {
+  id: string;
+  date: string;
+  type: "1" | "2";
+};
+
 const Users = defineTable({
   columns: {
     id: column.number({ primaryKey: true, autoIncrement: true, unique: true }),
@@ -175,6 +205,7 @@ export default defineDb({
     Pasteles,
     Sucursales,
     DisabledDateTimes,
+    SpecialOrderDates,
     Users,
     Sessions,
   },
