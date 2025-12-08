@@ -94,7 +94,42 @@ export const orders = {
         });
       }
 
-   
+   // 🕒 REGLA SALTILLO: Límite 9:00 PM (21:00) para pedidos del mismo día
+      // IDs obtenidos de tu base de datos: 50 (Carranza), 109 (Parque Centro), 520 (Parque Centro P.)
+      const sucursalesSaltillo = ["50", "109", "520"];
+
+      if (sucursalesSaltillo.includes(sucursal)) {
+        // 1. Obtener hora actual en México
+        const now = new Date();
+        const formatter = new Intl.DateTimeFormat("en-US", {
+          timeZone: "America/Mexico_City",
+          hour: "numeric",
+          hour12: false,
+        });
+        const currentHour = parseInt(formatter.format(now));
+
+        // 2. Revisar si el pedido es para "HOY"
+        const [year, month, day] = fecha.split("-").map(Number);
+        const selectedDate = new Date(year, month - 1, day);
+        
+        // Creamos fecha de "hoy" ajustada a zona horaria
+        const todayInMexico = new Date(
+          now.toLocaleString("en-US", { timeZone: "America/Mexico_City" })
+        );
+        
+        const isToday = 
+          selectedDate.getDate() === todayInMexico.getDate() &&
+          selectedDate.getMonth() === todayInMexico.getMonth() &&
+          selectedDate.getFullYear() === todayInMexico.getFullYear();
+
+        // 3. Si es hoy Y son las 9 PM (21) o más -> Bloquear
+        if (isToday && currentHour >= 21) {
+          throw new ActionError({
+            code: "BAD_REQUEST",
+            message: "En Saltillo el horario de pedidos finaliza a las 9:00 p.m.",
+          });
+        }
+      }
 
     
 
