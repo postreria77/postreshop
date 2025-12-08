@@ -96,38 +96,7 @@ export const orders = {
 
    
 
-      // 🕒 REGLA GENERAL: Límite 9:00 PM (21:00) para pedidos del mismo día
-      
-      // 1. Obtener hora actual en Monterrey/México
-      const now = new Date();
-      const formatter = new Intl.DateTimeFormat("en-US", {
-        timeZone: "America/Mexico_City",
-        hour: "numeric",
-        hour12: false,
-      });
-      const currentHour = parseInt(formatter.format(now));
-
-      // 2. Revisar si el pedido es para "HOY"
-      const [year, month, day] = fecha.split("-").map(Number);
-      const selectedDate = new Date(year, month - 1, day);
-      
-      // Creamos fecha de "hoy" ajustada a zona horaria para comparar solo día/mes/año
-      const todayInMexico = new Date(
-        now.toLocaleString("en-US", { timeZone: "America/Mexico_City" })
-      );
-      
-      const isToday = 
-        selectedDate.getDate() === todayInMexico.getDate() &&
-        selectedDate.getMonth() === todayInMexico.getMonth() &&
-        selectedDate.getFullYear() === todayInMexico.getFullYear();
-
-      // 3. Si es hoy Y son las 9 PM (21) o más -> Bloquear
-      if (isToday && currentHour >= 21) {
-        throw new ActionError({
-          code: "BAD_REQUEST",
-          message: "Ya cerramos por hoy. Nuestro horario de pedidos finaliza a las 9:00 p.m.",
-        });
-      }
+    
 
       // Check if any products are blocked for the selected date and sucursal
       const parsedProducts = JSON.parse(productos) as OrderProduct[];
