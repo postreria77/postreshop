@@ -101,40 +101,7 @@ export const orders = {
           message: "Esta sucursal no recibe pedidos los domingos.",
         });
       }
-      // 🔒 Regla especial Santa Catarina
-      const idSantaCatarina = "75";
 
-      if (sucursal === idSantaCatarina) {
-        const limitHour = 15; // 3 PM
-
-        const now = new Date();
-        const currentHour = now.getHours();
-
-        // Fecha seleccionada por el usuario
-        const dateParts = fecha.split("-");
-        const year = parseInt(dateParts[0]);
-        const month = parseInt(dateParts[1]) - 1;
-        const day = parseInt(dateParts[2]);
-        const selectedDate = new Date(year, month, day);
-
-        // Fecha de mañana
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
-        const isTomorrow =
-          selectedDate.getFullYear() === tomorrow.getFullYear() &&
-          selectedDate.getMonth() === tomorrow.getMonth() &&
-          selectedDate.getDate() === tomorrow.getDate();
-
-        // Si ya son las 3 PM o más y se intenta pedir para mañana → bloquear
-        if (currentHour >= limitHour && isTomorrow) {
-          throw new ActionError({
-            code: "BAD_REQUEST",
-            message:
-              "Santa Catarina ya no acepta pedidos para mañana después de las 3:00 p.m.",
-          });
-        }
-      }
 
       // Check if any products are blocked for the selected date and sucursal
       const parsedProducts = JSON.parse(productos) as OrderProduct[];
