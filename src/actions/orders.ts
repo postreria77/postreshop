@@ -94,35 +94,30 @@ export const orders = {
         });
       }
 
-   // 🕒 REGLA SALTILLO: Límite 9:00 PM (21:00) para pedidos del mismo día
-      // IDs obtenidos de tu base de datos: 50 (Carranza), 109 (Parque Centro), 520 (Parque Centro P.)
+  // ---------------------------------------------------------
+      // 🕒 REGLA SALTILLO: Límite 9:00 PM (21:00)
+      // IDs: 50 (Carranza), 109 (Parque Centro), 520 (Parque Centro P.)
+      // ---------------------------------------------------------
       const sucursalesSaltillo = ["50", "109", "520"];
 
       if (sucursalesSaltillo.includes(sucursal)) {
-        // 1. Obtener hora actual en México
+        // 1. Obtener hora exacta en México
         const now = new Date();
-        const formatter = new Intl.DateTimeFormat("en-US", {
-          timeZone: "America/Mexico_City",
-          hour: "numeric",
-          hour12: false,
-        });
-        const currentHour = parseInt(formatter.format(now));
-
-        // 2. Revisar si el pedido es para "HOY"
-        const [year, month, day] = fecha.split("-").map(Number);
-        const selectedDate = new Date(year, month - 1, day);
-        
-        // Creamos fecha de "hoy" ajustada a zona horaria
-        const todayInMexico = new Date(
+        const mexicoDate = new Date(
           now.toLocaleString("en-US", { timeZone: "America/Mexico_City" })
         );
-        
-        const isToday = 
-          selectedDate.getDate() === todayInMexico.getDate() &&
-          selectedDate.getMonth() === todayInMexico.getMonth() &&
-          selectedDate.getFullYear() === todayInMexico.getFullYear();
+        const currentHour = mexicoDate.getHours();
 
-        // 3. Si es hoy Y son las 9 PM (21) o más -> Bloquear
+        // 2. Verificar si el pedido es para "HOY"
+        const year = mexicoDate.getFullYear();
+        const month = String(mexicoDate.getMonth() + 1).padStart(2, "0");
+        const day = String(mexicoDate.getDate()).padStart(2, "0");
+        const todayString = `${year}-${month}-${day}`;
+        
+        const isToday = fecha === todayString;
+
+        // 3. AQUÍ ESTÁ EL CAMBIO: Usamos 21 (9 PM)
+        // Si tu código tenía un '15' aquí, eso era lo que bloqueaba a las 3 PM.
         if (isToday && currentHour >= 21) {
           throw new ActionError({
             code: "BAD_REQUEST",
@@ -130,7 +125,7 @@ export const orders = {
           });
         }
       }
-
+      // ---------------------------------------------------------
     
 
       // Check if any products are blocked for the selected date and sucursal
