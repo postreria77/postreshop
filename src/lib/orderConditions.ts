@@ -2,43 +2,41 @@ import { db, eq, DisabledDateTimes } from "astro:db";
 import type { OrderProduct } from "db/config";
 
 export function checkSaltilloTime(date: string, sucursalId: string): boolean {
-  const blockedSucursales = [
-    { id: "109" },
-    { id: "520" },
-    { id: "50" },
-    { id: "99" },
-    { id: "75" },
-  ];
-const normalizedId = String(sucursalId).trim();
+  // ✅ ID REAL de Saltillo
+  const SALTILLO_ID = "109";
 
-  const isBlockedSucursal = blockedSucursales.some(
-    (sucursal) => sucursal.id === normalizedId
-  );
+  const normalizedId = String(sucursalId).trim();
 
-  if (isBlockedSucursal) {
-    // Parse date parts directly to avoid timezone conversion issues
-    const dateParts = date.split("-");
-    if (dateParts.length !== 3) {
-      throw new Error("Invalid date format");
-    }
-
-    const year = parseInt(dateParts[0]);
-    const month = parseInt(dateParts[1]) - 1; // Month is 0-indexed in JS Date
-    const day = parseInt(dateParts[2]);
-
-    // Create date object with local date parts (no timezone confusion)
-    const localDate = new Date(year, month, day);
-    const dayOfWeek = localDate.getDay();
-
-    // getDay() returns 0 for Sunday, 1 for Monday, etc.
-    if (dayOfWeek === 0) {
-      return false;
-    }
-
+  // ✅ Si NO es Saltillo → siempre permitir
+  if (normalizedId !== SALTILLO_ID) {
     return true;
   }
 
+  // ✅ Parsear fecha seleccionada (YYYY-MM-DD)
+  const dateParts = date.split("-");
+  if (dateParts.length !== 3) {
+    throw new Error("Invalid date format");
+  }
+
+  const year = parseInt(dateParts[0]);
+  const month = parseInt(dateParts[1]) - 1;
+  const day = parseInt(dateParts[2]);
+
+  const selectedDate = new Date(year, month, day);
+
+  const today = new Date();
+  const todayWeekDay = today.getDay();          // 0 = domingo, 6 = sábado
+  const selectedWeekDay = selectedDate.getDay(); // 0 = domingo
+
+  // ❌ BLOQUEAR: si HOY es sábado (6) y quieren pedir para domingo (0)
+  if (todayWeekDay === 6 && selectedWeekDay === 0) {
+    return false;
+  }
+
+  // ✅ TODO lo demás está permitido (incluye viernes → domingo)
   return true;
+}
+
 }
 
 // Function to check if any products are blocked on the selected date
