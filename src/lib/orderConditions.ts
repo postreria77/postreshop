@@ -1,41 +1,7 @@
 import { db, eq, DisabledDateTimes } from "astro:db";
 import type { OrderProduct } from "db/config";
 
-export function checkSaltilloTime(date: string, sucursalId: string): boolean {
-  // ✅ ID REAL de Saltillo
-  const SALTILLO_ID = "109";
 
-  const normalizedId = String(sucursalId).trim();
-
-  // ✅ Si NO es Saltillo → siempre permitir
-  if (normalizedId !== SALTILLO_ID) {
-    return true;
-  }
-
-  // ✅ Parsear fecha seleccionada (YYYY-MM-DD)
-  const dateParts = date.split("-");
-  if (dateParts.length !== 3) {
-    throw new Error("Invalid date format");
-  }
-
-  const year = parseInt(dateParts[0]);
-  const month = parseInt(dateParts[1]) - 1;
-  const day = parseInt(dateParts[2]);
-
-  const selectedDate = new Date(year, month, day);
-
-  const today = new Date();
-  const todayWeekDay = today.getDay();          // 0 = domingo, 6 = sábado
-  const selectedWeekDay = selectedDate.getDay(); // 0 = domingo
-
-  // ❌ BLOQUEAR: si HOY es sábado (6) y quieren pedir para domingo (0)
-  if (todayWeekDay === 6 && selectedWeekDay === 0) {
-    return false;
-  }
-
-  // ✅ TODO lo demás está permitido (incluye viernes → domingo)
-  return true;
-}
 
 
 // Function to check if any products are blocked on the selected date
