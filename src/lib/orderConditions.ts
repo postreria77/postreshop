@@ -38,7 +38,6 @@ export function checkSaltilloTime(date: string, sucursalId: string): boolean {
 }
 
 
-
 // Function to check if any products are blocked on the selected date
 export async function checkBlockedProducts(
   productos: OrderProduct[],
