@@ -4,12 +4,22 @@ import type {
   SystemOrderProduct,
   OrderProduct,
 } from "db/config";
-import { db, eq, inArray, Orders, Pasteles } from "astro:db";
+import { db, eq, Orders } from "astro:db";
 import {
   checkBrand,
   getSentProducts,
   getSpecialIdProducts,
 } from "@/pages/api/webhook";
+import { actions } from "astro:actions";
+import type { APIContext } from "astro";
+import { emails } from "@/actions/emails";
+
+export function handleProcessError(message: string, code: number) {
+  console.error(`Error: ${message}`);
+  return new Response(`Card brand not found in payment method`, {
+    status: code,
+  });
+}
 
 /**
  * Get the type of the special date to check for special IDs
@@ -121,3 +131,55 @@ export const updateOrder = async (
 
   return { data: systemOrder, error: null, email: order[0].email };
 };
+
+/**
+ * Send an order to the POS system
+ * @param order - A formatted SystemOrder object
+ * @returns A Promise that has data or error
+ */
+export const uploadOrderToSystem = async (
+  order: SystemOrder,
+): Promise<{ data: string | null; error: Error | null }> => {
+  try {
+    const response = await fetch("https://app.rmstech.mx/api/guardar_pedido", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(order),
+    });
+    // Check if the response is OK
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`);
+    }
+    return { data: "No HTTP error", error: null };
+  } catch (error) {
+    return { data: null, error: error as Error };
+  }
+};
+
+/**
+ * Send an email receipt to the customer after uploading the order to the POS system
+ * @param id - The order to send
+ * @param email - The address to send the receipt
+ */
+export async function sendEmailReceipt(
+  id: number,
+  email: string,
+  action: APIContext["callAction"],
+) {
+  console.log("Sending email receipt to", email);
+
+  const { data, error } = await action(emails.send, {
+    id: id,
+    email,
+  });
+
+  if (error) {
+    console.error(error.message);
+    return { data: null, error };
+  } else if (data) {
+    console.log("Email sent to: " + email + " with Order ID: " + id);
+    return { data: data.id, error: null };
+  }
+}

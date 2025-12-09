@@ -1,29 +1,32 @@
-// export const prerender = false;
+export const prerender = false;
 
-// import { updateOrder } from "@/lib/systemOrders";
-// import { uploadOrderToSystem } from "@/pages/api/webhook";
-// import type { APIRoute } from "astro";
+import { updateOrder, uploadOrderToSystem } from "@/lib/systemOrders";
+import { sendEmailReceipt } from "@/lib/systemOrders";
+import type { APIRoute } from "astro";
 
-// export const POST: APIRoute = async ({ request }) => {
-//   const { id, brand } = await request.json();
-//   console.log("id", id);
-//   console.log("brand", brand);
-//   const { data, error } = await updateOrder(parseInt(id), brand);
-//   if (data) {
-//     const systemUpload = await uploadOrderToSystem(data);
+export const POST: APIRoute = async ({ request, callAction }) => {
+  const { id, brand, email } = await request.json();
+  console.log("id", id);
+  console.log("brand", brand);
+  console.log("email", email);
+  const numberId = parseInt(id);
+  const { data, error } = await updateOrder(numberId, brand);
+  if (data) {
+    const systemUpload = await uploadOrderToSystem(data);
 
-//     console.log("System upload status:", systemUpload);
-//   }
-//   return new Response(
-//     JSON.stringify({
-//       data: data,
-//       error: error,
-//     }),
-//     {
-//       status: 200,
-//     },
-//   );
-// };
+    console.log("System upload status:", systemUpload);
+  }
+  sendEmailReceipt(numberId, email, callAction);
+  return new Response(
+    JSON.stringify({
+      data: data,
+      error: error,
+    }),
+    {
+      status: 200,
+    },
+  );
+};
 
 // export const GET: APIRoute = async () => {
 //   return new Response(
@@ -32,4 +35,15 @@
 //       status: 200,
 //     },
 //   );
+// };
+
+// export const POST: APIRoute = async ({ request, callAction }) => {
+//   const { id, email } = await request.json();
+//   console.log("id", id);
+//   console.log("email", email);
+//   const numberId = parseInt(id);
+//   sendEmailReceipt(numberId, email, callAction);
+//   return new Response("Received", {
+//     status: 200,
+//   });
 // };

@@ -87,6 +87,7 @@ export function Receipt({ order }: ReceiptProps) {
               {order.productos.map((p, i) => (
                 <Row
                   className={`${i === order.productos.length - 1 ? "" : "border-b border-dashed border-dark/15"}`}
+                  key={p.id}
                 >
                   <Column className="w-16 py-4">
                     <Img

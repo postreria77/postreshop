@@ -1,7 +1,7 @@
 export const prerender = false;
 
 import type { APIRoute } from "astro";
-import { stripe } from "../../lib/stripe";
+import { getCardBrand, stripe } from "../../lib/stripe";
 import { db, eq, inArray, Orders, Pasteles } from "astro:db";
 import { getSecret } from "astro:env/server";
 import type {
@@ -13,7 +13,12 @@ import type {
 } from "db/config";
 import { emails } from "@/actions/emails";
 import { PRESENTACIONES_ID } from "@/lib/pricesConfig";
-import { updateOrder } from "@/lib/systemOrders";
+import {
+  handleProcessError,
+  sendEmailReceipt,
+  updateOrder,
+  uploadOrderToSystem,
+} from "@/lib/systemOrders";
 
 import type { CardBrandType } from "@/lib/systemOrders";
 
@@ -92,27 +97,6 @@ export async function getSpecialIdProducts(
   });
 }
 
-export const uploadOrderToSystem = async (
-  order: SystemOrder,
-): Promise<{ data: string | null; error: Error | null }> => {
-  try {
-    const response = await fetch("https://app.rmstech.mx/api/guardar_pedido", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(order),
-    });
-    // Check if the response is OK
-    if (!response.ok) {
-      throw new Error(`HTTP error! Status: ${response.status}`);
-    }
-    return { data: "No HTTP error", error: null };
-  } catch (error) {
-    return { data: null, error: error as Error };
-  }
-};
-
 const endpointSecret = getSecret("STRIPE_WEBHOOK_SECRET");
 
 if (!endpointSecret) {
@@ -120,73 +104,62 @@ if (!endpointSecret) {
 }
 
 export const POST: APIRoute = async ({ request, callAction }) => {
+  // Get the body and signature for the request
   const requestBody = await request.text();
   const sig = request.headers.get("stripe-signature");
-
-  let event;
-
   if (sig === null) {
-    return new Response(`Couldn't verify webhook signature`, {
-      status: 400,
-    });
+    return handleProcessError("Couldn't verify webhook signature", 400);
   }
 
+  // Make the stripe event and handle errors
+  let event;
   try {
     event = stripe.webhooks.constructEvent(requestBody, sig, endpointSecret);
   } catch (err) {
-    console.error(err);
-    return new Response(`Webhook Error: ${err}`, {
-      status: 400,
-    });
+    return handleProcessError(`Webhook Error: ${err}`, 400);
   }
 
-  async function getCardBrand(
-    paymentMethodId: string,
-  ): Promise<CardBrandType | null> {
-    const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
-    const cardBrand = paymentMethod.card?.brand;
-    if (!cardBrand) {
-      return null;
-    }
-    return cardBrand as CardBrandType;
-  }
-
+  // Handle the event per type and return on the default
   switch (event.type) {
     case "payment_intent.succeeded":
-      const paymentIntentSucceeded = event.data.object;
-      const orderId = paymentIntentSucceeded.metadata.order_id;
+      const paymentIntent = event.data.object;
+
+      // Handle missing orderId on stripe event
+      const orderId = paymentIntent.metadata.order_id;
       if (!orderId) {
         console.log("Order ID not found in payment intent metadata");
-        return new Response(`Order ID not found in payment intent metadata`, {
-          status: 400,
-        });
-      }
-      const paymentMethodId = paymentIntentSucceeded.payment_method;
-      if (!paymentMethodId) {
-        console.log("Payment method ID not found in payment intent");
-        return new Response(`Payment method ID not found in payment intent`, {
-          status: 400,
-        });
-      }
-
-      const cardBrand = await getCardBrand(paymentMethodId.toString());
-      if (!cardBrand) {
-        console.log("Card brand not found in payment method");
-        return new Response(`Card brand not found in payment method`, {
-          status: 400,
-        });
+        return handleProcessError(
+          "Order ID not found in payment intent metadata",
+          400,
+        );
       }
 
       const numberOrderId = parseInt(orderId);
       if (isNaN(numberOrderId)) {
-        console.log("Order ID is not a number");
-        return new Response(`Order ID is not a number`, {
-          status: 400,
-        });
+        return handleProcessError("Order ID is not a number", 400);
       }
 
-      console.log(`Order ID: ${numberOrderId}`);
-      console.log("Updating order...");
+      // Handle missing paymentMethodId on stripe event
+      const paymentMethodId = paymentIntent.payment_method;
+      if (!paymentMethodId) {
+        console.log("Payment method ID not found in payment intent");
+        return handleProcessError(
+          "Payment method ID not found in payment intent",
+          400,
+        );
+      }
+
+      // Handle missing cardBrand on stripe event
+      const cardBrand = await getCardBrand(paymentMethodId.toString());
+      if (!cardBrand) {
+        return handleProcessError(
+          "Card brand not found in payment method",
+          400,
+        );
+      }
+
+      // Update incoming order by ID
+      console.log("Updating order with ID:", numberOrderId);
       let { data, error, email } = await updateOrder(numberOrderId, cardBrand);
 
       if (error) {
@@ -203,30 +176,18 @@ export const POST: APIRoute = async ({ request, callAction }) => {
           break;
         } else if (orderData) {
           console.log(JSON.stringify(orderData, null, 2)); // log the data);
-          if (email) {
-            console.log("Sending email...");
-            const { data, error } = await callAction(emails.send, {
-              id: numberOrderId,
-              email,
-            });
-
-            if (error) {
-              console.error(error.message);
-              break;
-            }
-
-            console.log(
-              "Email sent to: " + email + " with Order ID: " + data?.id,
-            );
+          if (!email) {
+            handleProcessError("No email provided", 400);
             break;
           }
-          console.log("No email provided");
+          await sendEmailReceipt(numberOrderId, email, callAction);
           break;
         }
       }
 
     default:
-      console.log(`Unhandled event type ${event.type}`);
+      handleProcessError(`Unhandled event type ${event.type}`, 400);
+      break;
   }
 
   return new Response(`Webhook received: ${event.type}`, {

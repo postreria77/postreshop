@@ -7,6 +7,7 @@ export const stripe = new Stripe(getSecret("STRIPE_SECRET_KEY")!, {
 
 import type { PresentacionesType } from "./pricesConfig";
 import type { OrderProduct } from "db/config";
+import type { CardBrandType } from "./systemOrders";
 
 export type Product = {
   id: string;
@@ -83,4 +84,20 @@ export async function generateDiscountArray(
     }
   }
   return discounts;
+}
+
+/**
+ * Used to get the card brand to send to the system along with order
+ * @param paymentMethodId - The stripe payment method id
+ * @returns CardBrandType | null
+ */
+export async function getCardBrand(
+  paymentMethodId: string,
+): Promise<CardBrandType | null> {
+  const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
+  const cardBrand = paymentMethod.card?.brand;
+  if (!cardBrand) {
+    return null;
+  }
+  return cardBrand as CardBrandType;
 }
