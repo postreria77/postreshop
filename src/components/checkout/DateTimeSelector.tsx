@@ -62,16 +62,10 @@ export function DateTimeSelector({
       case "49":
         extraDays = currentHour >= 20 ? 2 : 1;
         break;
-      case "109":
-      case "50":
-      case "520":
-        if (isSunday) {
-          extraDays = 2;
-        } else {
-          extraDays = currentHour >= 15 ? 2 : 1;
-        }
-        break;
+      // ❌ AQUÍ BORRAMOS EL BLOQUE DE SALTILLO (IDs 109, 50, 520) ❌
+
       default:
+        // Ahora Saltillo caerá aquí (Horario normal hasta las 9:30 PM)
         extraDays =
           currentHour > 21 || (currentHour === 21 && currentMinute >= 30)
             ? 2

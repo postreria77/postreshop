@@ -94,47 +94,39 @@ export const orders = {
         });
       }
 
-      // Check if the sucursal is blocked
-      if (checkSaltilloTime(fecha, sucursal) === false) {
-        throw new ActionError({
-          code: "INTERNAL_SERVER_ERROR",
-          message: "Esta sucursal no recibe pedidos los domingos.",
-        });
-      }
-      // 🔒 Regla especial Santa Catarina
-      const idSantaCatarina = "75";
+  // ---------------------------------------------------------
+      // 🕒 REGLA SALTILLO: Límite 9:00 PM (21:00)
+      // IDs: 50 (Carranza), 109 (Parque Centro), 520 (Parque Centro P.)
+      // ---------------------------------------------------------
+      const sucursalesSaltillo = ["50", "109", "520"];
 
-      if (sucursal === idSantaCatarina) {
-        const limitHour = 15; // 3 PM
-
+      if (sucursalesSaltillo.includes(sucursal)) {
+        // 1. Obtener hora exacta en México
         const now = new Date();
-        const currentHour = now.getHours();
+        const mexicoDate = new Date(
+          now.toLocaleString("en-US", { timeZone: "America/Mexico_City" })
+        );
+        const currentHour = mexicoDate.getHours();
 
-        // Fecha seleccionada por el usuario
-        const dateParts = fecha.split("-");
-        const year = parseInt(dateParts[0]);
-        const month = parseInt(dateParts[1]) - 1;
-        const day = parseInt(dateParts[2]);
-        const selectedDate = new Date(year, month, day);
+        // 2. Verificar si el pedido es para "HOY"
+        const year = mexicoDate.getFullYear();
+        const month = String(mexicoDate.getMonth() + 1).padStart(2, "0");
+        const day = String(mexicoDate.getDate()).padStart(2, "0");
+        const todayString = `${year}-${month}-${day}`;
+        
+        const isToday = fecha === todayString;
 
-        // Fecha de mañana
-        const tomorrow = new Date();
-        tomorrow.setDate(tomorrow.getDate() + 1);
-
-        const isTomorrow =
-          selectedDate.getFullYear() === tomorrow.getFullYear() &&
-          selectedDate.getMonth() === tomorrow.getMonth() &&
-          selectedDate.getDate() === tomorrow.getDate();
-
-        // Si ya son las 3 PM o más y se intenta pedir para mañana → bloquear
-        if (currentHour >= limitHour && isTomorrow) {
+        // 3. AQUÍ ESTÁ EL CAMBIO: Usamos 21 (9 PM)
+        // Si tu código tenía un '15' aquí, eso era lo que bloqueaba a las 3 PM.
+        if (isToday && currentHour >= 21) {
           throw new ActionError({
             code: "BAD_REQUEST",
-            message:
-              "Santa Catarina ya no acepta pedidos para mañana después de las 3:00 p.m.",
+            message: "En Saltillo el horario de pedidos finaliza a las 9:00 p.m.",
           });
         }
       }
+      // ---------------------------------------------------------
+    
 
       // Check if any products are blocked for the selected date and sucursal
       const parsedProducts = JSON.parse(productos) as OrderProduct[];

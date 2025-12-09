@@ -1,45 +1,8 @@
 import { db, eq, DisabledDateTimes } from "astro:db";
 import type { OrderProduct } from "db/config";
 
-export function checkSaltilloTime(date: string, sucursalId: string): boolean {
-  const blockedSucursales = [
-    { id: "109" },
-    { id: "520" },
-    { id: "50" },
-    { id: "99" },
-    { id: "75" },
-  ];
-const normalizedId = String(sucursalId).trim();
 
-  const isBlockedSucursal = blockedSucursales.some(
-    (sucursal) => sucursal.id === normalizedId
-  );
 
-  if (isBlockedSucursal) {
-    // Parse date parts directly to avoid timezone conversion issues
-    const dateParts = date.split("-");
-    if (dateParts.length !== 3) {
-      throw new Error("Invalid date format");
-    }
-
-    const year = parseInt(dateParts[0]);
-    const month = parseInt(dateParts[1]) - 1; // Month is 0-indexed in JS Date
-    const day = parseInt(dateParts[2]);
-
-    // Create date object with local date parts (no timezone confusion)
-    const localDate = new Date(year, month, day);
-    const dayOfWeek = localDate.getDay();
-
-    // getDay() returns 0 for Sunday, 1 for Monday, etc.
-    if (dayOfWeek === 0) {
-      return false;
-    }
-
-    return true;
-  }
-
-  return true;
-}
 
 // Function to check if any products are blocked on the selected date
 export async function checkBlockedProducts(
