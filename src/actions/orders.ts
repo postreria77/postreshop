@@ -7,7 +7,6 @@ import type { OrderProduct } from "db/config";
 import type { Discount } from "@/lib/stripe";
 
 import {
-  checkSaltilloTime,
   checkBlockedProductsForSucursal,
   checkGiftOnPasteleria,
 } from "@/lib/orderConditions";
@@ -94,7 +93,7 @@ export const orders = {
         });
       }
 
-  // ---------------------------------------------------------
+      // ---------------------------------------------------------
       // 🕒 REGLA SALTILLO: Límite 9:00 PM (21:00)
       // IDs: 50 (Carranza), 109 (Parque Centro), 520 (Parque Centro P.)
       // ---------------------------------------------------------
@@ -104,7 +103,7 @@ export const orders = {
         // 1. Obtener hora exacta en México
         const now = new Date();
         const mexicoDate = new Date(
-          now.toLocaleString("en-US", { timeZone: "America/Mexico_City" })
+          now.toLocaleString("en-US", { timeZone: "America/Mexico_City" }),
         );
         const currentHour = mexicoDate.getHours();
 
@@ -113,7 +112,7 @@ export const orders = {
         const month = String(mexicoDate.getMonth() + 1).padStart(2, "0");
         const day = String(mexicoDate.getDate()).padStart(2, "0");
         const todayString = `${year}-${month}-${day}`;
-        
+
         const isToday = fecha === todayString;
 
         // 3. AQUÍ ESTÁ EL CAMBIO: Usamos 21 (9 PM)
@@ -121,12 +120,12 @@ export const orders = {
         if (isToday && currentHour >= 21) {
           throw new ActionError({
             code: "BAD_REQUEST",
-            message: "En Saltillo el horario de pedidos finaliza a las 9:00 p.m.",
+            message:
+              "En Saltillo el horario de pedidos finaliza a las 9:00 p.m.",
           });
         }
       }
       // ---------------------------------------------------------
-    
 
       // Check if any products are blocked for the selected date and sucursal
       const parsedProducts = JSON.parse(productos) as OrderProduct[];

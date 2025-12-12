@@ -37,10 +37,10 @@ export default function CartItem({
               style: "currency",
               currency: "MXN",
             }).format(getTotal(item) / 100)}`}
-            <div
+            <span
               aria-hidden="true"
               className="absolute -inset-x-1 top-1/2 h-[1px] bg-red-500"
-            ></div>
+            ></span>
           </span>
           {`${new Intl.NumberFormat("es-MX", {
             style: "currency",

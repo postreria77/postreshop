@@ -17,14 +17,36 @@ export type CartItem = {
   quantity: number;
 };
 
-const initialCartItems =
-  typeof window !== "undefined"
-    ? JSON.parse(localStorage.getItem("cartItems") || "{}")
-    : {};
+function getInitialItems() {
+  const cartLastUpdate = JSON.parse(
+    localStorage.getItem("cartLastUpdate") || "{}",
+  );
+  const ONE_HOUR = 60 * 60 * 1000 * 2; // 2 hours in milliseconds
+  const isExpired = Date.now() - cartLastUpdate > ONE_HOUR;
+  console.log("isExpired", isExpired);
+
+  if (isExpired) {
+    localStorage.removeItem("cartItems");
+    localStorage.removeItem("cartLastUpdate");
+    return {};
+  }
+
+  return JSON.parse(localStorage.getItem("cartItems") || "{}");
+}
+
+const initialCartItems = typeof window !== "undefined" ? getInitialItems() : {};
 
 export const cartItems = map<Record<string, CartItem>>({
   ...initialCartItems,
 });
+
+function updateCartItems() {
+  localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
+}
+
+function updateCartUpdateTime() {
+  localStorage.setItem("cartLastUpdate", JSON.stringify(Date.now()));
+}
 
 export function addCartItem({
   id,
@@ -42,7 +64,8 @@ export function addCartItem({
       price,
       quantity: existingEntry.quantity + quantity,
     });
-    localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
+    updateCartItems();
+    updateCartUpdateTime();
   } else {
     cartItems.setKey(price.id, {
       id,
@@ -53,7 +76,8 @@ export function addCartItem({
       price,
       size,
     });
-    localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
+    updateCartItems();
+    updateCartUpdateTime();
   }
 }
 
@@ -66,13 +90,15 @@ export function removeCartItem(price: { id: string }) {
       ([key]) => key !== price.id,
     );
     cartItems.set(Object.fromEntries(itemsWithoutEntry));
-    localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
+    updateCartItems();
+    updateCartUpdateTime();
   } else {
     cartItems.setKey(price.id, {
       ...existingEntry,
       quantity: existingEntry.quantity - 1,
     });
-    localStorage.setItem("cartItems", JSON.stringify(cartItems.get()));
+    updateCartItems();
+    updateCartUpdateTime();
   }
 }
 

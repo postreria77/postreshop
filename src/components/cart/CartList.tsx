@@ -41,7 +41,7 @@ export default function CartList() {
             ))}
           </ul>
           {/* Display Cart Total */}
-          <p className="flex items-center font-medium">
+          <div className="flex items-center font-medium">
             <span className="text-lg tracking-tighter">Total</span>
             <span className="relative ml-auto mr-2 text-sm font-normal text-light/50">
               {`${new Intl.NumberFormat("es-MX", {
@@ -69,7 +69,7 @@ export default function CartList() {
                 ) / 100,
               )}`}
             </span>
-          </p>
+          </div>
         </>
       )}
     </div>
