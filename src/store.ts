@@ -21,7 +21,7 @@ function getInitialItems() {
   const cartLastUpdate = JSON.parse(
     localStorage.getItem("cartLastUpdate") || "{}",
   );
-  const ONE_HOUR = 60 * 60 * 1000 * 2; // 2 hours in milliseconds
+  const ONE_HOUR = 60 * 60 * 1000 * 2; // 2 hourspt-section-lg in milliseconds
   const isExpired = Date.now() - cartLastUpdate > ONE_HOUR;
   console.log("isExpired", isExpired);
 

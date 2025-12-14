@@ -87,9 +87,12 @@ export async function getSpecialIdProducts(
     );
 
   return systemProducts.map((product) => {
-    const productId = pasteles.find((p) => p.id === product.producto)
-      ?.id_especiales as PastelIdsEspeciales;
-    const idEspecial = productId[brand][type];
+    const productIdEspecial = pasteles.find((p) =>
+      brand === "pasteleria"
+        ? p.id_pasteleria === product.producto
+        : p.id === product.producto,
+    )?.id_especiales as PastelIdsEspeciales;
+    const idEspecial = productIdEspecial[brand][type];
     return {
       ...product,
       producto: idEspecial ?? product.producto,

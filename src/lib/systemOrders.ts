@@ -97,17 +97,17 @@ export const updateOrder = async (
   const productos = JSON.parse(order[0].productos as string) as OrderProduct[];
   const systemProducts = getSentProducts(order[0].sucursal, productos);
 
-  const isSpecialDate = await checkSpecialDate(order[0].fecha);
+  const specialDate = await checkSpecialDate(order[0].fecha);
 
   let sentProducts: SystemOrderProduct[];
 
-  if (isSpecialDate === "1" || isSpecialDate === "2") {
+  if (specialDate === "1" || specialDate === "2") {
     const brand = checkBrand(order[0].sucursal);
     sentProducts = await getSpecialIdProducts(
       systemProducts,
       productos,
       brand,
-      isSpecialDate,
+      specialDate,
     );
   } else {
     sentProducts = systemProducts;
