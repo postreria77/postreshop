@@ -1,9 +1,6 @@
 import { db, eq, DisabledDateTimes } from "astro:db";
 import type { OrderProduct } from "db/config";
 
-
-
-
 // Function to check if any products are blocked on the selected date
 export async function checkBlockedProducts(
   productos: OrderProduct[],
@@ -355,3 +352,32 @@ export const checkGiftOnPasteleria = async (
 
   return true;
 };
+
+/**
+ * This function checks if an order is being placed on a Saturday to be picked up on the day after (Sunday) at a Saltillo Sucursal.
+ * @param date
+ * @param sucursalId
+ */
+export function checkSaltilloOnSaturday(
+  fecha: string,
+  sucursal: string,
+): boolean {
+  const isSaltillo = SUCURSALES_SALTILLO.includes(sucursal);
+
+  if (!isSaltillo) return true;
+
+  const today = new Date();
+  const isSaturday = today.getDay() === 6;
+
+  if (!isSaturday) return true;
+
+  const dateStringToDate = new Date(fecha);
+
+  const isOrderForSunday = dateStringToDate.getDay() === 0;
+
+  if (isOrderForSunday) return false;
+
+  return true;
+}
+
+export const SUCURSALES_SALTILLO = ["50", "109", "520"];

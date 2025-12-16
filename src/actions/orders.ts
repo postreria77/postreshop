@@ -4,11 +4,12 @@ import { db, eq, Orders, Sucursales, DisabledDateTimes } from "astro:db";
 import { createStripeCheckout, generateDiscountArray } from "@/lib/stripe";
 
 import type { OrderProduct } from "db/config";
-import type { Discount } from "@/lib/stripe";
 
 import {
   checkBlockedProductsForSucursal,
   checkGiftOnPasteleria,
+  checkSaltilloOnSaturday,
+  SUCURSALES_SALTILLO,
 } from "@/lib/orderConditions";
 import {
   blockOrderDate,
@@ -97,13 +98,12 @@ export const orders = {
       // 🕒 REGLA SALTILLO: Límite 9:00 PM (21:00)
       // IDs: 50 (Carranza), 109 (Parque Centro), 520 (Parque Centro P.)
       // ---------------------------------------------------------
-      const sucursalesSaltillo = ["50", "109", "520"];
 
-      if (sucursalesSaltillo.includes(sucursal)) {
+      if (SUCURSALES_SALTILLO.includes(sucursal)) {
         // 1. Obtener hora exacta en México
         const now = new Date();
         const mexicoDate = new Date(
-          now.toLocaleString("en-US", { timeZone: "America/Mexico_City" }),
+          now.toLocaleString("en-US", { timeZone: "America/Monterrey" }),
         );
         const currentHour = mexicoDate.getHours();
 
@@ -159,6 +159,16 @@ export const orders = {
           code: "BAD_REQUEST",
           message:
             "Solo se pueden realizar pedidos de Gift Cake en sucursales de La Pastelería.",
+        });
+      }
+
+      const isSaltilloOnSaturday = checkSaltilloOnSaturday(fecha, sucursal);
+
+      if (!isSaltilloOnSaturday) {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message:
+            "No se puede realizar el pedido en Saltillo del sábado para el Domingo.",
         });
       }
 
