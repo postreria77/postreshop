@@ -1,10 +1,8 @@
+import type { Product } from "./stripe";
+
 export type PresentacionesType = "tradicional" | "anytime" | "gift";
 
-export interface PresentacionesPrice {
-  tradicional: number;
-  anytime: number;
-  gift: number;
-}
+export type PresentacionesPrice = Record<PresentacionesType, number>;
 
 export const PRESENTACIONES_PRICE: PresentacionesPrice = {
   tradicional: 1340,
@@ -45,3 +43,33 @@ export function getPresentacionPrice(presentacion: any): number {
   }
   return PRESENTACIONES_PRICE.tradicional; // Fallback price
 }
+
+// Nuevas configuraciones para tabla de productos
+
+export type ProductCategoryTypes = "pasteles" | "roscas";
+
+export type PresentacionesRoscasType = "grande" | "chica";
+
+export type ProductPresentacionesType<T extends ProductCategoryTypes> =
+  T extends "pasteles"
+    ? PresentacionesType
+    : T extends "roscas"
+      ? PresentacionesRoscasType
+      : never;
+
+export type ProductsPricesType = {
+  pasteles: Record<PresentacionesType, number>;
+  roscas: Record<PresentacionesRoscasType, number>;
+};
+
+export const PRESENTACIONES_PRODUCTOS_PRICES: ProductsPricesType = {
+  pasteles: {
+    tradicional: 1340,
+    anytime: 650,
+    gift: 370,
+  },
+  roscas: {
+    grande: 849,
+    chica: 649,
+  },
+};

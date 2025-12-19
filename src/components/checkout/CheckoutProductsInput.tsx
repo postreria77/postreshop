@@ -3,11 +3,6 @@ import { useStore } from "@nanostores/react";
 import type { OrderProduct } from "db/config";
 import { useEffect } from "react";
 
-import {
-  PRESENTACIONES_PRICE,
-  PRESENTACIONES_DISCOUNT,
-} from "@/lib/pricesConfig";
-
 // Fechas bloqueadas
 const DISABLED_DATES = ["2025-12-25", "2026-01-01"];
 
@@ -37,6 +32,7 @@ export default function CheckoutProductsInput({
     precio: (item.price.amount - item.price.discount) / 100,
     stripePriceId: item.price.id,
     presentacion: item.size,
+    categoria: item.category,
   }));
 
   // Si es fecha bloqueada intenta eliminar el Pistache

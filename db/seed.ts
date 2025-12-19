@@ -1,4 +1,11 @@
-import { db, Pasteles, Sucursales, DisabledDateTimes, Users } from "astro:db";
+import {
+  db,
+  Pasteles,
+  Productos,
+  Sucursales,
+  DisabledDateTimes,
+  Users,
+} from "astro:db";
 
 // https://astro.build/db/seed
 export default async function seed() {
@@ -26,7 +33,7 @@ export default async function seed() {
         "Mostachón de nuez, arándanos y un toque de pistaches, con una capa de New York style cheesecake, platano y fresa fresca, decorado con un betún cremoso de caramelo, mousse de queso crema con lechera, nuez y arándanos.",
       precio: "price_1Qg5Dw2N0hejjjHDiY16NYda",
       imagen: "/images/pasteles/mostachon-platano.webp",
-      categoria: "Pasteles",
+      categoria: "pasteles",
       nuevo: false,
       archived: false,
     },
@@ -43,7 +50,7 @@ export default async function seed() {
       imagenAnytime: "/images/pasteles/red-velvet-anytime.webp",
       precioGift: "price_1QnMhv2N0hejjjHD3dcETUfG",
       imagenGift: "/images/pasteles/red-velvet-gift.webp",
-      categoria: "Pasteles",
+      categoria: "pasteles",
       nuevo: false,
       archived: false,
     },
@@ -105,7 +112,10 @@ export default async function seed() {
       id: "2025-06-25-productos",
       date: "2025-06-25",
       dayDisabled: false,
-      productos: ["price_1Qg57s2N0hejjjHD6e1l5fyx", "price_1Qg3bS2N0hejjjHDX8EYDGH1"],
+      productos: [
+        "price_1Qg57s2N0hejjjHD6e1l5fyx",
+        "price_1Qg3bS2N0hejjjHDX8EYDGH1",
+      ],
     },
     // Block specific products for specific sucursales on June 26th
     {

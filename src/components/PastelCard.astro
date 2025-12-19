@@ -1,0 +1,123 @@
+---
+import { Image } from "astro:assets";
+import AddToCart from "@/components/cart/AddToCart";
+import type { Pastel } from "db/config";
+import { slugify } from "@/lib/format";
+import {
+  PRESENTACIONES_DISCOUNT,
+  PRESENTACIONES_PRICE,
+} from "@/lib/pricesConfig";
+
+type Props = {
+  pastel: Pastel;
+};
+
+const { pastel } = Astro.props;
+const {
+  id,
+  id_pasteleria,
+  nombre,
+  descripcion,
+  imagen,
+  precio,
+  precioAnytime,
+  imagenAnytime,
+  precioGift,
+  imagenGift,
+} = pastel;
+
+const slug = slugify(nombre);
+---
+
+<li class="relative flex flex-col rounded-sm">
+  <a href=`productos/${slug}`>
+    <Image
+      src={imagen}
+      alt={nombre}
+      width={480}
+      height={480}
+      quality={80}
+      loading={"lazy"}
+      class="aspect-square overflow-clip rounded-md object-cover"
+    />
+  </a>
+  <div class="flex items-center justify-between">
+    <h3 class="mb-1 mt-3 font-medium capitalize tracking-tighter ~text-lg/xl">
+      {nombre}
+    </h3>
+  </div>
+  <p
+    class="mb-2 line-clamp-3 font-light leading-relaxed opacity-60 ~text-[0.6rem]/xs"
+  >
+    {descripcion}
+  </p>
+  <div class="mt-auto flex flex-wrap items-center justify-between gap-2">
+    <AddToCart
+      id={id}
+      id_pasteleria={id_pasteleria}
+      price={precio
+        ? {
+            id: precio,
+            amount: PRESENTACIONES_PRICE.tradicional * 100,
+            discount: PRESENTACIONES_DISCOUNT.tradicional * 100,
+          }
+        : { id: "", amount: 0, discount: 0 }}
+      name={nombre}
+      size="tradicional"
+      image={imagen}
+      quantity={1}
+      category="pasteles"
+      client:only>Trad. +</AddToCart
+    >
+    {
+      precioAnytime && (
+        <AddToCart
+          id={id}
+          id_pasteleria={id_pasteleria}
+          price={
+            precioAnytime
+              ? {
+                  id: precioAnytime,
+                  amount: PRESENTACIONES_PRICE.anytime * 100,
+                  discount: PRESENTACIONES_DISCOUNT.anytime * 100,
+                }
+              : { id: "", amount: 0, discount: 0 }
+          }
+          name={nombre}
+          size="anytime"
+          image={imagenAnytime ? imagenAnytime : imagen}
+          quantity={1}
+          category="pasteles"
+          client:only
+        >
+          Anytime +
+        </AddToCart>
+      )
+    }
+    {
+      precioGift && (
+        <AddToCart
+          id={id}
+          id_pasteleria={id_pasteleria}
+          price={
+            precio
+              ? {
+                  id: precioGift,
+                  amount: PRESENTACIONES_PRICE.gift * 100,
+                  discount: PRESENTACIONES_DISCOUNT.gift * 100,
+                }
+              : { id: "", amount: 0, discount: 0 }
+          }
+          name={nombre}
+          size="gift"
+          image={imagenGift ? imagenGift : imagen}
+          quantity={1}
+          category="pasteles"
+          client:only
+        >
+          Gift +
+        </AddToCart>
+      )
+    }
+  </div>
+</li>

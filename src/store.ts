@@ -1,5 +1,8 @@
 import { atom, map } from "nanostores";
-import type { PresentacionesType } from "./lib/pricesConfig";
+import type {
+  ProductCategoryTypes,
+  ProductPresentacionesType,
+} from "./lib/pricesConfig";
 
 export const cartOpen = atom(false);
 
@@ -12,7 +15,10 @@ export type CartItem = {
     discount: number;
   };
   name: string;
-  size: PresentacionesType;
+  size:
+    | ProductPresentacionesType<"pasteles">
+    | ProductPresentacionesType<"roscas">;
+  category: ProductCategoryTypes;
   image: string;
   quantity: number;
 };
@@ -55,6 +61,7 @@ export function addCartItem({
   name,
   size,
   image,
+  category,
   quantity,
 }: CartItem) {
   const existingEntry = cartItems.get()[price.id];
@@ -72,6 +79,7 @@ export function addCartItem({
       id_pasteleria,
       name,
       image,
+      category,
       quantity,
       price,
       size,

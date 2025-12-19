@@ -1,4 +1,7 @@
-import type { PresentacionesType } from "@/lib/pricesConfig";
+import type {
+  ProductCategoryTypes,
+  ProductPresentacionesType,
+} from "@/lib/pricesConfig";
 import { defineDb, defineTable, column } from "astro:db";
 
 // https://astro.build/db/config
@@ -15,7 +18,7 @@ const Pasteles = defineTable({
     imagenAnytime: column.text({ optional: true }),
     precioGift: column.text({ optional: true }),
     imagenGift: column.text({ optional: true }),
-    categoria: column.text({ default: "Pasteles" }),
+    categoria: column.text({ default: "pasteles" }),
     nuevo: column.boolean({ default: false }),
     archived: column.boolean({ default: false }),
   },
@@ -47,6 +50,39 @@ export type PastelIdsEspeciales = {
     1: string;
     2: string;
   };
+};
+
+const Productos = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true, autoIncrement: true }),
+    ids_sistema: column.json({ optional: true, default: {} }),
+    nombre: column.text(),
+    presentacion: column.text(),
+    descripcion: column.text(),
+    imagen: column.text(),
+    categoria: column.text({ default: "otro" }),
+    precioStripe: column.text(),
+    nuevo: column.boolean({ default: false }),
+    archived: column.boolean({ default: false }),
+  },
+});
+
+export type Producto = {
+  id: string;
+  ids_sistema: unknown;
+  nombre: string;
+  presentacion: string;
+  descripcion: string;
+  imagen: string;
+  categoria: string;
+  precioStripe: string;
+  nuevo: boolean;
+  archived: boolean;
+};
+
+export type ProductosIdsSistema = {
+  postreria: string;
+  pasteleria: string;
 };
 
 const Orders = defineTable({
@@ -83,7 +119,10 @@ export type OrderProduct = {
   cantidad: number;
   stripePriceId: string;
   precio: number;
-  presentacion: PresentacionesType;
+  categoria: ProductCategoryTypes;
+  presentacion:
+    | ProductPresentacionesType<"pasteles">
+    | ProductPresentacionesType<"roscas">;
 };
 
 export type SystemOrderProduct = {
@@ -201,6 +240,7 @@ export default defineDb({
   tables: {
     Orders,
     Pasteles,
+    Productos,
     Sucursales,
     DisabledDateTimes,
     SpecialOrderDates,

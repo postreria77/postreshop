@@ -6,13 +6,13 @@ import CartList from "@/components/cart/CartList";
 
 <dialog
   id="cart-dialog"
-  class="fixed bottom-0 right-0 top-0 my-0 ml-auto mr-0 min-h-screen min-w-80 border-l border-light border-opacity-25 bg-dark-2 bg-none py-0 text-light backdrop:bg-dark-2 backdrop:bg-opacity-50"
+  class="fixed inset-0 my-0 ml-auto mr-0 min-h-screen w-full border-l border-light border-opacity-25 bg-dark-2 bg-none py-0 text-light backdrop:bg-dark-2 backdrop:bg-opacity-50 sm:w-[25rem]"
 >
-  <div class="relative min-h-screen w-full px-8 py-16">
+  <div class="relative w-full px-8 py-16">
     <h3 class="mb-4 font-medium tracking-tighter ~text-xl/2xl">Carrito</h3>
     <Icon
       name="close"
-      class="absolute right-8 top-16 size-6 cursor-pointer opacity-15 hover:opacity-100"
+      class="absolute right-8 top-16 size-6 cursor-pointer hover:opacity-100 sm:opacity-15"
       id="close-cart"
     />
     <CartList client:only />
@@ -21,6 +21,12 @@ import CartList from "@/components/cart/CartList";
     >
   </div>
 </dialog>
+
+<style>
+  dialog[open] {
+    display: flex;
+  }
+</style>
 
 <script>
   import { cartOpen } from "@/store";

@@ -36,7 +36,7 @@ const button = cva("button", {
 
 export interface ButtonProps
   extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "disabled">,
-  VariantProps<typeof button> {
+    VariantProps<typeof button> {
   intent?: "primary";
   buttonSize?: "small" | "medium" | "large";
 }
@@ -49,14 +49,24 @@ export default function AddToCart({
   size,
   image,
   quantity,
+  category,
   intent,
   buttonSize,
-  children
+  children,
 }: CartItem & ButtonProps) {
   const handleAddToCart = () => {
     cartOpen.set(true);
     document.body.classList.add("overflow-hidden");
-    addCartItem({ id, id_pasteleria, price, name, size, image, quantity });
+    addCartItem({
+      id,
+      id_pasteleria,
+      price,
+      name,
+      size,
+      image,
+      quantity,
+      category,
+    });
   };
 
   return (

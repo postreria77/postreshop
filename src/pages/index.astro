@@ -2,19 +2,25 @@
 // Component Imports
 import Layout from "@layouts/Layout.astro";
 import Section from "@components/Section.astro";
-import ProductCard from "@components/ProductCard.astro";
+import PastelCard from "@components/PastelCard.astro";
+import ProductCard from "@/components/ProductCard.astro";
 import Button from "@components/ui/Button.astro";
 import { Image } from "astro:assets";
 
 // Asset imports
 import hero from "@assets/hero_black.png";
 
-import { db, eq, Pasteles } from "astro:db";
+import { db, eq, Pasteles, Productos } from "astro:db";
 
 const pasteles = await db
   .select()
   .from(Pasteles)
   .where(eq(Pasteles.archived, false));
+
+const roscas = await db
+  .select()
+  .from(Productos)
+  .where(eq(Productos.categoria, "roscas"));
 ---
 
 <Layout
@@ -43,12 +49,32 @@ const pasteles = await db
     />
   </header>
 
+  <!-- Sección de roscas -->
   <Section>
+    <h2
+      class="mt-8 inline-block rounded-r-full border border-white/50 bg-white/5 px-4 py-1 text-xl font-medium"
+    >
+      Roscas de Reyes
+    </h2>
     <ul
       id="pasteles"
-      class="mt-16 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))]"
+      class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))]"
     >
-      {pasteles?.map((pastel: any) => <ProductCard pastel={pastel} />)}
+      {roscas?.map((rosca: any) => <ProductCard producto={rosca} />)}
+    </ul>
+  </Section>
+
+  <Section>
+    <h2
+      class="mt-8 inline-block rounded-r-full border border-white/50 bg-white/5 px-4 py-1 text-xl font-medium"
+    >
+      Pasteles
+    </h2>
+    <ul
+      id="pasteles"
+      class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))]"
+    >
+      {pasteles?.map((pastel: any) => <PastelCard pastel={pastel} />)}
     </ul>
   </Section>
 </Layout>

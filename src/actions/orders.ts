@@ -11,6 +11,7 @@ import {
   checkSaltilloOnSaturday,
   SUCURSALES_SALTILLO,
 } from "@/lib/orderConditions";
+import { checkRoscaAvailability } from "@/lib/specialOrderConditions";
 import {
   blockOrderDate,
   blockSucursalesForDate,
@@ -77,22 +78,32 @@ export const orders = {
       const { productos, tel, email, nombre, apellido, sucursal, fecha, hora } =
         input;
 
-      // Parse items for Stripe session
-      const line_items = JSON.parse(productos).map(
-        (producto: OrderProduct) => ({
-          price: producto.stripePriceId,
-          quantity: producto.cantidad,
-        }),
-      );
+      let parsedProducts;
 
       try {
-        JSON.parse(productos) as OrderProduct[];
+        parsedProducts = JSON.parse(productos) as OrderProduct[];
       } catch (error) {
         throw new ActionError({
           code: "INTERNAL_SERVER_ERROR",
           message: "Error en los productos. Intente nuevamente.",
         });
       }
+
+      const isRoscaAvailable = checkRoscaAvailability(parsedProducts, fecha);
+
+      if (!isRoscaAvailable) {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message:
+            "Solo se pueden realizar pedidos de Rosca para los días 5 y 6 de enero.",
+        });
+      }
+
+      // Parse items for Stripe session
+      const line_items = parsedProducts.map((producto: OrderProduct) => ({
+        price: producto.stripePriceId,
+        quantity: producto.cantidad,
+      }));
 
       // ---------------------------------------------------------
       // 🕒 REGLA SALTILLO: Límite 9:00 PM (21:00)
@@ -127,8 +138,6 @@ export const orders = {
       }
       // ---------------------------------------------------------
 
-      // Check if any products are blocked for the selected date and sucursal
-      const parsedProducts = JSON.parse(productos) as OrderProduct[];
       // Check if any products are blocked for the selected date and sucursal
 
       const blockingResult = await checkBlockedProductsForSucursal(
