@@ -135,10 +135,12 @@ export const updateOrder = async (
 /**
  * Send an order to the POS system
  * @param order - A formatted SystemOrder object
+ * @param orderId - The order ID to send
  * @returns A Promise that has data or error
  */
 export const uploadOrderToSystem = async (
   order: SystemOrder,
+  orderId: number,
 ): Promise<{ data: string | null; error: Error | null }> => {
   try {
     const response = await fetch("https://app.rmstech.mx/api/guardar_pedido", {
@@ -150,6 +152,13 @@ export const uploadOrderToSystem = async (
     });
     // Check if the response is OK
     if (!response.ok) {
+      await db
+        .update(Orders)
+        .set({
+          estado: "Error de sistema",
+        })
+        .where(eq(Orders.id, orderId))
+        .returning();
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
     return { data: "No HTTP error", error: null };

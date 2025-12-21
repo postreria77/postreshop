@@ -2,7 +2,7 @@ export const prerender = false;
 
 import type { APIRoute } from "astro";
 import { getCardBrand, stripe } from "../../lib/stripe";
-import { db, eq, inArray, Orders, Pasteles } from "astro:db";
+import { db, inArray, Pasteles } from "astro:db";
 import { getSecret } from "astro:env/server";
 import type {
   OrderProduct,
@@ -11,7 +11,6 @@ import type {
   SystemOrderProduct,
   PastelIdsEspeciales,
 } from "db/config";
-import { emails } from "@/actions/emails";
 import { PRESENTACIONES_ID } from "@/lib/pricesConfig";
 import {
   handleProcessError,
@@ -19,8 +18,6 @@ import {
   updateOrder,
   uploadOrderToSystem,
 } from "@/lib/systemOrders";
-
-import type { CardBrandType } from "@/lib/systemOrders";
 
 type Brands = "postreria" | "pasteleria";
 
@@ -172,7 +169,7 @@ export const POST: APIRoute = async ({ request, callAction }) => {
         console.log(JSON.stringify(data, null, 2)); // log the data);
         console.log("Uploading order to system...");
         const { data: orderData, error: orderError } =
-          await uploadOrderToSystem(data);
+          await uploadOrderToSystem(data, numberOrderId);
         console.log("Order upload returned:");
         if (orderError) {
           console.error(orderError.message);
