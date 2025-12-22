@@ -17,10 +17,10 @@ const pasteles = await db
   .from(Pasteles)
   .where(eq(Pasteles.archived, false));
 
-const roscas = await db
-  .select()
-  .from(Productos)
-  .where(eq(Productos.categoria, "roscas"));
+// const roscas = await db
+//   .select()
+//   .from(Productos)
+//   .where(eq(Productos.categoria, "roscas"));
 ---
 
 <Layout
@@ -40,7 +40,6 @@ const roscas = await db
         Realiza un pedido de tus pasteles favoritos y recógelo en tu sucursal de
         preferencia.
       </p>
-      <Button href="/#pasteles">Ver Pasteles</Button>
     </div>
     <Image
       src={hero}
@@ -50,7 +49,7 @@ const roscas = await db
   </header>
 
   <!-- Sección de roscas -->
-  <Section>
+  <!-- <Section>
     <h2
       class="mt-8 inline-block rounded-r-full border border-white/50 bg-white/5 px-4 py-1 text-xl font-medium"
     >
@@ -62,7 +61,7 @@ const roscas = await db
     >
       {roscas?.map((rosca: any) => <ProductCard producto={rosca} />)}
     </ul>
-  </Section>
+  </Section> -->
 
   <Section>
     <h2
