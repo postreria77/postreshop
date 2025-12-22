@@ -32,8 +32,8 @@ export async function checkSpecialDate(
   const date = dateTime.split("T")[0];
 
   const specialDates: SpecialOrderDate[] = [
-    { id: "1", date: "2025-12-23", type: "1" },
-    { id: "2", date: "2025-12-24", type: "2" },
+    { id: "1", date: "2025-12-30", type: "1" },
+    { id: "2", date: "2025-12-31", type: "2" },
   ];
 
   const specialDate = specialDates.find((d) => d.date === date);
