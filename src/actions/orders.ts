@@ -89,15 +89,15 @@ export const orders = {
         });
       }
 
-      const isRoscaAvailable = checkRoscaAvailability(parsedProducts, fecha);
+      // const isRoscaAvailable = checkRoscaAvailability(parsedProducts, fecha);
 
-      if (!isRoscaAvailable) {
-        throw new ActionError({
-          code: "BAD_REQUEST",
-          message:
-            "Solo se pueden realizar pedidos de Rosca para los días 5 y 6 de enero.",
-        });
-      }
+      // if (!isRoscaAvailable) {
+      //   throw new ActionError({
+      //     code: "BAD_REQUEST",
+      //     message:
+      //       "Solo se pueden realizar pedidos de Rosca para los días 5 y 6 de enero.",
+      //   });
+      // }
 
       // Parse items for Stripe session
       const line_items = parsedProducts.map((producto: OrderProduct) => ({
