@@ -11,7 +11,7 @@ import type {
   SystemOrderProduct,
   PastelIdsEspeciales,
 } from "db/config";
-import { PRESENTACIONES_ID } from "@/lib/pricesConfig";
+import { getPresentacionIds } from "@/lib/pricesConfig";
 import {
   handleProcessError,
   sendEmailReceipt,
@@ -44,10 +44,14 @@ export function getSentProducts(
   const brand = checkBrand(sucursal);
   if (brand === "pasteleria") {
     return productos.map((producto) => {
+      const presentacion = getPresentacionIds(
+        producto.categoria,
+        producto.presentacion,
+      );
       return {
         producto: producto.id_pasteleria,
         cantidad: producto.cantidad,
-        presentacion: PRESENTACIONES_ID[producto.presentacion].pasteleria,
+        presentacion: presentacion.pasteleria,
         precioProducto: 0,
         precioPresentacion: producto.precio,
         comentarios: "",
@@ -55,10 +59,14 @@ export function getSentProducts(
     });
   } else {
     return productos.map((producto) => {
+      const presentacion = getPresentacionIds(
+        producto.categoria,
+        producto.presentacion,
+      );
       return {
         producto: producto.id,
         cantidad: producto.cantidad,
-        presentacion: PRESENTACIONES_ID[producto.presentacion].postreria,
+        presentacion: presentacion.postreria,
         precioProducto: 0,
         precioPresentacion: producto.precio,
         comentarios: "",

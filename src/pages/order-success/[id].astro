@@ -7,8 +7,8 @@ import { Image } from "astro:assets";
 
 import receiptIcon from "@/assets/receipt-icon.png";
 
-import { db, eq, Orders, Pasteles, inArray } from "astro:db";
-import type { OrderProduct } from "db/config";
+import { db, eq, Orders, Pasteles, Productos, inArray } from "astro:db";
+import type { OrderProduct, ProductosIdsSistema } from "db/config";
 import { Sucursales } from "astro:db";
 import { getPresentacionPrice } from "@lib/pricesConfig";
 
@@ -21,7 +21,7 @@ const ordenesConId = await db
   .where(eq(Orders.id, numberId))
   .limit(1);
 const orden = ordenesConId[0];
-const productosOrden = JSON.parse(orden.productos as string) as OrderProduct[];
+const productos = JSON.parse(orden.productos as string) as OrderProduct[];
 
 const pasteles = await db
   .select()
@@ -29,9 +29,14 @@ const pasteles = await db
   .where(
     inArray(
       Pasteles.id,
-      productosOrden.map((p) => p.id),
+      productos.map((p) => p.id),
     ),
   );
+
+const roscas = await db
+  .select()
+  .from(Productos)
+  .where(eq(Productos.categoria, "roscas"));
 
 type OrderDetailsProduct = OrderProduct & {
   nombre: string;
@@ -40,19 +45,41 @@ type OrderDetailsProduct = OrderProduct & {
   importe: number;
 };
 
-const productos = productosOrden.map((p) => {
-  // Use TypeScript type guard to validate and get price safely
-  const importe = getPresentacionPrice(p.presentacion);
+const pastelesOrden = productos
+  .filter((p) => p.categoria === "pasteles")
+  .map((p) => {
+    // Use TypeScript type guard to validate and get price safely
+    const importe = getPresentacionPrice(p.categoria, p.presentacion);
 
-  const pastel = pasteles.find((pastel) => pastel.id === p.id);
-  return {
-    ...p,
-    nombre: pastel?.nombre || "",
-    precio: pastel?.precio || 0,
-    imagen: pastel?.imagen || "",
-    importe: p.precio ?? importe,
-  } as OrderDetailsProduct;
-});
+    const pastel = pasteles.find((pastel) => pastel.id === p.id);
+    return {
+      ...p,
+      nombre: pastel?.nombre || "",
+      precio: pastel?.precio || 0,
+      imagen: pastel?.imagen || "",
+      importe: p.precio ?? importe,
+    } as OrderDetailsProduct;
+  });
+
+const productosOrden = productos
+  .filter((p) => p.categoria !== "pasteles")
+  .map((p) => {
+    // Use TypeScript type guard to validate and get price safely
+    const importe = getPresentacionPrice(p.categoria, p.presentacion);
+
+    const producto = roscas.find((producto) => {
+      const parsedIds = producto.ids_sistema as ProductosIdsSistema;
+      return parsedIds.postreria === p.id;
+    });
+    return {
+      ...p,
+      nombre: producto?.nombre || "",
+      precio: producto?.precioStripe || 0,
+      imagen: producto?.imagen || "",
+      importe: p.precio ?? importe,
+    } as OrderDetailsProduct;
+  });
+
 const sucursal = await db
   .select()
   .from(Sucursales)
@@ -62,7 +89,8 @@ const total = new Intl.NumberFormat("es-MX", {
   style: "currency",
   currency: "MXN",
 }).format(
-  productos.reduce((acc, item) => acc + item.importe * item.cantidad, 0),
+  pastelesOrden.reduce((acc, item) => acc + item.importe * item.cantidad, 0) +
+    productosOrden.reduce((acc, item) => acc + item.importe * item.cantidad, 0),
 );
 ---
 
@@ -110,7 +138,34 @@ const total = new Intl.NumberFormat("es-MX", {
         </div>
         <ul class="border-dark-/60 space-y-2 border-y py-2">
           {
-            productos.map((p) => (
+            pastelesOrden.map((p) => (
+              <li class="flex items-center justify-between gap-2 border-b border-dashed border-dark/30 pb-2 last:border-0 last:pb-0">
+                <div class="flex items-center gap-2">
+                  <Image
+                    src={p.imagen}
+                    width={64}
+                    height={64}
+                    alt={p.nombre}
+                    class="rounded-sm"
+                  />
+                  <div class="flex flex-col">
+                    <h3 class="font-medium">{p.nombre}</h3>
+                    <p class="text-xs capitalize opacity-60">
+                      {p.presentacion}
+                    </p>
+                  </div>
+                </div>
+                <div class="flex items-end gap-1 font-medium">
+                  <span class="text-xs font-light leading-none">
+                    {p.cantidad}x
+                  </span>
+                  <strong class="leading-none">${p.importe}</strong>
+                </div>
+              </li>
+            ))
+          }
+          {
+            productosOrden.map((p) => (
               <li class="flex items-center justify-between gap-2 border-b border-dashed border-dark/30 pb-2 last:border-0 last:pb-0">
                 <div class="flex items-center gap-2">
                   <Image

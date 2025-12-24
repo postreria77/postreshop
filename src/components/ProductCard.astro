@@ -4,10 +4,12 @@ import AddToCart from "@/components/cart/AddToCart";
 import type { Producto, ProductosIdsSistema } from "db/config";
 import { slugify } from "@/lib/format";
 import {
-  PRESENTACIONES_PRODUCTOS_PRICES,
+  PRODUCTOS_PRESENTACIONES_PRICES,
   type ProductCategoryTypes,
   type ProductPresentacionesType,
+  getPresentacionType,
 } from "@/lib/pricesConfig";
+import { getPresentacionPrice } from "@/lib/pricesConfig";
 
 type Props = {
   producto: Producto;
@@ -19,6 +21,7 @@ const categoria = producto.categoria as ProductCategoryTypes;
 const presentacion = producto.presentacion as ProductPresentacionesType<
   typeof categoria
 >;
+const precio = getPresentacionPrice(categoria, presentacion);
 const ids_sistema = producto.ids_sistema as ProductosIdsSistema;
 
 const slug = slugify(nombre);
@@ -55,8 +58,7 @@ const slug = slugify(nombre);
       price={precioStripe
         ? {
             id: precioStripe,
-            amount:
-              PRESENTACIONES_PRODUCTOS_PRICES[categoria][presentacion] * 100,
+            amount: precio * 100,
             discount: 0,
           }
         : { id: "", amount: 0, discount: 0 }}

@@ -6,12 +6,14 @@ import {
   Pasteles,
   Sucursales,
   DisabledDateTimes,
+  Productos,
 } from "astro:db";
 import type {
   Order,
   OrderProduct,
   Sucursal,
   DisabledDateTime,
+  ProductosIdsSistema,
 } from "db/config";
 import { getPresentacionPrice } from "./pricesConfig";
 
@@ -53,9 +55,7 @@ export async function getReceiptInformation(
   }
 
   // Correctly cast as OrderProduct from the stringified JSON
-  const productosOrden = JSON.parse(
-    order[0].productos as string,
-  ) as OrderProduct[];
+  const productos = JSON.parse(order[0].productos as string) as OrderProduct[];
 
   // Get the pasteles by their IDs
   const pasteles = await db
@@ -64,13 +64,18 @@ export async function getReceiptInformation(
     .where(
       inArray(
         Pasteles.id,
-        productosOrden.map((p) => p.id),
+        productos.map((p) => p.id),
       ),
     );
 
+  const roscas = await db
+    .select()
+    .from(Productos)
+    .where(eq(Productos.categoria, "roscas"));
+
   // Cast the pasteles to the correct types
-  const productos = productosOrden.map((p) => {
-    let importe = getPresentacionPrice(p.presentacion);
+  const pastelesOrden = productos.map((p) => {
+    let importe = getPresentacionPrice(p.categoria, p.presentacion);
 
     const pastel = pasteles.find((pastel) => pastel.id === p.id);
     return {
@@ -82,12 +87,34 @@ export async function getReceiptInformation(
     } as ReceiptDetailsProduct;
   });
 
+  const productosOrden = productos.map((p) => {
+    let importe = getPresentacionPrice(p.categoria, p.presentacion);
+
+    const producto = roscas.find((producto) => {
+      const parsedIds = producto.ids_sistema as ProductosIdsSistema;
+      return parsedIds.postreria === p.id;
+    });
+    return {
+      ...p,
+      nombre: producto?.nombre || "",
+      precio: producto?.precioStripe || 0,
+      imagen: producto?.imagen || "",
+      importe: p.precio ?? importe,
+    } as ReceiptDetailsProduct;
+  });
+
+  const sentProducts = [...pastelesOrden, ...productosOrden];
+
   // Get the total for the order
   const total = new Intl.NumberFormat("es-MX", {
     style: "currency",
     currency: "MXN",
   }).format(
-    productos.reduce((acc, item) => acc + item.importe * item.cantidad, 0),
+    pastelesOrden.reduce((acc, item) => acc + item.importe * item.cantidad, 0) +
+      productosOrden.reduce(
+        (acc, item) => acc + item.importe * item.cantidad,
+        0,
+      ),
   );
 
   // Get the sucursal by it's ID
@@ -99,7 +126,7 @@ export async function getReceiptInformation(
   // Cast all the information to the correct types
   return {
     ...order[0],
-    productos,
+    productos: sentProducts,
     total,
     sucursal: sucursal[0],
   };

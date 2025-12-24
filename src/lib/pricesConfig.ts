@@ -1,7 +1,5 @@
 import type { Product } from "./stripe";
 
-export type PresentacionesType = "tradicional" | "anytime" | "gift";
-
 export type PresentacionesPrice = Record<PresentacionesType, number>;
 
 export const PRESENTACIONES_PRICE: PresentacionesPrice = {
@@ -37,17 +35,18 @@ function isPresentacionValid(
   );
 }
 
-export function getPresentacionPrice(presentacion: any): number {
-  if (isPresentacionValid(presentacion)) {
-    return PRESENTACIONES_PRICE[presentacion];
-  }
-  return PRESENTACIONES_PRICE.tradicional; // Fallback price
-}
+// export function getPresentacionPrice(presentacion: any): number {
+//   if (isPresentacionValid(presentacion)) {
+//     return PRESENTACIONES_PRICE[presentacion];
+//   }
+//   return PRESENTACIONES_PRICE.tradicional; // Fallback price
+// }
 
 // Nuevas configuraciones para tabla de productos
 
 export type ProductCategoryTypes = "pasteles" | "roscas";
 
+export type PresentacionesType = "tradicional" | "anytime" | "gift";
 export type PresentacionesRoscasType = "grande" | "chica";
 
 export type ProductPresentacionesType<T extends ProductCategoryTypes> =
@@ -57,12 +56,53 @@ export type ProductPresentacionesType<T extends ProductCategoryTypes> =
       ? PresentacionesRoscasType
       : never;
 
+export function isCategory<T extends ProductCategoryTypes>(
+  categoria: ProductCategoryTypes,
+  expected: T,
+): categoria is ProductCategoryTypes {
+  return categoria === expected;
+}
+
+export function getPresentacionIds(
+  categoria: ProductCategoryTypes,
+  presentacion: string,
+) {
+  let presentacionType;
+  switch (categoria) {
+    case "pasteles":
+      presentacionType = presentacion as ProductPresentacionesType<"pasteles">;
+      return PRODUCT_PRESENTACIONES_ID.pasteles[presentacionType];
+    case "roscas":
+      presentacionType = presentacion as ProductPresentacionesType<"roscas">;
+      return PRODUCT_PRESENTACIONES_ID.roscas[presentacionType];
+    default:
+      throw new Error(`Invalid category: ${categoria}`);
+  }
+}
+
 export type ProductsPricesType = {
   pasteles: Record<PresentacionesType, number>;
   roscas: Record<PresentacionesRoscasType, number>;
 };
 
-export const PRESENTACIONES_PRODUCTOS_PRICES: ProductsPricesType = {
+export function getPresentacionPrice(
+  categoria: ProductCategoryTypes,
+  presentacion: string,
+): number {
+  let presentacionType;
+  switch (categoria) {
+    case "pasteles":
+      presentacionType = presentacion as ProductPresentacionesType<"pasteles">;
+      return PRODUCTOS_PRESENTACIONES_PRICES.pasteles[presentacionType];
+    case "roscas":
+      presentacionType = presentacion as ProductPresentacionesType<"roscas">;
+      return PRODUCTOS_PRESENTACIONES_PRICES.roscas[presentacionType];
+    default:
+      return 0;
+  }
+}
+
+export const PRODUCTOS_PRESENTACIONES_PRICES: ProductsPricesType = {
   pasteles: {
     tradicional: 1340,
     anytime: 650,
@@ -71,5 +111,28 @@ export const PRESENTACIONES_PRODUCTOS_PRICES: ProductsPricesType = {
   roscas: {
     grande: 849,
     chica: 649,
+  },
+};
+
+export type ProductPresentacionesIds = {
+  pasteles: Record<
+    ProductPresentacionesType<"pasteles">,
+    { postreria: string; pasteleria: string }
+  >;
+  roscas: Record<
+    ProductPresentacionesType<"roscas">,
+    { postreria: string; pasteleria: string }
+  >;
+};
+
+export const PRODUCT_PRESENTACIONES_ID: ProductPresentacionesIds = {
+  pasteles: {
+    tradicional: { postreria: "68", pasteleria: "198" },
+    anytime: { postreria: "1069", pasteleria: "199" },
+    gift: { postreria: "1284", pasteleria: "359" },
+  },
+  roscas: {
+    grande: { postreria: "28", pasteleria: "354" },
+    chica: { postreria: "29", pasteleria: "400" },
   },
 };

@@ -12,7 +12,7 @@ export const POST: APIRoute = async ({ request, callAction }) => {
   const numberId = parseInt(id);
   const { data, error } = await updateOrder(numberId, brand);
   if (data) {
-    const systemUpload = await uploadOrderToSystem(data);
+    const systemUpload = await uploadOrderToSystem(data, numberId);
 
     console.log("System upload status:", systemUpload);
   }
