@@ -46,7 +46,7 @@ export function Receipt({ order }: ReceiptProps) {
                 <Column className="flex flex-col items-end">
                   <Text className="m-0">
                     <b className="font-medium">
-                      {new Date(order.fecha).toLocaleDateString()}
+                      {new Date(order.fecha).toLocaleDateString("es-MX")}
                     </b>
                   </Text>
                   <Text className="m-0 text-xs opacity-60">ID: {order.id}</Text>
@@ -66,7 +66,7 @@ export function Receipt({ order }: ReceiptProps) {
               <Row className="m-0 font-medium">
                 <Text className="m-0">
                   <b className="font-medium">Fecha de Entrega:</b>{" "}
-                  {new Date(order.fecha).toLocaleDateString()}
+                  {new Date(order.fecha).toLocaleDateString("es-MX")}
                 </Text>
               </Row>
               <Row className="m-0 font-medium">

@@ -81,7 +81,7 @@ const total = new Intl.NumberFormat("es-MX", {
           <Image src={receiptIcon} alt="Postre Shop Icon" class="size-16" />
           <div class="text-right">
             <h3 class="text-medium">
-              {new Date(orden.creado).toLocaleDateString()}
+              {new Date(orden.creado).toLocaleDateString("es-MX")}
             </h3>
             <p class="text-xs opacity-60"><span>ID:</span> {orden.id}</p>
           </div>
@@ -96,7 +96,7 @@ const total = new Intl.NumberFormat("es-MX", {
             <li><b class="font-medium">Estado:</b> {orden.estado}</li>
             <li>
               <b class="font-medium">Fecha de Entrega:</b>
-              {new Date(orden.fecha).toLocaleDateString()}
+              {new Date(orden.fecha).toLocaleDateString("es-MX")}
             </li>
             <li>
               <b class="font-medium">Hora de Entrega:</b>
