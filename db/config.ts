@@ -64,6 +64,7 @@ const Productos = defineTable({
     precioStripe: column.text(),
     nuevo: column.boolean({ default: false }),
     archived: column.boolean({ default: false }),
+    detalles: column.json({ optional: true, default: {} }),
   },
 });
 
@@ -78,12 +79,15 @@ export type Producto = {
   precioStripe: string;
   nuevo: boolean;
   archived: boolean;
+  detalles: unknown;
 };
 
 export type ProductosIdsSistema = {
   postreria: string;
   pasteleria: string;
 };
+
+export type ProductoDetalles = string[];
 
 const Orders = defineTable({
   columns: {

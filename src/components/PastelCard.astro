@@ -29,8 +29,8 @@ const {
 const slug = slugify(nombre);
 ---
 
-<li class="relative flex flex-col rounded-sm">
-  <a href=`productos/${slug}`>
+<li class="relative flex flex-col">
+  <a href={`productos/${slug}`}>
     <Image
       src={imagen}
       alt={nombre}
@@ -38,7 +38,7 @@ const slug = slugify(nombre);
       height={480}
       quality={80}
       loading={"lazy"}
-      class="aspect-square overflow-clip rounded-md object-cover"
+      class="aspect-square overflow-clip object-cover"
     />
   </a>
   <div class="flex items-center justify-between">

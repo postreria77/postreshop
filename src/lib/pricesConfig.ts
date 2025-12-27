@@ -47,7 +47,7 @@ function isPresentacionValid(
 export type ProductCategoryTypes = "pasteles" | "roscas";
 
 export type PresentacionesType = "tradicional" | "anytime" | "gift";
-export type PresentacionesRoscasType = "grande" | "chica";
+export type PresentacionesRoscasType = "grande" | "mediana";
 
 export type ProductPresentacionesType<T extends ProductCategoryTypes> =
   T extends "pasteles"
@@ -102,6 +102,23 @@ export function getPresentacionPrice(
   }
 }
 
+export function getPresentacionDiscount(
+  categoria: ProductCategoryTypes,
+  presentacion: string,
+): number {
+  let presentacionType;
+  switch (categoria) {
+    case "pasteles":
+      presentacionType = presentacion as ProductPresentacionesType<"pasteles">;
+      return PRODUCTOS_PRESENTACIONES_DISCOUNTS.pasteles[presentacionType];
+    case "roscas":
+      presentacionType = presentacion as ProductPresentacionesType<"roscas">;
+      return PRODUCTOS_PRESENTACIONES_DISCOUNTS.roscas[presentacionType];
+    default:
+      return 0;
+  }
+}
+
 export const PRODUCTOS_PRESENTACIONES_PRICES: ProductsPricesType = {
   pasteles: {
     tradicional: 1340,
@@ -109,8 +126,20 @@ export const PRODUCTOS_PRESENTACIONES_PRICES: ProductsPricesType = {
     gift: 370,
   },
   roscas: {
-    grande: 849,
-    chica: 649,
+    grande: 870,
+    mediana: 670,
+  },
+};
+
+export const PRODUCTOS_PRESENTACIONES_DISCOUNTS: ProductsPricesType = {
+  pasteles: {
+    tradicional: 350,
+    anytime: 100,
+    gift: 80,
+  },
+  roscas: {
+    grande: 80,
+    mediana: 80,
   },
 };
 
@@ -133,6 +162,6 @@ export const PRODUCT_PRESENTACIONES_ID: ProductPresentacionesIds = {
   },
   roscas: {
     grande: { postreria: "28", pasteleria: "354" },
-    chica: { postreria: "29", pasteleria: "400" },
+    mediana: { postreria: "29", pasteleria: "400" },
   },
 };

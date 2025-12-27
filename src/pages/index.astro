@@ -4,7 +4,6 @@ import Layout from "@layouts/Layout.astro";
 import Section from "@components/Section.astro";
 import PastelCard from "@components/PastelCard.astro";
 import ProductCard from "@/components/ProductCard.astro";
-import Button from "@components/ui/Button.astro";
 import { Image } from "astro:assets";
 
 // Asset imports
@@ -43,15 +42,16 @@ const roscas = await db
     </div>
     <Image
       src={hero}
-      alt="Hero image"
+      alt="Un pastel Black Velvet tamaño tradicional."
       class="w-[110%] max-w-7xl object-cover object-top"
+      loading="eager"
     />
   </header>
 
   <!-- Sección de roscas -->
   <Section>
     <h2
-      class="mt-8 inline-block rounded-r-full border border-white/50 bg-white/5 px-4 py-1 text-xl font-medium"
+      class="mt-8 inline-block rounded-r-full border border-white/50 bg-white/5 py-1 pl-3 pr-4 text-xl font-medium"
     >
       Roscas de Reyes
     </h2>
@@ -65,7 +65,7 @@ const roscas = await db
 
   <Section>
     <h2
-      class="mt-8 inline-block rounded-r-full border border-white/50 bg-white/5 px-4 py-1 text-xl font-medium"
+      class="mt-8 inline-block rounded-r-full border border-white/50 bg-white/5 py-1 pl-3 pr-4 text-xl font-medium"
     >
       Pasteles
     </h2>

@@ -89,14 +89,17 @@ export const orders = {
         });
       }
 
-      const isRoscaAvailable = checkRoscaAvailability(parsedProducts, fecha);
-      console.log(isRoscaAvailable);
+      const { available, message } = checkRoscaAvailability(
+        parsedProducts,
+        fecha,
+        hora,
+      );
+      console.log(available);
 
-      if (!isRoscaAvailable) {
+      if (!available) {
         throw new ActionError({
           code: "BAD_REQUEST",
-          message:
-            "Solo se pueden realizar pedidos de Rosca para los días 5 y 6 de enero.",
+          message: message,
         });
       }
 

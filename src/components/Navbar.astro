@@ -13,9 +13,13 @@ const { showCart, sessionControls } = Astro.props;
 
 <nav class="sticky top-0 z-40 border-b border-light border-opacity-25 bg-black">
   <div
-    class="mx-auto flex max-w-7xl items-center justify-between gap-4 py-8 ~px-4/16"
+    class="mx-auto flex max-w-7xl items-center justify-between gap-4 py-6 ~px-4/16 md:py-8"
   >
-    <a href="/" class="font-medium ~text-lg/2xl"><Icon name="logo" /></a>
+    <a
+      href="/"
+      class="font-medium ~text-lg/2xl"
+      aria-label="Ir a la página principal"><Icon name="logo" /></a
+    >
     {
       showCart && (
         <Button icon="cart" intent="secondary" size="zero" id="nav-to-cart">
