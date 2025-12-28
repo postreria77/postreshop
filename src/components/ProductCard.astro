@@ -19,7 +19,7 @@ type Props = {
 };
 
 const { producto } = Astro.props;
-const { nombre, descripcion, imagen, precioStripe } = producto;
+const { id, nombre, descripcion, imagen, precioStripe } = producto;
 const categoria = producto.categoria as ProductCategoryTypes;
 const presentacion = producto.presentacion as ProductPresentacionesType<
   typeof categoria
@@ -28,12 +28,10 @@ const precio = getPresentacionPrice(categoria, presentacion);
 const descuento = getPresentacionDiscount(categoria, presentacion);
 const ids_sistema = producto.ids_sistema as ProductosIdsSistema;
 const detalles = producto.detalles as ProductoDetalles;
-
-const slug = slugify(nombre);
 ---
 
 <li class="relative flex flex-col items-start">
-  <a href={`productos/${slug}`} aria-label={`Ver detalles de ${nombre}`}>
+  <a href={`productos/${id}`} aria-label={`Ver detalles de ${nombre}`}>
     <Image
       src={imagen}
       alt={nombre}

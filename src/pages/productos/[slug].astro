@@ -10,8 +10,6 @@ import { slugify } from "@/lib/format";
 import AddToCart from "@/components/cart/AddToCart";
 import { Icon } from "astro-icon/components";
 import {
-  PRESENTACIONES_DISCOUNT,
-  PRESENTACIONES_PRICE,
   getPresentacionPrice,
   getPresentacionDiscount,
   type ProductCategoryTypes,
@@ -27,7 +25,7 @@ export const getStaticPaths = (async () => {
   return productos.map((producto) => {
     return {
       params: {
-        slug: slugify(producto.nombre),
+        slug: producto.id.toString(),
       },
       props: {
         producto: producto,
@@ -65,6 +63,22 @@ const detalles = producto.detalles as ProductoDetalles;
           ><Icon name="arrow-left" class="mr-1 inline" /> Volver a la tienda</a
         >
         <h1 class="mb-2 mt-6 text-4xl font-medium md:mt-8">{nombre}</h1>
+        <span
+          class="mb-2 inline-block rounded-full border border-brand/50 bg-brand/15 px-2 py-1 capitalize leading-none text-brand-2"
+          >{presentacion}</span
+        >
+        <ul
+          class="mb-2 flex flex-wrap gap-x-2 gap-y-1 text-sm capitalize leading-none"
+        >
+          {
+            detalles.map((detalle) => (
+              <li class="rounded-full bg-light/15 px-1.5 py-[0.25rem]">
+                {detalle}
+              </li>
+            ))
+          }
+        </ul>
+
         <p class="mb-2 font-light leading-relaxed opacity-60 ~text-lg/xl">
           {descripcion}
         </p>
