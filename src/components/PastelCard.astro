@@ -30,7 +30,7 @@ const slug = slugify(nombre);
 ---
 
 <li class="relative flex flex-col">
-  <a href={`productos/${slug}`}>
+  <a href={`pasteles/${slug}`} aria-label={`Ver detalles de ${nombre}`}>
     <Image
       src={imagen}
       alt={nombre}

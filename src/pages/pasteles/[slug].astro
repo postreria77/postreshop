@@ -1,0 +1,142 @@
+---
+import Section from "@/components/Section.astro";
+import Layout from "@/layouts/Layout.astro";
+import { Image } from "astro:assets";
+
+import { db, eq, Pasteles } from "astro:db";
+import type { GetStaticPaths } from "astro";
+import { slugify } from "@/lib/format";
+import AddToCart from "@/components/cart/AddToCart";
+import { Icon } from "astro-icon/components";
+import {
+  PRESENTACIONES_DISCOUNT,
+  PRESENTACIONES_PRICE,
+} from "@/lib/pricesConfig";
+
+export const getStaticPaths = (async () => {
+  const pasteles = await db
+    .select()
+    .from(Pasteles)
+    .where(eq(Pasteles.archived, false));
+
+  return pasteles.map((pastel) => {
+    return {
+      params: {
+        slug: slugify(pastel.nombre),
+      },
+      props: {
+        pastel: pastel,
+      },
+    };
+  });
+}) satisfies GetStaticPaths;
+
+const { pastel } = Astro.props;
+const {
+  id,
+  id_pasteleria,
+  descripcion,
+  imagen,
+  nombre,
+  precio,
+  precioAnytime,
+  imagenAnytime,
+  precioGift,
+  imagenGift,
+} = pastel;
+---
+
+<Layout title={nombre} description={descripcion}>
+  <Section>
+    <div class="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2">
+      <Image
+        src={pastel.imagen}
+        alt={pastel.nombre}
+        width={500}
+        height={500}
+        class="w-full rounded-lg object-cover"
+      />
+      <div class="mt-8">
+        <a href="/" class="flex items-center text-lg hover:underline"
+          ><Icon name="arrow-left" class="mr-1 inline" /> Volver a la tienda</a
+        >
+        <h1 class="mb-2 mt-8 text-4xl font-medium">{pastel.nombre}</h1>
+        <p class="mb-2 font-light leading-relaxed opacity-60 ~text-lg/xl">
+          {descripcion}
+        </p>
+        <div class="mt-8 flex items-center gap-4">
+          <AddToCart
+            id={id}
+            id_pasteleria={id_pasteleria}
+            price={precio
+              ? {
+                  id: precio,
+                  amount: PRESENTACIONES_PRICE.tradicional * 100,
+                  discount: PRESENTACIONES_DISCOUNT.tradicional * 100,
+                }
+              : { id: "", amount: 0, discount: 0 }}
+            name={nombre}
+            size="tradicional"
+            image={imagen}
+            quantity={1}
+            category="pasteles"
+            client:only
+            buttonSize="large">Trad. +</AddToCart
+          >
+          {
+            precioAnytime && (
+              <AddToCart
+                id={id}
+                id_pasteleria={id_pasteleria}
+                price={
+                  precioAnytime
+                    ? {
+                        id: precioAnytime,
+                        amount: PRESENTACIONES_PRICE.anytime * 100,
+                        discount: PRESENTACIONES_DISCOUNT.anytime * 100,
+                      }
+                    : { id: "", amount: 0, discount: 0 }
+                }
+                name={nombre}
+                size="anytime"
+                image={imagenAnytime ? imagenAnytime : imagen}
+                quantity={1}
+                category="pasteles"
+                client:only
+                buttonSize="large"
+              >
+                Anytime +
+              </AddToCart>
+            )
+          }
+          {
+            precioGift && (
+              <AddToCart
+                id={id}
+                id_pasteleria={id_pasteleria}
+                price={
+                  precioGift
+                    ? {
+                        id: precioGift,
+                        amount: PRESENTACIONES_PRICE.gift * 100,
+                        discount: PRESENTACIONES_DISCOUNT.gift * 100,
+                      }
+                    : { id: "", amount: 0, discount: 0 }
+                }
+                name={nombre}
+                size="gift"
+                image={imagenGift ? imagenGift : imagen}
+                quantity={1}
+                category="pasteles"
+                client:only
+                buttonSize="large"
+              >
+                Gift +
+              </AddToCart>
+            )
+          }
+        </div>
+      </div>
+    </div>
+  </Section>
+</Layout>
