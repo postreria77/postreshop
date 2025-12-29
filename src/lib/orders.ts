@@ -56,6 +56,8 @@ export async function getReceiptInformation(
 
   // Correctly cast as OrderProduct from the stringified JSON
   const productos = JSON.parse(order[0].productos as string) as OrderProduct[];
+  const orderPasteles = productos.filter((p) => p.categoria === "pasteles");
+  const orderProductos = productos.filter((p) => p.categoria !== "pasteles");
 
   // Get the pasteles by their IDs
   const pasteles = await db
@@ -68,13 +70,22 @@ export async function getReceiptInformation(
       ),
     );
 
+  console.log("Pasteles:", pasteles);
+
   const roscas = await db
     .select()
     .from(Productos)
-    .where(eq(Productos.categoria, "roscas"));
+    .where(
+      inArray(
+        Productos.precioStripe,
+        productos.map((p) => p.stripePriceId),
+      ),
+    );
+
+  console.log("Roscas:", roscas);
 
   // Cast the pasteles to the correct types
-  const pastelesOrden = productos.map((p) => {
+  const pastelesOrden = orderPasteles.map((p) => {
     let importe = getPresentacionPrice(p.categoria, p.presentacion);
 
     const pastel = pasteles.find((pastel) => pastel.id === p.id);
@@ -87,7 +98,9 @@ export async function getReceiptInformation(
     } as ReceiptDetailsProduct;
   });
 
-  const productosOrden = productos.map((p) => {
+  console.log("Pasteles Orden:", pastelesOrden);
+
+  const productosOrden = orderProductos.map((p) => {
     let importe = getPresentacionPrice(p.categoria, p.presentacion);
 
     const producto = roscas.find((producto) => {
@@ -103,7 +116,11 @@ export async function getReceiptInformation(
     } as ReceiptDetailsProduct;
   });
 
+  console.log("Productos Orden:", productosOrden);
+
   const sentProducts = [...pastelesOrden, ...productosOrden];
+
+  console.log("Sent Products:", sentProducts);
 
   // Get the total for the order
   const total = new Intl.NumberFormat("es-MX", {

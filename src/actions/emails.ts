@@ -16,6 +16,7 @@ export const emails = {
     }),
     handler: async ({ id, email }) => {
       const order = await getReceiptInformation(id);
+      console.log("Order:", order);
 
       if (!order) {
         throw new ActionError({

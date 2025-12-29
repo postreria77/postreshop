@@ -6,7 +6,6 @@ import { Image } from "astro:assets";
 import { db, eq, Productos } from "astro:db";
 import type { ProductosIdsSistema, ProductoDetalles } from "db/config";
 import type { GetStaticPaths } from "astro";
-import { slugify } from "@/lib/format";
 import AddToCart from "@/components/cart/AddToCart";
 import { Icon } from "astro-icon/components";
 import {
