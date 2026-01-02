@@ -9,9 +9,9 @@ export const PRESENTACIONES_PRICE: PresentacionesPrice = {
 };
 
 export const PRESENTACIONES_DISCOUNT: PresentacionesPrice = {
-  tradicional: 350,
-  anytime: 100,
-  gift: 80,
+  tradicional: 0,
+  anytime: 0,
+  gift: 0,
 };
 
 export interface PresentacionesIds {
@@ -133,9 +133,9 @@ export const PRODUCTOS_PRESENTACIONES_PRICES: ProductsPricesType = {
 
 export const PRODUCTOS_PRESENTACIONES_DISCOUNTS: ProductsPricesType = {
   pasteles: {
-    tradicional: 350,
-    anytime: 100,
-    gift: 80,
+    tradicional: 0,
+    anytime: 0,
+    gift: 0,
   },
   roscas: {
     grande: 80,
