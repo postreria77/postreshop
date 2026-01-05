@@ -16,10 +16,12 @@ const pasteles = await db
   .from(Pasteles)
   .where(eq(Pasteles.archived, false));
 
-const roscas = await db
+const productos = await db
   .select()
   .from(Productos)
-  .where(eq(Productos.categoria, "roscas"));
+  .where(eq(Productos.archived, false));
+
+const roscas = productos.filter((producto) => producto.categoria === "roscas");
 ---
 
 <Layout
