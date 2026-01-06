@@ -15,13 +15,6 @@ const pasteles = await db
   .select()
   .from(Pasteles)
   .where(eq(Pasteles.archived, false));
-
-const productos = await db
-  .select()
-  .from(Productos)
-  .where(eq(Productos.archived, false));
-
-const roscas = productos.filter((producto) => producto.categoria === "roscas");
 ---
 
 <Layout
@@ -49,21 +42,6 @@ const roscas = productos.filter((producto) => producto.categoria === "roscas");
       loading="eager"
     />
   </header>
-
-  <!-- Sección de roscas -->
-  <Section>
-    <h2
-      class="mt-8 inline-block rounded-r-full border border-white/50 bg-white/5 py-1 pl-3 pr-4 text-xl font-medium"
-    >
-      Roscas de Reyes
-    </h2>
-    <ul
-      id="pasteles"
-      class="mt-8 grid grid-cols-2 gap-4 sm:grid-cols-[repeat(auto-fill,minmax(240px,1fr))]"
-    >
-      {roscas?.map((rosca: any) => <ProductCard producto={rosca} />)}
-    </ul>
-  </Section>
 
   <Section>
     <h2
