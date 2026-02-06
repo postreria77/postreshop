@@ -13,6 +13,7 @@ const Pasteles = defineTable({
     nombre: column.text(),
     descripcion: column.text(),
     precio: column.text(),
+    precio_descuentos: column.json({ optional: true, default: {} }),
     imagen: column.text(),
     precioAnytime: column.text({ optional: true }),
     imagenAnytime: column.text({ optional: true }),
@@ -31,6 +32,7 @@ export type Pastel = {
   nombre: string;
   descripcion: string;
   precio: string;
+  precio_descuentos: unknown;
   imagen: string;
   precioAnytime?: string;
   imagenAnytime?: string;
@@ -50,6 +52,11 @@ export type PastelIdsEspeciales = {
     1: string;
     2: string;
   };
+};
+
+export type PastelPrecioDescuentos = {
+  tradicional: string;
+  anytime: string;
 };
 
 const Productos = defineTable({
@@ -122,6 +129,7 @@ export type OrderProduct = {
   id_pasteleria: string;
   cantidad: number;
   stripePriceId: string;
+  discountedStripePriceId?: string;
   precio: number;
   categoria: ProductCategoryTypes;
   presentacion:

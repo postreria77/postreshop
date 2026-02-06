@@ -1,6 +1,13 @@
 import { ActionError, defineAction } from "astro:actions";
 import { z } from "astro:schema";
-import { db, eq, Orders, Sucursales, DisabledDateTimes } from "astro:db";
+import {
+  db,
+  eq,
+  Orders,
+  Sucursales,
+  DisabledDateTimes,
+  Pasteles,
+} from "astro:db";
 import { createStripeCheckout, generateDiscountArray } from "@/lib/stripe";
 
 import type { OrderProduct } from "db/config";
@@ -105,7 +112,10 @@ export const orders = {
 
       // Parse items for Stripe session
       const line_items = parsedProducts.map((producto: OrderProduct) => ({
-        price: producto.stripePriceId,
+        price:
+          fecha === "2026-02-14"
+            ? producto.discountedStripePriceId
+            : producto.stripePriceId,
         quantity: producto.cantidad,
       }));
 

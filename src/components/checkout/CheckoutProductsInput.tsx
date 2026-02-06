@@ -31,6 +31,7 @@ export default function CheckoutProductsInput({
     cantidad: item.quantity,
     precio: (item.price.amount - item.price.discount) / 100,
     stripePriceId: item.price.id,
+    discountedStripePriceId: item.discountedPrice,
     presentacion: item.size,
     categoria: item.category,
   }));

@@ -1,7 +1,7 @@
 ---
 import { Image } from "astro:assets";
 import AddToCart from "@/components/cart/AddToCart";
-import type { Pastel } from "db/config";
+import type { Pastel, PastelPrecioDescuentos } from "db/config";
 import { slugify } from "@/lib/format";
 import {
   PRESENTACIONES_DISCOUNT,
@@ -20,11 +20,14 @@ const {
   descripcion,
   imagen,
   precio,
+  precio_descuentos,
   precioAnytime,
   imagenAnytime,
   precioGift,
   imagenGift,
 } = pastel;
+
+const descuentos = precio_descuentos as PastelPrecioDescuentos;
 
 const slug = slugify(nombre);
 ---
@@ -62,6 +65,7 @@ const slug = slugify(nombre);
             discount: PRESENTACIONES_DISCOUNT.tradicional * 100,
           }
         : { id: "", amount: 0, discount: 0 }}
+      discountedPrice={descuentos["tradicional"]}
       name={nombre}
       size="tradicional"
       image={imagen}
@@ -83,6 +87,7 @@ const slug = slugify(nombre);
                 }
               : { id: "", amount: 0, discount: 0 }
           }
+          discountedPrice={descuentos["anytime"]}
           name={nombre}
           size="anytime"
           image={imagenAnytime ? imagenAnytime : imagen}

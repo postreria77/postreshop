@@ -14,6 +14,7 @@ export type CartItem = {
     amount: number;
     discount: number;
   };
+  discountedPrice?: string;
   name: string;
   size:
     | ProductPresentacionesType<"pasteles">
@@ -58,17 +59,20 @@ export function addCartItem({
   id,
   id_pasteleria,
   price,
+  discountedPrice,
   name,
   size,
   image,
   category,
   quantity,
 }: CartItem) {
+  console.log("[Cart] Adding item:", { name, price, discountedPrice });
   const existingEntry = cartItems.get()[price.id];
   if (existingEntry) {
     cartItems.setKey(price.id, {
       ...existingEntry,
       price,
+      discountedPrice,
       quantity: existingEntry.quantity + quantity,
     });
     updateCartItems();
@@ -82,6 +86,7 @@ export function addCartItem({
       category,
       quantity,
       price,
+      discountedPrice,
       size,
     });
     updateCartItems();
