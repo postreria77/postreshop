@@ -18,18 +18,26 @@ export default function CheckoutProductsInput({
 }) {
   const $items = useStore(cartItems);
 
+  const DISCOUNT_DATE = "2026-02-14";
+
   const selectedDateStr = selectedDate
-    ? selectedDate.toISOString().split("T")[0]
+    ? selectedDate instanceof Date
+      ? selectedDate.toISOString().split("T")[0]
+      : `${selectedDate.year}-${String(selectedDate.month).padStart(2, "0")}-${String(selectedDate.day).padStart(2, "0")}`
     : null;
 
   const isBlockedDate =
     selectedDateStr && DISABLED_DATES.includes(selectedDateStr);
 
+  const isDiscountDate = selectedDateStr === DISCOUNT_DATE;
+
   const orderProducts: OrderProduct[] = Object.values($items).map((item) => ({
     id: item.id,
     id_pasteleria: item.id_pasteleria,
     cantidad: item.quantity,
-    precio: (item.price.amount - item.price.discount) / 100,
+    precio: isDiscountDate
+      ? (item.price.amount - item.price.discount) / 100
+      : item.price.amount / 100,
     stripePriceId: item.price.id,
     discountedStripePriceId: item.discountedPrice,
     presentacion: item.size,

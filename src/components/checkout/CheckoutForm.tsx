@@ -34,6 +34,7 @@ export function CheckoutForm({
   );
 
   const [selectedSucursal, setSelectedSucursal] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState<any>(null);
 
   // Form state to persist values on error
   const [formData, setFormData] = useState({
@@ -87,7 +88,7 @@ export function CheckoutForm({
           ])}
         />
       ) : (
-        <CheckoutProductsInput />
+        <CheckoutProductsInput selectedDate={selectedDate} />
       )}
       <div className="grid grid-cols-2 gap-4">
         <div>
@@ -180,6 +181,7 @@ export function CheckoutForm({
         disabledDates={disabledDates}
         inputErrors={inputErrors}
         selectedSucursalId={selectedSucursal}
+        onDateChange={setSelectedDate}
       />
       {actionError?.message && (
         <FormInputError error={actionError.message} name="form" />

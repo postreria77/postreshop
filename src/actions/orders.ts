@@ -113,7 +113,7 @@ export const orders = {
       // Parse items for Stripe session
       const line_items = parsedProducts.map((producto: OrderProduct) => ({
         price:
-          fecha === "2026-02-14"
+          fecha === "2026-02-14" && producto.discountedStripePriceId
             ? producto.discountedStripePriceId
             : producto.stripePriceId,
         quantity: producto.cantidad,
