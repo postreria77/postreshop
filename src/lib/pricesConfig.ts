@@ -10,7 +10,7 @@ export const PRESENTACIONES_PRICE: PresentacionesPrice = {
 
 export const PRESENTACIONES_PERSONAS: Record<PresentacionesType, string> = {
   tradicional: "12-15 Personas",
-  anytime: "3-4 Personas",
+  anytime: "8-10 Personas",
   gift: "3-4 Personas",
 };
 
