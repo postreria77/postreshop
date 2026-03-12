@@ -2,7 +2,7 @@
 import Section from "@/components/Section.astro";
 import Layout from "@/layouts/Layout.astro";
 import { Image } from "astro:assets";
-
+import type { ImageMetadata } from "astro";
 import { db, eq, Pasteles } from "astro:db";
 import type { GetStaticPaths } from "astro";
 import { slugify } from "@/lib/format";
@@ -10,7 +10,9 @@ import AddToCart from "@/components/cart/AddToCart";
 import { Icon } from "astro-icon/components";
 import {
   PRESENTACIONES_DISCOUNT,
+  PRESENTACIONES_PERSONAS,
   PRESENTACIONES_PRICE,
+  type PresentacionesType,
 } from "@/lib/pricesConfig";
 
 export const getStaticPaths = (async () => {
@@ -19,19 +21,14 @@ export const getStaticPaths = (async () => {
     .from(Pasteles)
     .where(eq(Pasteles.archived, false));
 
-  return pasteles.map((pastel) => {
-    return {
-      params: {
-        slug: slugify(pastel.nombre),
-      },
-      props: {
-        pastel: pastel,
-      },
-    };
-  });
+  return pasteles.map((pastel) => ({
+    params: { slug: slugify(pastel.nombre) },
+    props: { pastel },
+  }));
 }) satisfies GetStaticPaths;
 
 const { pastel } = Astro.props;
+const { slug } = Astro.params;
 const {
   id,
   id_pasteleria,
@@ -44,99 +41,238 @@ const {
   precioGift,
   imagenGift,
 } = pastel;
+
+const formatPrice = (amount: number) =>
+  new Intl.NumberFormat("es-MX", {
+    style: "currency",
+    currency: "MXN",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(amount);
+
+const allAssetImages = import.meta.glob<{ default: ImageMetadata }>(
+  "../../assets/images/pasteles/**/*.{png,jpg,webp,jpeg}",
+  { eager: true },
+);
+
+const assetGalleryImages = Object.entries(allAssetImages)
+  .filter(([path]) => path.includes(`/pasteles/${slug}/`))
+  .map(([path, mod]) => ({
+    label:
+      path
+        .split("/")
+        .pop()
+        ?.replace(/\.[^.]+$/, "") ?? "",
+    src: mod.default,
+  }));
+
+type ImageEntry = { label: string; src: string | ImageMetadata };
+type SizeEntry = {
+  displayName: string;
+  size: PresentacionesType;
+  personas: string;
+  stripeId: string;
+  image: string;
+  amount: number;
+  discount: number;
+};
+
+const dbImages: ImageEntry[] = [];
+const sizes: SizeEntry[] = [];
+
+if (precio) {
+  dbImages.push({ label: "Tradicional", src: imagen });
+  sizes.push({
+    displayName: "Tradicional",
+    size: "tradicional",
+    personas: PRESENTACIONES_PERSONAS.tradicional,
+    stripeId: precio,
+    image: imagen,
+    amount: PRESENTACIONES_PRICE.tradicional * 100,
+    discount: PRESENTACIONES_DISCOUNT.tradicional * 100,
+  });
+}
+if (precioAnytime) {
+  dbImages.push({ label: "Anytime", src: imagenAnytime ?? imagen });
+  sizes.push({
+    displayName: "Anytime",
+    size: "anytime",
+    personas: PRESENTACIONES_PERSONAS.anytime,
+    stripeId: precioAnytime,
+    image: imagenAnytime ?? imagen,
+    amount: PRESENTACIONES_PRICE.anytime * 100,
+    discount: PRESENTACIONES_DISCOUNT.anytime * 100,
+  });
+}
+if (precioGift) {
+  dbImages.push({ label: "Gift", src: imagenGift ?? imagen });
+  sizes.push({
+    displayName: "Gift",
+    size: "gift",
+    personas: PRESENTACIONES_PERSONAS.gift,
+    stripeId: precioGift,
+    image: imagenGift ?? imagen,
+    amount: PRESENTACIONES_PRICE.gift * 100,
+    discount: PRESENTACIONES_DISCOUNT.gift * 100,
+  });
+}
+
+const images: ImageEntry[] =
+  assetGalleryImages.length > 0 ? assetGalleryImages : dbImages;
 ---
 
 <Layout title={nombre} description={descripcion}>
   <Section>
-    <div class="mt-16 grid grid-cols-1 gap-8 sm:grid-cols-2">
-      <Image
-        src={pastel.imagen}
-        alt={pastel.nombre}
-        width={500}
-        height={500}
-        class="w-full rounded-lg object-cover"
-      />
-      <div class="mt-8">
-        <a href="/" class="flex items-center text-lg hover:underline"
-          ><Icon name="arrow-left" class="mr-1 inline" /> Volver a la tienda</a
-        >
-        <h1 class="mb-2 mt-8 text-4xl font-medium">{pastel.nombre}</h1>
-        <p class="mb-2 font-light leading-relaxed opacity-60 ~text-lg/xl">
-          {descripcion}
-        </p>
-        <div class="mt-8 flex items-center gap-4">
-          <AddToCart
-            id={id}
-            id_pasteleria={id_pasteleria}
-            price={precio
-              ? {
-                  id: precio,
-                  amount: PRESENTACIONES_PRICE.tradicional * 100,
-                  discount: PRESENTACIONES_DISCOUNT.tradicional * 100,
-                }
-              : { id: "", amount: 0, discount: 0 }}
-            name={nombre}
-            size="tradicional"
-            image={imagen}
-            quantity={1}
-            category="pasteles"
-            client:only
-            buttonSize="large">Trad. +</AddToCart
-          >
+    <div class="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-2">
+      <!-- Left: image gallery -->
+      <div data-gallery>
+        <div class="aspect-[4/3] overflow-hidden rounded-lg">
           {
-            precioAnytime && (
-              <AddToCart
-                id={id}
-                id_pasteleria={id_pasteleria}
-                price={
-                  precioAnytime
-                    ? {
-                        id: precioAnytime,
-                        amount: PRESENTACIONES_PRICE.anytime * 100,
-                        discount: PRESENTACIONES_DISCOUNT.anytime * 100,
-                      }
-                    : { id: "", amount: 0, discount: 0 }
-                }
-                name={nombre}
-                size="anytime"
-                image={imagenAnytime ? imagenAnytime : imagen}
-                quantity={1}
-                category="pasteles"
-                client:only
-                buttonSize="large"
+            images.map((img, i) => (
+              <div
+                data-gallery-slide={i}
+                data-active={i === 0 ? "true" : "false"}
+                class="h-full data-[active=false]:hidden"
               >
-                Anytime +
-              </AddToCart>
-            )
-          }
-          {
-            precioGift && (
-              <AddToCart
-                id={id}
-                id_pasteleria={id_pasteleria}
-                price={
-                  precioGift
-                    ? {
-                        id: precioGift,
-                        amount: PRESENTACIONES_PRICE.gift * 100,
-                        discount: PRESENTACIONES_DISCOUNT.gift * 100,
-                      }
-                    : { id: "", amount: 0, discount: 0 }
-                }
-                name={nombre}
-                size="gift"
-                image={imagenGift ? imagenGift : imagen}
-                quantity={1}
-                category="pasteles"
-                client:only
-                buttonSize="large"
-              >
-                Gift +
-              </AddToCart>
-            )
+                <Image
+                  src={img.src}
+                  alt={`${nombre} - ${img.label}`}
+                  width={600}
+                  height={450}
+                  quality={85}
+                  class="h-full w-full object-cover"
+                />
+              </div>
+            ))
           }
         </div>
+
+        {
+          images.length > 1 && (
+            <div class="mt-3 flex gap-2">
+              {images.map((img, i) => (
+                <button
+                  data-gallery-thumb={i}
+                  data-active={i === 0 ? "true" : "false"}
+                  aria-label={`Ver imagen ${img.label}`}
+                  class="overflow-hidden rounded-md border-2 transition-colors data-[active=false]:border-transparent data-[active=true]:border-brand"
+                >
+                  <Image
+                    src={img.src}
+                    alt={`${nombre} - ${img.label}`}
+                    width={100}
+                    height={100}
+                    quality={70}
+                    class="aspect-square w-20 object-cover"
+                  />
+                </button>
+              ))}
+            </div>
+          )
+        }
+      </div>
+
+      <!-- Right: info + sizes -->
+      <div class="flex flex-col">
+        <a
+          href="/"
+          class="flex w-fit items-center gap-1 text-sm opacity-60 transition-opacity hover:opacity-100"
+        >
+          <Icon name="arrow-left" class="size-4" />
+          Volver a la tienda
+        </a>
+
+        <h1
+          class="mb-3 mt-6 font-medium capitalize tracking-tighter ~text-3xl/4xl"
+        >
+          {nombre}
+        </h1>
+        <p class="font-light leading-relaxed opacity-60 ~text-sm/base">
+          {descripcion}
+        </p>
+
+        <ul class="mt-8 border-t border-dashed border-light/25">
+          {
+            sizes.map((s) => (
+              <li class="flex items-center gap-4 border-b border-dashed border-light/25 py-6">
+                <Image
+                  src={s.image}
+                  alt={`${nombre} - ${s.displayName}`}
+                  width={120}
+                  height={120}
+                  quality={80}
+                  class="size-28 shrink-0 rounded-lg object-cover"
+                />
+                <div class="flex flex-1 items-start justify-between gap-4">
+                  <div>
+                    <p class="text-xl font-medium capitalize">
+                      {s.displayName}
+                    </p>
+                    <p class="mb-4 mt-1 text-sm opacity-60">{s.personas}</p>
+                    <AddToCart
+                      id={id}
+                      id_pasteleria={id_pasteleria}
+                      price={{
+                        id: s.stripeId,
+                        amount: s.amount,
+                        discount: s.discount,
+                      }}
+                      name={nombre}
+                      size={s.size}
+                      image={s.image}
+                      quantity={1}
+                      category="pasteles"
+                      buttonSize="medium"
+                      client:only
+                    >
+                      Añadir al carrito
+                    </AddToCart>
+                  </div>
+                  <p class="shrink-0 text-2xl font-medium">
+                    {formatPrice(s.amount / 100)}
+                  </p>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
       </div>
     </div>
   </Section>
 </Layout>
+
+<script>
+  function initGallery() {
+    document
+      .querySelectorAll<HTMLElement>("[data-gallery]:not([data-initialized])")
+      .forEach((gallery) => {
+        gallery.dataset.initialized = "true";
+
+        const slides = gallery.querySelectorAll<HTMLElement>(
+          "[data-gallery-slide]",
+        );
+        const thumbs = gallery.querySelectorAll<HTMLButtonElement>(
+          "[data-gallery-thumb]",
+        );
+
+        if (slides.length <= 1) return;
+
+        let current = 0;
+
+        function goTo(index: number) {
+          slides[current].dataset.active = "false";
+          thumbs[current].dataset.active = "false";
+          current = index;
+          slides[current].dataset.active = "true";
+          thumbs[current].dataset.active = "true";
+        }
+
+        thumbs.forEach((thumb, i) => {
+          thumb.addEventListener("click", () => goTo(i));
+        });
+      });
+  }
+
+  initGallery();
+  document.addEventListener("astro:page-load", initGallery);
+</script>

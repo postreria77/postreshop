@@ -24,7 +24,8 @@ const slug = slugify(nombre);
 type Size = { name: string; image: string };
 const sizes: Size[] = [];
 if (precio) sizes.push({ name: "Tradicional", image: imagen });
-if (precioAnytime) sizes.push({ name: "Anytime", image: imagenAnytime ?? imagen });
+if (precioAnytime)
+  sizes.push({ name: "Anytime", image: imagenAnytime ?? imagen });
 if (precioGift) sizes.push({ name: "Gift", image: imagenGift ?? imagen });
 ---
 
@@ -57,7 +58,7 @@ if (precioGift) sizes.push({ name: "Gift", image: imagenGift ?? imagen });
           <button
             data-carousel-prev
             aria-label="Tamaño anterior"
-            class="group absolute inset-y-0 left-0 flex w-10 items-center justify-center"
+            class="group absolute inset-y-8 left-0 flex w-10 items-center justify-center md:inset-y-16"
           >
             <span class="rounded-full bg-dark/70 p-1.5 text-light backdrop-blur-sm transition group-hover:bg-dark">
               <svg
@@ -78,7 +79,7 @@ if (precioGift) sizes.push({ name: "Gift", image: imagenGift ?? imagen });
           <button
             data-carousel-next
             aria-label="Siguiente tamaño"
-            class="group absolute inset-y-0 right-0 flex w-10 items-center justify-center"
+            class="group absolute inset-y-8 right-0 flex w-10 items-center justify-center md:inset-y-16"
           >
             <span class="rounded-full bg-dark/70 p-1.5 text-light backdrop-blur-sm transition group-hover:bg-dark">
               <svg
@@ -111,7 +112,7 @@ if (precioGift) sizes.push({ name: "Gift", image: imagenGift ?? imagen });
         <span
           data-tag={i}
           data-active={i === 0 ? "true" : "false"}
-          class="cursor-pointer rounded-md border px-2 py-1 text-[10px] capitalize leading-none transition-colors data-[active=false]:border-light/25 data-[active=false]:opacity-60 data-[active=true]:border-brand/50 data-[active=true]:bg-brand/15 data-[active=true]:text-brand-2"
+          class="cursor-pointer rounded-md border px-2 py-1 text-[10px] capitalize leading-none transition-colors data-[active=false]:border-light/25 data-[active=true]:border-brand/50 data-[active=true]:bg-brand/15 data-[active=true]:text-brand-2 data-[active=false]:opacity-60"
         >
           {size.name}
         </span>
@@ -127,7 +128,7 @@ if (precioGift) sizes.push({ name: "Gift", image: imagenGift ?? imagen });
 
   <a
     href={`pasteles/${slug}`}
-    class="relative mt-auto flex w-full items-center justify-center rounded-md border border-light/25 bg-dark py-1 text-center leading-none transition duration-75 ease-out hover:border-brand/50 hover:bg-brand/15 hover:text-brand-2 focus:outline-brand ~px-2/4 ~text-xs/sm"
+    class="relative mt-auto flex w-full items-center justify-center rounded-md border border-light/25 bg-dark py-1 text-center leading-none transition duration-75 ease-out ~text-xs/sm ~px-2/4 hover:border-brand/50 hover:bg-brand/15 hover:text-brand-2 focus:outline-brand"
   >
     Ver Producto
   </a>
@@ -140,8 +141,7 @@ if (precioGift) sizes.push({ name: "Gift", image: imagenGift ?? imagen });
       .forEach((carousel) => {
         carousel.dataset.initialized = "true";
 
-        const slides =
-          carousel.querySelectorAll<HTMLElement>("[data-slide]");
+        const slides = carousel.querySelectorAll<HTMLElement>("[data-slide]");
         const tags = carousel.querySelectorAll<HTMLElement>("[data-tag]");
         const prevBtn = carousel.querySelector<HTMLButtonElement>(
           "[data-carousel-prev]",
