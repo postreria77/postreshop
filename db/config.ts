@@ -248,6 +248,18 @@ export type Session = {
   expiresAt: Date;
 };
 
+const ProcessedEvents = defineTable({
+  columns: {
+    id: column.text({ primaryKey: true, unique: true }),
+    processedAt: column.text(),
+  },
+});
+
+export type ProcessedEvent = {
+  id: string;
+  processedAt: string;
+};
+
 export default defineDb({
   tables: {
     Orders,
@@ -258,5 +270,6 @@ export default defineDb({
     SpecialOrderDates,
     Users,
     Sessions,
+    ProcessedEvents,
   },
 });

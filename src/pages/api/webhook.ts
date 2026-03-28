@@ -2,7 +2,7 @@ export const prerender = false;
 
 import type { APIRoute } from "astro";
 import { getCardBrand, stripe } from "../../lib/stripe";
-import { db, inArray, Pasteles } from "astro:db";
+import { db, eq, inArray, Pasteles, ProcessedEvents } from "astro:db";
 import { getSecret } from "astro:env/server";
 import type {
   OrderProduct,
@@ -127,6 +127,19 @@ export const POST: APIRoute = async ({ request, callAction }) => {
     return handleProcessError(`Webhook Error: ${err}`, 400);
   }
 
+  // Idempotency check: skip if this event was already processed
+  const existingEvent = await db
+    .select()
+    .from(ProcessedEvents)
+    .where(eq(ProcessedEvents.id, event.id));
+
+  if (existingEvent.length > 0) {
+    console.log(`Duplicate webhook event ignored: ${event.id}`);
+    return new Response(`Duplicate event ignored: ${event.id}`, {
+      status: 200,
+    });
+  }
+
   // Handle the event per type and return on the default
   switch (event.type) {
     case "payment_intent.succeeded":
@@ -189,6 +202,10 @@ export const POST: APIRoute = async ({ request, callAction }) => {
             break;
           }
           await sendEmailReceipt(numberOrderId, email, callAction);
+          await db.insert(ProcessedEvents).values({
+            id: event.id,
+            processedAt: new Date().toISOString(),
+          });
           break;
         }
       }
