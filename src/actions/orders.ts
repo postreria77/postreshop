@@ -117,6 +117,40 @@ export const orders = {
       }));
 
       // ---------------------------------------------------------
+      // 🕒 REGLA GLOBAL: Sin pedidos después de las 10:00 PM para hoy o mañana
+      // ---------------------------------------------------------
+      {
+        const now = new Date();
+        const mexicoDate = new Date(
+          now.toLocaleString("en-US", { timeZone: "America/Monterrey" }),
+        );
+        const currentHour = mexicoDate.getHours();
+
+        if (currentHour >= 22) {
+          const year = mexicoDate.getFullYear();
+          const month = String(mexicoDate.getMonth() + 1).padStart(2, "0");
+          const day = String(mexicoDate.getDate()).padStart(2, "0");
+          const todayString = `${year}-${month}-${day}`;
+
+          const tomorrowDate = new Date(mexicoDate);
+          tomorrowDate.setDate(tomorrowDate.getDate() + 1);
+          const tYear = tomorrowDate.getFullYear();
+          const tMonth = String(tomorrowDate.getMonth() + 1).padStart(2, "0");
+          const tDay = String(tomorrowDate.getDate()).padStart(2, "0");
+          const tomorrowString = `${tYear}-${tMonth}-${tDay}`;
+
+          if (fecha === todayString || fecha === tomorrowString) {
+            throw new ActionError({
+              code: "BAD_REQUEST",
+              message:
+                "El horario de pedidos finaliza a las 10:00 p.m. No es posible realizar pedidos para hoy o el día de mañana.",
+            });
+          }
+        }
+      }
+      // ---------------------------------------------------------
+
+      // ---------------------------------------------------------
       // 🕒 REGLA SALTILLO: Límite 9:00 PM (21:00)
       // IDs: 50 (Carranza), 109 (Parque Centro), 520 (Parque Centro P.)
       // ---------------------------------------------------------
