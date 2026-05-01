@@ -381,3 +381,4 @@ export function checkSaltilloOnSaturday(
 }
 
 export const SUCURSALES_SALTILLO = ["50", "109", "520"];
+export const SUCURSALES_HERRADURA_PCENTRO = ["520", "536"];
