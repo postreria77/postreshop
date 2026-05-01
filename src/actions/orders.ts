@@ -17,7 +17,6 @@ import {
   checkGiftOnPasteleria,
   checkSaltilloOnSaturday,
   SUCURSALES_SALTILLO,
-  SUCURSALES_HERRADURA_PCENTRO,
   SUCURSALES_CIERRE9,
 } from "@/lib/orderConditions";
 import { checkRoscaAvailability } from "@/lib/specialOrderConditions";
