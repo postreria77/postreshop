@@ -155,21 +155,24 @@ export const orders = {
       // 🕒 REGLA SUCURSALES QUE CIERRAN: Límite 9:00 PM (21:00)
       // IDs: 50 (Carranza), 109 (Parque Centro), 520 (Parque Centro P.), 536 (Herradura) 
       // ---------------------------------------------------------
-      const mexicoDate = new Intl.DateTimeFormat("en-US", {
-        timeZone: "America/Monterrey",
-        hour: "2-digit",
-        hour12: false,
-      }).format(new Date());
+      const now = new Date();
 
-      const currentHour = parseInt(mexicoDate, 10);
+      // hora México (segura)
+      const mexicoTime = new Date(
+        now.toLocaleString("en-US", { timeZone: "America/Monterrey" })
+      );
+
+      const currentHour = mexicoTime.getHours();
+
+      // fecha México en formato YYYY-MM-DD
+      const year = mexicoTime.getFullYear();
+      const month = String(mexicoTime.getMonth() + 1).padStart(2, "0");
+      const day = String(mexicoTime.getDate()).padStart(2, "0");
+      const todayString = `${year}-${month}-${day}`;
+
+      const isToday = fecha?.slice(0, 10) === todayString;
 
       if (SUCURSALES_CIERRE9.includes(String(sucursal).trim())) {
-        const year = new Date().toLocaleString("en-US", { timeZone: "America/Monterrey" });
-        const now = new Date(year);
-
-        const todayString = now.toISOString().split("T")[0];
-        const isToday = fecha === todayString;
-
         if (isToday && currentHour >= 21) {
           throw new ActionError({
             code: "BAD_REQUEST",
