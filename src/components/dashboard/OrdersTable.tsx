@@ -10,7 +10,7 @@ import {
 } from "@heroui/react";
 import { useEffect, useState } from "react";
 import type { Order } from "db/config";
-import { formatDateString } from "@/lib/format";
+import { formatDateTimeString } from "@/lib/format";
 
 export default function OrdersTable() {
   const [orders, setOrders] = useState([]);
@@ -60,7 +60,8 @@ export default function OrdersTable() {
             <TableColumn>Email</TableColumn>
             <TableColumn>Estado</TableColumn>
             <TableColumn>Sucursal</TableColumn>
-            <TableColumn>Fecha</TableColumn>
+            <TableColumn>Fecha entrega</TableColumn>
+            <TableColumn>Pedido creado</TableColumn>
           </TableHeader>
           <TableBody className="overflow-x-scroll">
             {orders.map((order: Order) => (
@@ -87,7 +88,10 @@ export default function OrdersTable() {
                 </TableCell>
                 <TableCell className="~text-xs/sm">{order.sucursal}</TableCell>
                 <TableCell className="~text-xs/sm">
-                  {formatDateString(order.fecha)}
+                  {formatDateTimeString(order.fecha)}
+                </TableCell>
+                <TableCell className="~text-xs/sm">
+                  {formatDateTimeString(order.creado)}
                 </TableCell>
               </TableRow>
             ))}

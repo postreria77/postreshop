@@ -42,3 +42,14 @@ export function formatDateString(dateString: string): string {
 
   return formattedDate;
 }
+
+export function formatDateTimeString(dateString: string): string {
+  if (!dateString) return "-";
+  const [datePart, timePart] = dateString.split("T");
+  if (!datePart) return "-";
+  const [year, month, day] = datePart.split("-");
+  const base = `${day}/${month}/${year}`;
+  if (!timePart) return base;
+  const [hour, minute] = timePart.split(":");
+  return `${base} ${hour}:${minute || "00"}`;
+}
