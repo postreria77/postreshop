@@ -45,11 +45,15 @@ export function formatDateString(dateString: string): string {
 
 export function formatDateTimeString(dateString: string): string {
   if (!dateString) return "-";
-  const [datePart, timePart] = dateString.split("T");
-  if (!datePart) return "-";
-  const [year, month, day] = datePart.split("-");
-  const base = `${day}/${month}/${year}`;
-  if (!timePart) return base;
-  const [hour, minute] = timePart.split(":");
-  return `${base} ${hour}:${minute || "00"}`;
+  const date = new Date(dateString);
+  if (isNaN(date.getTime())) return "-";
+  return date.toLocaleString("es-MX", {
+    timeZone: "America/Monterrey",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
 }
