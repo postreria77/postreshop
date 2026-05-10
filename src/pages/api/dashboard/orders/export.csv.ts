@@ -1,4 +1,4 @@
-import { db, Orders, or, like } from "astro:db";
+import { db, Orders, like } from "astro:db";
 import type { Order } from "db/config";
 
 export const prerender = false;
@@ -31,12 +31,7 @@ export async function GET() {
   const orders = await db
     .select()
     .from(Orders)
-    .where(
-      or(
-        like(Orders.fecha, "2026-05-09%"),
-        like(Orders.fecha, "2026-05-10%"),
-      ),
-    )
+    .where(like(Orders.fecha, "2026-05-10%"))
     .orderBy();
 
   const headers = [
@@ -67,7 +62,7 @@ export async function GET() {
     status: 200,
     headers: {
       "Content-Type": "text/csv; charset=utf-8",
-      "Content-Disposition": "attachment; filename=pedidos-9-10-mayo.csv",
+      "Content-Disposition": "attachment; filename=pedidos-10-mayo.csv",
     },
   });
 }

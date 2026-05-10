@@ -48,7 +48,7 @@ export default function OrdersTable() {
           download
           className="rounded-md border border-brand/50 px-3 py-1.5 text-xs text-brand hover:bg-brand/10"
         >
-          ↓ Descargar pedidos 9 y 10 mayo
+          ↓ Descargar pedidos 10 mayo
         </a>
       </div>
       <div className="flex items-center gap-3">
