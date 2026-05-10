@@ -17,10 +17,15 @@ export default function OrdersTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [fecha, setFecha] = useState("");
+  const [sort, setSort] = useState<"asc" | "desc">("desc");
 
   const fetchOrders = async () => {
     setLoading(true);
-    const response = await fetch(`/api/dashboard/orders/${currentPage}.json`);
+    const params = new URLSearchParams();
+    if (fecha) params.set("fecha", fecha);
+    params.set("sort", sort);
+    const response = await fetch(`/api/dashboard/orders/${currentPage}.json?${params.toString()}`);
     const data = await response.json();
     setOrders(data.orders);
     setTotalPages(data.totalPages);
@@ -28,11 +33,47 @@ export default function OrdersTable() {
   };
 
   useEffect(() => {
+    setCurrentPage(1);
+  }, [fecha, sort]);
+
+  useEffect(() => {
     fetchOrders();
-  }, [currentPage]);
+  }, [currentPage, fecha, sort]);
 
   return (
-    <div>
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between gap-3">
+        <a
+          href="/api/dashboard/orders/export.csv"
+          download
+          className="rounded-md border border-brand/50 px-3 py-1.5 text-xs text-brand hover:bg-brand/10"
+        >
+          ↓ Descargar pedidos 10 mayo
+        </a>
+      </div>
+      <div className="flex items-center gap-3">
+        <input
+          type="date"
+          value={fecha}
+          onChange={(e) => setFecha(e.target.value)}
+          className="rounded-md border border-light/20 bg-transparent px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand"
+        />
+        {fecha && (
+          <button
+            onClick={() => setFecha("")}
+            className="rounded-md border border-light/20 px-3 py-1.5 text-xs text-light/60 hover:text-white"
+          >
+            Limpiar
+          </button>
+        )}
+        <button
+          onClick={() => setSort(sort === "desc" ? "asc" : "desc")}
+          className="rounded-md border border-light/20 px-3 py-1.5 text-xs text-light/60 hover:text-white"
+        >
+          Fecha entrega: {sort === "desc" ? "↓ Más reciente" : "↑ Más antigua"}
+        </button>
+      </div>
+
       {loading ? (
         <Spinner color="white" />
       ) : (
