@@ -42,6 +42,15 @@ export default function OrdersTable() {
 
   return (
     <div className="flex flex-col gap-4">
+      <div className="flex items-center justify-between gap-3">
+        <a
+          href="/api/dashboard/orders/export.csv"
+          download
+          className="rounded-md border border-brand/50 px-3 py-1.5 text-xs text-brand hover:bg-brand/10"
+        >
+          ↓ Descargar pedidos 9 y 10 mayo
+        </a>
+      </div>
       <div className="flex items-center gap-3">
         <input
           type="date"
