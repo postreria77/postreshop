@@ -62,13 +62,32 @@ export function CheckoutForm({
 
   const inputErrors = isInputError(error) ? error.fields : {};
   const actionError = !isInputError(error) ? error : undefined;
+  const [cartError, setCartError] = useState<string>("");
 
   if (data?.url && !error) {
     return navigate(data.url);
   }
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const form = e.currentTarget;
+    const productosInput = form.querySelector<HTMLInputElement>('input[name="productos"]');
+    if (!productosInput) return;
+    try {
+      const productos = JSON.parse(productosInput.value);
+      if (!Array.isArray(productos) || productos.length === 0) {
+        e.preventDefault();
+        setCartError("Tu carrito está vacío. Agrega productos antes de continuar.");
+      } else {
+        setCartError("");
+      }
+    } catch {
+      e.preventDefault();
+      setCartError("Error al leer el carrito. Recarga la página e intenta de nuevo.");
+    }
+  };
+
   return (
-    <form className="sticky top-32 space-y-4" method="POST" action={action}>
+    <form className="sticky top-32 space-y-4" method="POST" action={action} onSubmit={handleSubmit}>
       {test ? (
         <input
           type="hidden"
@@ -183,6 +202,9 @@ export function CheckoutForm({
         selectedSucursalId={selectedSucursal}
         onDateChange={setSelectedDate}
       />
+      {cartError && (
+        <FormInputError error={cartError} name="cart" />
+      )}
       {actionError?.message && (
         <FormInputError error={actionError.message} name="form" />
       )}
