@@ -112,10 +112,19 @@ export const orders = {
       }
 
       // Parse items for Stripe session
-      const line_items = parsedProducts.map((producto: OrderProduct) => ({
-        price: producto.stripePriceId,
-        quantity: producto.cantidad,
-      }));
+      const line_items = parsedProducts
+        .filter((producto: OrderProduct) => producto.stripePriceId)
+        .map((producto: OrderProduct) => ({
+          price: producto.stripePriceId,
+          quantity: producto.cantidad,
+        }));
+
+      if (line_items.length === 0) {
+        throw new ActionError({
+          code: "BAD_REQUEST",
+          message: "No hay productos válidos en el carrito. Intente nuevamente.",
+        });
+      }
 
       // ---------------------------------------------------------
       // 🕒 REGLA GLOBAL: Sin pedidos después de las 10:00 PM para hoy o mañana
