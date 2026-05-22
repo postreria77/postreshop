@@ -44,6 +44,7 @@ export async function createStripeCheckout(
   connectedStripeAccount: string,
   order_id: number,
   line_items: Stripe.Checkout.SessionCreateParams.LineItem[],
+  nombre: string,
   // discounts: Discount[],
 ): Promise<Stripe.Checkout.Session> {
   let payment_intent_data: Stripe.Checkout.SessionCreateParams.PaymentIntentData;
@@ -51,6 +52,7 @@ export async function createStripeCheckout(
     payment_intent_data = {
       metadata: {
         order_id: order_id,
+        nombre_receptor: nombre,
       },
     };
   } else {
@@ -60,6 +62,7 @@ export async function createStripeCheckout(
       },
       metadata: {
         order_id: order_id,
+        nombre_receptor: nombre,
       },
     };
   }

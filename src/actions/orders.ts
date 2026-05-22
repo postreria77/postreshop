@@ -281,6 +281,7 @@ export const orders = {
         connectedStripeAccount,
         id,
         line_items,
+        nombreCompleto.toLowerCase(),
         // discounts,
       );
 
