@@ -160,6 +160,7 @@ export type SystemOrder = {
   municipio: string; //empty,
   referencia: string; //empty,
   forma_pago_id: string; //0 = visa, 1 = mastercard, 2 = amex,
+  titular?: string; // Nombre del titular de la tarjeta (de Stripe)
 };
 
 const Sucursales = defineTable({

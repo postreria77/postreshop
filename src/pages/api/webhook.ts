@@ -171,17 +171,18 @@ export const POST: APIRoute = async ({ request, callAction }) => {
       }
 
       // Handle missing cardBrand on stripe event
-      const cardBrand = await getCardBrand(paymentMethodId.toString());
-      if (!cardBrand) {
+      const cardDetails = await getCardBrand(paymentMethodId.toString());
+      if (!cardDetails) {
         return handleProcessError(
           "Card brand not found in payment method",
           400,
         );
       }
+      const { brand: cardBrand, titular } = cardDetails;
 
       // Update incoming order by ID
       console.log("Updating order with ID:", numberOrderId);
-      let { data, error, email } = await updateOrder(numberOrderId, cardBrand);
+      let { data, error, email } = await updateOrder(numberOrderId, cardBrand, titular);
 
       if (error) {
         console.error(error.message);

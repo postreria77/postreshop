@@ -96,11 +96,12 @@ export async function generateDiscountArray(
  */
 export async function getCardBrand(
   paymentMethodId: string,
-): Promise<CardBrandType | null> {
+): Promise<{ brand: CardBrandType; titular: string } | null> {
   const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
   const cardBrand = paymentMethod.card?.brand;
   if (!cardBrand) {
     return null;
   }
-  return cardBrand as CardBrandType;
+  const titular = paymentMethod.billing_details?.name ?? "";
+  return { brand: cardBrand as CardBrandType, titular };
 }
