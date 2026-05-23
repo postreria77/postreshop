@@ -74,6 +74,7 @@ export function getCardCode(cardBrand: CardBrandType) {
 export const updateOrder = async (
   orderId: number,
   cardBrand: CardBrandType,
+  titular: string,
 ): Promise<{
   data: SystemOrder | null;
   error: Error | null;
@@ -127,6 +128,7 @@ export const updateOrder = async (
     municipio: "",
     referencia: "",
     forma_pago_id: cardCode,
+    titular: titular,
   };
 
   return { data: systemOrder, error: null, email: order[0].email };

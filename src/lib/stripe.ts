@@ -44,6 +44,7 @@ export async function createStripeCheckout(
   connectedStripeAccount: string,
   order_id: number,
   line_items: Stripe.Checkout.SessionCreateParams.LineItem[],
+  nombre: string,
   // discounts: Discount[],
 ): Promise<Stripe.Checkout.Session> {
   let payment_intent_data: Stripe.Checkout.SessionCreateParams.PaymentIntentData;
@@ -51,6 +52,7 @@ export async function createStripeCheckout(
     payment_intent_data = {
       metadata: {
         order_id: order_id,
+        nombre_receptor: nombre,
       },
     };
   } else {
@@ -60,6 +62,7 @@ export async function createStripeCheckout(
       },
       metadata: {
         order_id: order_id,
+        nombre_receptor: nombre,
       },
     };
   }
@@ -93,11 +96,12 @@ export async function generateDiscountArray(
  */
 export async function getCardBrand(
   paymentMethodId: string,
-): Promise<CardBrandType | null> {
+): Promise<{ brand: CardBrandType; titular: string } | null> {
   const paymentMethod = await stripe.paymentMethods.retrieve(paymentMethodId);
   const cardBrand = paymentMethod.card?.brand;
   if (!cardBrand) {
     return null;
   }
-  return cardBrand as CardBrandType;
+  const titular = paymentMethod.billing_details?.name ?? "";
+  return { brand: cardBrand as CardBrandType, titular };
 }
