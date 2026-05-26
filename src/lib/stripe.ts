@@ -72,6 +72,7 @@ export async function createStripeCheckout(
     // discounts,
     mode: "payment",
     payment_intent_data: payment_intent_data,
+    billing_address_collection: "required",
     expires_at: Math.floor(Date.now() / 1000) + 1800,
   });
 }
