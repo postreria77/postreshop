@@ -13,19 +13,19 @@ import {
   PRESENTACIONES_PERSONAS,
   type PresentacionesType,
 } from "@/lib/pricesConfig";
-import { stripe } from "@/lib/stripe";
-
-const fetchStripeAmount = async (priceId: string | null): Promise<number> => {
-  if (!priceId) return 0;
-  try {
-    const price = await stripe.prices.retrieve(priceId);
-    return price.unit_amount ?? 0;
-  } catch {
-    return 0;
-  }
-};
-
 export const getStaticPaths = (async () => {
+  const { stripe } = await import("@/lib/stripe");
+
+  const fetchStripeAmount = async (priceId: string | null): Promise<number> => {
+    if (!priceId) return 0;
+    try {
+      const price = await stripe.prices.retrieve(priceId);
+      return price.unit_amount ?? 0;
+    } catch {
+      return 0;
+    }
+  };
+
   const pasteles = await db
     .select()
     .from(Pasteles)
