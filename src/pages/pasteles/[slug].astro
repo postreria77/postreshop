@@ -11,23 +11,50 @@ import { Icon } from "astro-icon/components";
 import {
   PRESENTACIONES_DISCOUNT,
   PRESENTACIONES_PERSONAS,
-  PRESENTACIONES_PRICE,
   type PresentacionesType,
 } from "@/lib/pricesConfig";
-
 export const getStaticPaths = (async () => {
+  const { stripe } = await import("@/lib/stripe");
+
+  const fetchStripeAmount = async (priceId: string | null): Promise<number> => {
+    if (!priceId) return 0;
+    try {
+      const price = await stripe.prices.retrieve(priceId);
+      return price.unit_amount ?? 0;
+    } catch {
+      return 0;
+    }
+  };
+
   const pasteles = await db
     .select()
     .from(Pasteles)
     .where(eq(Pasteles.archived, false));
 
-  return pasteles.map((pastel) => ({
-    params: { slug: slugify(pastel.nombre) },
-    props: { pastel },
-  }));
+  return await Promise.all(
+    pasteles.map(async (pastel) => {
+      const [amountTradicional, amountAnytime, amountGift] = await Promise.all([
+        fetchStripeAmount(pastel.precio),
+        fetchStripeAmount(pastel.precioAnytime),
+        fetchStripeAmount(pastel.precioGift),
+      ]);
+
+      return {
+        params: { slug: slugify(pastel.nombre) },
+        props: {
+          pastel,
+          amounts: {
+            tradicional: amountTradicional,
+            anytime: amountAnytime,
+            gift: amountGift,
+          },
+        },
+      };
+    }),
+  );
 }) satisfies GetStaticPaths;
 
-const { pastel } = Astro.props;
+const { pastel, amounts } = Astro.props;
 const { slug } = Astro.params;
 const {
   id,
@@ -88,7 +115,7 @@ if (precio) {
     personas: PRESENTACIONES_PERSONAS.tradicional,
     stripeId: precio,
     image: imagen,
-    amount: PRESENTACIONES_PRICE.tradicional * 100,
+    amount: amounts.tradicional,
     discount: PRESENTACIONES_DISCOUNT.tradicional * 100,
   });
 }
@@ -100,7 +127,7 @@ if (precioAnytime) {
     personas: PRESENTACIONES_PERSONAS.anytime,
     stripeId: precioAnytime,
     image: imagenAnytime ?? imagen,
-    amount: PRESENTACIONES_PRICE.anytime * 100,
+    amount: amounts.anytime,
     discount: PRESENTACIONES_DISCOUNT.anytime * 100,
   });
 }
@@ -112,7 +139,7 @@ if (precioGift) {
     personas: PRESENTACIONES_PERSONAS.gift,
     stripeId: precioGift,
     image: imagenGift ?? imagen,
-    amount: PRESENTACIONES_PRICE.gift * 100,
+    amount: amounts.gift,
     discount: PRESENTACIONES_DISCOUNT.gift * 100,
   });
 }
