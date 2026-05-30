@@ -37,42 +37,50 @@ export function checkBrand(sucursalId: string): Brands {
  * @param productos - The array of products in the order.
  * @returns The array of products ready to be sent to the system.
  */
-export function getSentProducts(
+export async function getSentProducts(
   sucursal: string,
   productos: OrderProduct[],
-): SystemOrderProduct[] {
+): Promise<SystemOrderProduct[]> {
   const brand = checkBrand(sucursal);
-  if (brand === "pasteleria") {
-    return productos.map((producto) => {
+
+  const fetchPrice = async (stripePriceId: string, fallback: number): Promise<number> => {
+    try {
+      const price = await stripe.prices.retrieve(stripePriceId);
+      return (price.unit_amount ?? 0) / 100;
+    } catch {
+      return fallback;
+    }
+  };
+
+  return await Promise.all(
+    productos.map(async (producto) => {
       const presentacion = getPresentacionIds(
         producto.categoria,
         producto.presentacion,
       );
-      return {
-        producto: producto.id_pasteleria,
-        cantidad: producto.cantidad,
-        presentacion: presentacion.pasteleria,
-        precioProducto: 0,
-        precioPresentacion: producto.precio,
-        comentarios: "",
-      };
-    });
-  } else {
-    return productos.map((producto) => {
-      const presentacion = getPresentacionIds(
-        producto.categoria,
-        producto.presentacion,
-      );
-      return {
-        producto: producto.id,
-        cantidad: producto.cantidad,
-        presentacion: presentacion.postreria,
-        precioProducto: 0,
-        precioPresentacion: producto.precio,
-        comentarios: "",
-      };
-    });
-  }
+      const precio = await fetchPrice(producto.stripePriceId, producto.precio);
+
+      if (brand === "pasteleria") {
+        return {
+          producto: producto.id_pasteleria,
+          cantidad: producto.cantidad,
+          presentacion: presentacion.pasteleria,
+          precioProducto: 0,
+          precioPresentacion: precio,
+          comentarios: "",
+        };
+      } else {
+        return {
+          producto: producto.id,
+          cantidad: producto.cantidad,
+          presentacion: presentacion.postreria,
+          precioProducto: 0,
+          precioPresentacion: precio,
+          comentarios: "",
+        };
+      }
+    }),
+  );
 }
 
 export async function getSpecialIdProducts(

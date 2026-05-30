@@ -96,7 +96,7 @@ export const updateOrder = async (
   const cardCode = getCardCode(cardBrand);
 
   const productos = JSON.parse(order[0].productos as string) as OrderProduct[];
-  const systemProducts = getSentProducts(order[0].sucursal, productos);
+  const systemProducts = await getSentProducts(order[0].sucursal, productos);
 
   const specialDate = await checkSpecialDate(order[0].fecha);
 
