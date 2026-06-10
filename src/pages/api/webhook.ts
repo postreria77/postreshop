@@ -186,7 +186,10 @@ export const POST: APIRoute = async ({ request, callAction }) => {
           400,
         );
       }
-      const { brand: cardBrand, titular } = cardDetails;
+      const { brand: cardBrand, titular: titularFromCard } = cardDetails;
+
+      // Use billing name from card, fallback to nombre_receptor from metadata
+      const titular = titularFromCard || paymentIntent.metadata.nombre_receptor || "";
 
       // Update incoming order by ID
       console.log("Updating order with ID:", numberOrderId);
