@@ -108,6 +108,8 @@ const Orders = defineTable({
     estado: column.text(),
     creado: column.text(),
     modificado: column.text(),
+    rmsEnviado: column.boolean({ default: false, optional: true }),
+    rmsAlertEnviado: column.boolean({ default: false, optional: true }),
   },
 });
 
@@ -122,6 +124,8 @@ export type Order = {
   estado: string;
   creado: string;
   modificado: string;
+  rmsEnviado?: boolean;
+  rmsAlertEnviado?: boolean;
 };
 
 export type OrderProduct = {
