@@ -15,6 +15,7 @@ import { getPresentacionIds } from "@/lib/pricesConfig";
 import {
   handleProcessError,
   sendEmailReceipt,
+  sendRmsFailureAlert,
   updateOrder,
   uploadOrderToSystem,
 } from "@/lib/systemOrders";
@@ -205,6 +206,7 @@ export const POST: APIRoute = async ({ request, callAction }) => {
         if (orderError) {
           // Retorna 500 para que Stripe reintente el webhook automáticamente
           console.error("RMS error:", orderError.message);
+          await sendRmsFailureAlert(numberOrderId, data.nombre, orderError.message);
           return new Response("Error uploading to RMS", { status: 500 });
         } else if (orderData) {
           if (!email) {

@@ -13,6 +13,28 @@ import {
 import { actions } from "astro:actions";
 import type { APIContext } from "astro";
 import { emails } from "@/actions/emails";
+import { Resend } from "resend";
+import { getSecret } from "astro:env/server";
+
+export async function sendRmsFailureAlert(orderId: number, nombre: string, errorMessage: string) {
+  try {
+    const resend = new Resend(getSecret("RESEND_SECRET_KEY"));
+    await resend.emails.send({
+      from: "no-reply@shop.lapostreria77.com",
+      to: "holajolet510@gmail.com",
+      subject: `⚠️ Pedido #${orderId} no llegó a RMS`,
+      html: `
+        <h2>Alerta: Pedido no enviado a RMS</h2>
+        <p><strong>Pedido:</strong> #${orderId}</p>
+        <p><strong>Cliente:</strong> ${nombre}</p>
+        <p><strong>Error:</strong> ${errorMessage}</p>
+        <p>Stripe reintentará el envío automáticamente. Si el problema persiste, revisa el estado del servidor RMS.</p>
+      `,
+    });
+  } catch (e) {
+    console.error("Error sending RMS failure alert:", e);
+  }
+}
 
 export function handleProcessError(message: string, code: number) {
   console.error(`Error: ${message}`);
