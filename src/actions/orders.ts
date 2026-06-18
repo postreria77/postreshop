@@ -127,6 +127,29 @@ export const orders = {
       }
 
       // ---------------------------------------------------------
+      // 📅 REGLA GLOBAL: No se permiten pedidos para hoy ni fechas pasadas
+      // ---------------------------------------------------------
+      {
+        const now = new Date();
+        const mexicoDate = new Date(
+          now.toLocaleString("en-US", { timeZone: "America/Monterrey" }),
+        );
+        const year = mexicoDate.getFullYear();
+        const month = String(mexicoDate.getMonth() + 1).padStart(2, "0");
+        const day = String(mexicoDate.getDate()).padStart(2, "0");
+        const todayString = `${year}-${month}-${day}`;
+
+        if (fecha && fecha.slice(0, 10) <= todayString) {
+          throw new ActionError({
+            code: "BAD_REQUEST",
+            message:
+              "No es posible realizar pedidos para hoy o fechas anteriores. La fecha mínima de entrega es mañana.",
+          });
+        }
+      }
+      // ---------------------------------------------------------
+
+      // ---------------------------------------------------------
       // 🕒 REGLA GLOBAL: Sin pedidos después de las 10:00 PM para hoy o mañana
       // ---------------------------------------------------------
       {
