@@ -202,11 +202,6 @@ export const uploadOrderToSystem = async (
         .returning();
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
-    // Marcar como enviado a RMS exitosamente
-    await db
-      .update(Orders)
-      .set({ rmsEnviado: true })
-      .where(eq(Orders.id, orderId));
     return { data: "No HTTP error", error: null };
   } catch (error) {
     return { data: null, error: error as Error };
