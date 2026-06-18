@@ -2,7 +2,7 @@ export const prerender = false;
 
 import type { APIRoute } from "astro";
 import { getCardBrand, stripe } from "../../lib/stripe";
-import { db, eq, inArray, Pasteles, ProcessedEvents, Orders } from "astro:db";
+import { db, eq, inArray, Pasteles, ProcessedEvents } from "astro:db";
 import { getSecret } from "astro:env/server";
 import type {
   OrderProduct,
@@ -16,7 +16,6 @@ import {
   handleProcessError,
   sendEmailReceipt,
   sendRmsFailureAlert,
-  sendRmsSuccessAlert,
   updateOrder,
   uploadOrderToSystem,
 } from "@/lib/systemOrders";
@@ -207,19 +206,9 @@ export const POST: APIRoute = async ({ request, callAction }) => {
         if (orderError) {
           // Retorna 500 para que Stripe reintente el webhook automáticamente
           console.error("RMS error:", orderError.message);
-          // Solo mandar alerta si no se ha enviado antes
-          const orderRecord = await db.select().from(Orders).where(eq(Orders.id, numberOrderId));
-          if (orderRecord.length > 0 && !orderRecord[0].rmsAlertEnviado) {
-            await sendRmsFailureAlert(numberOrderId, data.nombre, orderError.message);
-            await db.update(Orders).set({ rmsAlertEnviado: true }).where(eq(Orders.id, numberOrderId));
-          }
+          await sendRmsFailureAlert(numberOrderId, data.nombre, orderError.message);
           return new Response("Error uploading to RMS", { status: 500 });
         } else if (orderData) {
-          // Si había una alerta previa, mandar email de que ya llegó a RMS
-          const orderRecord = await db.select().from(Orders).where(eq(Orders.id, numberOrderId));
-          if (orderRecord.length > 0 && orderRecord[0].rmsAlertEnviado) {
-            await sendRmsSuccessAlert(numberOrderId, data.nombre);
-          }
           if (!email) {
             return new Response("No email provided", { status: 500 });
           }
