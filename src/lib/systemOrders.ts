@@ -16,6 +16,25 @@ import { emails } from "@/actions/emails";
 import { Resend } from "resend";
 import { getSecret } from "astro:env/server";
 
+export async function sendRmsSuccessAlert(orderId: number, nombre: string) {
+  try {
+    const resend = new Resend(getSecret("RESEND_SECRET_KEY"));
+    await resend.emails.send({
+      from: "no-reply@shop.lapostreria77.com",
+      to: "holajolet510@gmail.com",
+      subject: `✅ Pedido #${orderId} ya llegó a RMS`,
+      html: `
+        <h2>Pedido enviado exitosamente a RMS</h2>
+        <p><strong>Pedido:</strong> #${orderId}</p>
+        <p><strong>Cliente:</strong> ${nombre}</p>
+        <p>El pedido que anteriormente falló ya fue recibido por RMS correctamente.</p>
+      `,
+    });
+  } catch (e) {
+    console.error("Error sending RMS success alert:", e);
+  }
+}
+
 export async function sendRmsFailureAlert(orderId: number, nombre: string, errorMessage: string) {
   try {
     const resend = new Resend(getSecret("RESEND_SECRET_KEY"));
@@ -178,13 +197,16 @@ export const uploadOrderToSystem = async (
     if (!response.ok) {
       await db
         .update(Orders)
-        .set({
-          estado: "Error de sistema",
-        })
+        .set({ estado: "Error de sistema" })
         .where(eq(Orders.id, orderId))
         .returning();
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
+    // Marcar como enviado a RMS exitosamente
+    await db
+      .update(Orders)
+      .set({ rmsEnviado: true })
+      .where(eq(Orders.id, orderId));
     return { data: "No HTTP error", error: null };
   } catch (error) {
     return { data: null, error: error as Error };
