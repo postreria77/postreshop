@@ -4,7 +4,6 @@ export const prerender = false;
 import Layout from "@/layouts/Layout.astro";
 import Section from "@/components/Section.astro";
 import { Image } from "astro:assets";
-
 import receiptIcon from "@/assets/receipt-icon.png";
 
 import { db, eq, Orders, Pasteles, Productos, inArray } from "astro:db";
@@ -141,13 +140,15 @@ const total = new Intl.NumberFormat("es-MX", {
             pastelesOrden.map((p) => (
               <li class="flex items-center justify-between gap-2 border-b border-dashed border-dark/30 pb-2 last:border-0 last:pb-0">
                 <div class="flex items-center gap-2">
-                  <Image
-                    src={p.imagen}
-                    width={64}
-                    height={64}
-                    alt={p.nombre}
-                    class="rounded-sm"
-                  />
+                  {p.imagen && (
+                    <img
+                      src={p.imagen}
+                      width={64}
+                      height={64}
+                      alt={p.nombre}
+                      class="rounded-sm object-cover"
+                    />
+                  )}
                   <div class="flex flex-col">
                     <h3 class="font-medium">{p.nombre}</h3>
                     <p class="text-xs capitalize opacity-60">
@@ -168,13 +169,15 @@ const total = new Intl.NumberFormat("es-MX", {
             productosOrden.map((p) => (
               <li class="flex items-center justify-between gap-2 border-b border-dashed border-dark/30 pb-2 last:border-0 last:pb-0">
                 <div class="flex items-center gap-2">
-                  <Image
-                    src={p.imagen}
-                    width={64}
-                    height={64}
-                    alt={p.nombre}
-                    class="rounded-sm"
-                  />
+                  {p.imagen && (
+                    <img
+                      src={p.imagen}
+                      width={64}
+                      height={64}
+                      alt={p.nombre}
+                      class="rounded-sm object-cover"
+                    />
+                  )}
                   <div class="flex flex-col">
                     <h3 class="font-medium">{p.nombre}</h3>
                     <p class="text-xs capitalize opacity-60">
