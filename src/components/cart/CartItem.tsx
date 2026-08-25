@@ -1,4 +1,5 @@
-import { type CartItem, removeCartItem } from "@/store";
+import { type CartItem, removeCartItem, selectedDeliveryDate } from "@/store";
+import { useStore } from "@nanostores/react";
 
 const ABUELO_DATE = "2026-08-28";
 const fmt = (n: number) =>
@@ -17,7 +18,8 @@ export default function CartItem({
     removeCartItem(item.price);
   };
 
-  const isAbueloDay = new Date().toISOString().slice(0, 10) === ABUELO_DATE;
+  const $deliveryDate = useStore(selectedDeliveryDate);
+  const isAbueloDay = $deliveryDate === ABUELO_DATE;
   const hasDiscount =
     item.price.discount > 0 || (isAbueloDay && !!item.discountedAmount);
 

@@ -5,6 +5,7 @@ import type {
 } from "./lib/pricesConfig";
 
 export const cartOpen = atom(false);
+export const selectedDeliveryDate = atom<string | null>(null);
 
 export type CartItem = {
   id: string;

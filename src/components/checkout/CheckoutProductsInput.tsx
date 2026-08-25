@@ -1,4 +1,4 @@
-import { cartItems } from "@/store";
+import { cartItems, selectedDeliveryDate } from "@/store";
 import { useStore } from "@nanostores/react";
 import type { OrderProduct } from "db/config";
 import { useEffect } from "react";
@@ -30,6 +30,10 @@ export default function CheckoutProductsInput({
     selectedDateStr && DISABLED_DATES.includes(selectedDateStr);
 
   const isDiscountDate = selectedDateStr === DISCOUNT_DATE;
+
+  useEffect(() => {
+    selectedDeliveryDate.set(selectedDateStr);
+  }, [selectedDateStr]);
 
   const orderProducts: OrderProduct[] = Object.values($items).map((item) => ({
     id: item.id,
