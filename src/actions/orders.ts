@@ -112,12 +112,7 @@ export const orders = {
       }
 
       // Parse items for Stripe session
-      const _now = new Date();
-      const _mexicoNow = new Date(
-        _now.toLocaleString("en-US", { timeZone: "America/Monterrey" }),
-      );
-      const _todayMx = `${_mexicoNow.getFullYear()}-${String(_mexicoNow.getMonth() + 1).padStart(2, "0")}-${String(_mexicoNow.getDate()).padStart(2, "0")}`;
-      const isAbueloDate = _todayMx === "2026-08-28";
+      const isAbueloDate = fecha?.slice(0, 10) === "2026-08-28";
 
       const line_items = parsedProducts
         .filter((producto: OrderProduct) => producto.stripePriceId)
