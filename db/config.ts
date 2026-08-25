@@ -55,8 +55,9 @@ export type PastelIdsEspeciales = {
 };
 
 export type PastelPrecioDescuentos = {
-  tradicional: string;
-  anytime: string;
+  tradicional?: string;
+  anytime?: string;
+  gift?: string;
 };
 
 const Productos = defineTable({

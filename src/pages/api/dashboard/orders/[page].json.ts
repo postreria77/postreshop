@@ -1,11 +1,17 @@
-import { db, Orders, count, like, asc, desc, or, and } from "astro:db";
+import { db, Orders, Pasteles, count, like, asc, desc, or, and, inArray } from "astro:db";
 import type { Params } from "astro";
-import type { Order } from "db/config";
+import type { Order, OrderProduct } from "db/config";
 
 export const prerender = false;
 
+export type OrderProductDetalle = {
+  nombre: string;
+  cantidad: number;
+  presentacion: string;
+};
+
 export type OrderAPIResponse = {
-  orders: Order[];
+  orders: (Order & { productosDetalle: OrderProductDetalle[] })[];
   totalPages: number;
   currentPage: number;
 };
@@ -46,8 +52,40 @@ export async function GET({ params, request }: { params: Params; request: Reques
     .from(Orders)
     .where(whereClause);
 
+  // Collect unique pastel IDs from all orders to fetch names
+  const allProductos = orders.flatMap((order) => {
+    try {
+      return JSON.parse(order.productos as string) as OrderProduct[];
+    } catch {
+      return [];
+    }
+  });
+  const uniqueIds = [...new Set(allProductos.map((p) => p.id))];
+
+  let pastelMap: Record<string, string> = {};
+  if (uniqueIds.length > 0) {
+    const pasteles = await db
+      .select({ id: Pasteles.id, nombre: Pasteles.nombre })
+      .from(Pasteles)
+      .where(inArray(Pasteles.id, uniqueIds));
+    pastelMap = Object.fromEntries(pasteles.map((p) => [p.id, p.nombre]));
+  }
+
+  const enrichedOrders = orders.map((order) => {
+    let productosDetalle: OrderProductDetalle[] = [];
+    try {
+      const productos = JSON.parse(order.productos as string) as OrderProduct[];
+      productosDetalle = productos.map((p) => ({
+        nombre: pastelMap[p.id] ?? p.id,
+        cantidad: p.cantidad,
+        presentacion: p.presentacion,
+      }));
+    } catch {}
+    return { ...order, productosDetalle };
+  });
+
   const response: OrderAPIResponse = {
-    orders,
+    orders: enrichedOrders,
     totalPages: Math.ceil(totalNumbers[0].value / limit),
     currentPage: page,
   };

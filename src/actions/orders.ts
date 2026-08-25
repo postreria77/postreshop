@@ -112,10 +112,20 @@ export const orders = {
       }
 
       // Parse items for Stripe session
+      const _now = new Date();
+      const _mexicoNow = new Date(
+        _now.toLocaleString("en-US", { timeZone: "America/Monterrey" }),
+      );
+      const _todayMx = `${_mexicoNow.getFullYear()}-${String(_mexicoNow.getMonth() + 1).padStart(2, "0")}-${String(_mexicoNow.getDate()).padStart(2, "0")}`;
+      const isAbueloDate = _todayMx === "2026-08-28";
+
       const line_items = parsedProducts
         .filter((producto: OrderProduct) => producto.stripePriceId)
         .map((producto: OrderProduct) => ({
-          price: producto.stripePriceId,
+          price:
+            isAbueloDate && producto.discountedStripePriceId
+              ? producto.discountedStripePriceId
+              : producto.stripePriceId,
           quantity: producto.cantidad,
         }));
 
@@ -185,7 +195,7 @@ export const orders = {
 
       // ---------------------------------------------------------
       // 🕒 REGLA SUCURSALES QUE CIERRAN: Límite 9:00 PM (21:00)
-      // IDs: 50 (Carranza), 109 (Parque Centro), 520 (Parque Centro P.), 536 (Herradura) 
+      // IDs: 50 (Carranza), 109 (Parque Centro), 520 (Parque Centro P.), 536 (Herradura)
       // ---------------------------------------------------------
       const now = new Date();
 

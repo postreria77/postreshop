@@ -10,6 +10,7 @@ import {
 } from "@heroui/react";
 import { useEffect, useState } from "react";
 import type { Order } from "db/config";
+import type { OrderProductDetalle } from "@/pages/api/dashboard/orders/[page].json";
 import { formatDateTimeString } from "@/lib/format";
 
 export default function OrdersTable() {
@@ -107,6 +108,7 @@ export default function OrdersTable() {
           <TableHeader>
             <TableColumn>ID</TableColumn>
             <TableColumn>Nombre</TableColumn>
+            <TableColumn>Productos</TableColumn>
             <TableColumn>Teléfono</TableColumn>
             <TableColumn>Email</TableColumn>
             <TableColumn>Estado</TableColumn>
@@ -127,6 +129,16 @@ export default function OrdersTable() {
                 </TableCell>
                 <TableCell className="capitalize ~text-xs/sm">
                   {order.nombre}
+                </TableCell>
+                <TableCell className="~text-xs/sm">
+                  <div className="flex flex-col gap-0.5">
+                    {((order as any).productosDetalle as OrderProductDetalle[])?.map((p, i) => (
+                      <span key={i} className="capitalize">
+                        {p.nombre} ×{p.cantidad}{" "}
+                        <span className="text-light/50">({p.presentacion})</span>
+                      </span>
+                    ))}
+                  </div>
                 </TableCell>
                 <TableCell className="~text-xs/sm">{order.tel}</TableCell>
                 <TableCell className="~text-xs/sm">{order.email}</TableCell>
