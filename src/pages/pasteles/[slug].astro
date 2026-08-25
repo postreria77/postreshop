@@ -14,6 +14,7 @@ import {
   PRESENTACIONES_PRICE,
   type PresentacionesType,
 } from "@/lib/pricesConfig";
+import type { PastelPrecioDescuentos } from "db/config";
 
 export const getStaticPaths = (async () => {
   const pasteles = await db
@@ -23,11 +24,14 @@ export const getStaticPaths = (async () => {
 
   return pasteles.map((pastel) => ({
     params: { slug: slugify(pastel.nombre) },
-    props: { pastel },
+    props: {
+      pastel,
+      descuentos: (pastel.precio_descuentos ?? {}) as PastelPrecioDescuentos,
+    },
   }));
 }) satisfies GetStaticPaths;
 
-const { pastel } = Astro.props;
+const { pastel, descuentos } = Astro.props;
 const { slug } = Astro.params;
 const {
   id,
@@ -72,48 +76,59 @@ type SizeEntry = {
   size: PresentacionesType;
   personas: string;
   stripeId: string;
+  discountedPrice: string;
   image: string;
   amount: number;
   discount: number;
+  discountedAmount: number;
 };
 
 const dbImages: ImageEntry[] = [];
 const sizes: SizeEntry[] = [];
 
 if (precio) {
+  const amount = PRESENTACIONES_PRICE.tradicional * 100;
   dbImages.push({ label: "Tradicional", src: imagen });
   sizes.push({
     displayName: "Tradicional",
     size: "tradicional",
     personas: PRESENTACIONES_PERSONAS.tradicional,
     stripeId: precio,
+    discountedPrice: descuentos.tradicional ?? "",
     image: imagen,
-    amount: PRESENTACIONES_PRICE.tradicional * 100,
+    amount,
     discount: PRESENTACIONES_DISCOUNT.tradicional * 100,
+    discountedAmount: Math.round(amount * 0.8),
   });
 }
 if (precioAnytime) {
+  const amount = PRESENTACIONES_PRICE.anytime * 100;
   dbImages.push({ label: "Anytime", src: imagenAnytime ?? imagen });
   sizes.push({
     displayName: "Anytime",
     size: "anytime",
     personas: PRESENTACIONES_PERSONAS.anytime,
     stripeId: precioAnytime,
+    discountedPrice: descuentos.anytime ?? "",
     image: imagenAnytime ?? imagen,
-    amount: PRESENTACIONES_PRICE.anytime * 100,
+    amount,
     discount: PRESENTACIONES_DISCOUNT.anytime * 100,
+    discountedAmount: Math.round(amount * 0.8),
   });
 }
 if (precioGift) {
+  const amount = PRESENTACIONES_PRICE.gift * 100;
   dbImages.push({ label: "Gift", src: imagenGift ?? imagen });
   sizes.push({
     displayName: "Gift",
     size: "gift",
     personas: PRESENTACIONES_PERSONAS.gift,
     stripeId: precioGift,
+    discountedPrice: descuentos.gift ?? "",
     image: imagenGift ?? imagen,
-    amount: PRESENTACIONES_PRICE.gift * 100,
+    amount,
     discount: PRESENTACIONES_DISCOUNT.gift * 100,
+    discountedAmount: Math.round(amount * 0.8),
   });
 }
 
@@ -217,6 +232,8 @@ const images: ImageEntry[] =
                         amount: s.amount,
                         discount: s.discount,
                       }}
+                      discountedPrice={s.discountedPrice}
+                      discountedAmount={s.discountedAmount}
                       name={nombre}
                       size={s.size}
                       image={s.image}

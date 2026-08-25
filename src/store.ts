@@ -15,6 +15,7 @@ export type CartItem = {
     discount: number;
   };
   discountedPrice?: string;
+  discountedAmount?: number;
   name: string;
   size:
     | ProductPresentacionesType<"pasteles">
@@ -60,6 +61,7 @@ export function addCartItem({
   id_pasteleria,
   price,
   discountedPrice,
+  discountedAmount,
   name,
   size,
   image,
@@ -73,6 +75,7 @@ export function addCartItem({
       ...existingEntry,
       price,
       discountedPrice,
+      discountedAmount,
       quantity: existingEntry.quantity + quantity,
     });
     updateCartItems();
@@ -87,6 +90,7 @@ export function addCartItem({
       quantity,
       price,
       discountedPrice,
+      discountedAmount,
       size,
     });
     updateCartItems();

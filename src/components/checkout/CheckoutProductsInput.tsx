@@ -18,7 +18,7 @@ export default function CheckoutProductsInput({
 }) {
   const $items = useStore(cartItems);
 
-  const DISCOUNT_DATE = "2026-02-14";
+  const DISCOUNT_DATE = "2026-08-28";
 
   const selectedDateStr = selectedDate
     ? selectedDate instanceof Date
@@ -35,8 +35,8 @@ export default function CheckoutProductsInput({
     id: item.id,
     id_pasteleria: item.id_pasteleria,
     cantidad: item.quantity,
-    precio: isDiscountDate
-      ? (item.price.amount - item.price.discount) / 100
+    precio: isDiscountDate && item.discountedAmount
+      ? item.discountedAmount / 100
       : item.price.amount / 100,
     stripePriceId: item.price.id,
     discountedStripePriceId: item.discountedPrice,

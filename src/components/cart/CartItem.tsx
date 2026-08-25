@@ -1,5 +1,9 @@
 import { type CartItem, removeCartItem } from "@/store";
 
+const ABUELO_DATE = "2026-08-28";
+const fmt = (n: number) =>
+  new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN" }).format(n);
+
 export default function CartItem({
   item,
   getTotal,
@@ -12,6 +16,10 @@ export default function CartItem({
   const handleRemoveItem = () => {
     removeCartItem(item.price);
   };
+
+  const isAbueloDay = new Date().toISOString().slice(0, 10) === ABUELO_DATE;
+  const hasDiscount =
+    item.price.discount > 0 || (isAbueloDay && !!item.discountedAmount);
 
   return (
     <li
@@ -32,27 +40,18 @@ export default function CartItem({
         <p className="mb-1 text-xs capitalize opacity-60">{item.size}</p>
         <p className="">
           {item.quantity} x{" "}
-          {item.price.discount === 0 ? (
-            <span>{`${new Intl.NumberFormat("es-MX", {
-              style: "currency",
-              currency: "MXN",
-            }).format(getDiscountedTotal(item) / 100)}`}</span>
+          {!hasDiscount ? (
+            <span>{fmt(getDiscountedTotal(item) / 100)}</span>
           ) : (
             <>
               <span className="relative ml-auto mr-2 text-xs font-normal text-light/50">
-                {`${new Intl.NumberFormat("es-MX", {
-                  style: "currency",
-                  currency: "MXN",
-                }).format(getTotal(item) / 100)}`}
+                {fmt(getTotal(item) / 100)}
                 <span
                   aria-hidden="true"
                   className="absolute -inset-x-1 top-1/2 h-[1px] bg-red-500"
                 ></span>
               </span>
-              {`${new Intl.NumberFormat("es-MX", {
-                style: "currency",
-                currency: "MXN",
-              }).format(getDiscountedTotal(item) / 100)}`}
+              {fmt(getDiscountedTotal(item) / 100)}
             </>
           )}
         </p>

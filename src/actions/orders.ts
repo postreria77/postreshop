@@ -17,6 +17,7 @@ import {
   checkGiftOnPasteleria,
   checkSaltilloOnSaturday,
   SUCURSALES_SALTILLO,
+  SUCURSALES_CIERRE9,
 } from "@/lib/orderConditions";
 import { checkRoscaAvailability } from "@/lib/specialOrderConditions";
 import {
@@ -111,10 +112,22 @@ export const orders = {
       }
 
       // Parse items for Stripe session
-      const line_items = parsedProducts.map((producto: OrderProduct) => ({
-        price: producto.stripePriceId,
-        quantity: producto.cantidad,
-      }));
+      const _now = new Date();
+      const _mexicoNow = new Date(
+        _now.toLocaleString("en-US", { timeZone: "America/Monterrey" }),
+      );
+      const _todayMx = `${_mexicoNow.getFullYear()}-${String(_mexicoNow.getMonth() + 1).padStart(2, "0")}-${String(_mexicoNow.getDate()).padStart(2, "0")}`;
+      const isAbueloDate = _todayMx === "2026-08-28";
+
+      const line_items = parsedProducts
+        .filter((producto: OrderProduct) => producto.stripePriceId)
+        .map((producto: OrderProduct) => ({
+          price:
+            isAbueloDate && producto.discountedStripePriceId
+              ? producto.discountedStripePriceId
+              : producto.stripePriceId,
+          quantity: producto.cantidad,
+        }));
 
       // ---------------------------------------------------------
       // 🕒 REGLA GLOBAL: Sin pedidos después de las 10:00 PM para hoy o mañana
@@ -151,19 +164,17 @@ export const orders = {
       // ---------------------------------------------------------
 
       // ---------------------------------------------------------
-      // 🕒 REGLA SALTILLO: Límite 9:00 PM (21:00)
-      // IDs: 50 (Carranza), 109 (Parque Centro), 520 (Parque Centro P.)
+      // 🕒 REGLA CIERRE 9 PM: Límite 9:00 PM (21:00)
+      // IDs: 50, 109, 520, 536
       // ---------------------------------------------------------
 
-      if (SUCURSALES_SALTILLO.includes(sucursal)) {
-        // 1. Obtener hora exacta en México
+      if (SUCURSALES_CIERRE9.includes(sucursal)) {
         const now = new Date();
         const mexicoDate = new Date(
           now.toLocaleString("en-US", { timeZone: "America/Monterrey" }),
         );
         const currentHour = mexicoDate.getHours();
 
-        // 2. Verificar si el pedido es para "HOY"
         const year = mexicoDate.getFullYear();
         const month = String(mexicoDate.getMonth() + 1).padStart(2, "0");
         const day = String(mexicoDate.getDate()).padStart(2, "0");
@@ -171,13 +182,11 @@ export const orders = {
 
         const isToday = fecha === todayString;
 
-        // 3. AQUÍ ESTÁ EL CAMBIO: Usamos 21 (9 PM)
-        // Si tu código tenía un '15' aquí, eso era lo que bloqueaba a las 3 PM.
         if (isToday && currentHour >= 21) {
           throw new ActionError({
             code: "BAD_REQUEST",
             message:
-              "En Saltillo el horario de pedidos finaliza a las 9:00 p.m.",
+              "El horario de pedidos en esta sucursal finaliza a las 9:00 p.m.",
           });
         }
       }
