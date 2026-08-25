@@ -1,16 +1,23 @@
 import { useStore } from "@nanostores/react";
-import { cartItems } from "@/store";
+import { cartItems, selectedDeliveryDate } from "@/store";
 import CartItem from "./CartItem";
 import type { CartItem as CartItemType } from "@/store";
 
+const ABUELO_DATE = "2026-08-28";
+
 export default function CartList() {
   const $items = useStore(cartItems);
+  const $deliveryDate = useStore(selectedDeliveryDate);
+  const isAbueloDay = $deliveryDate === ABUELO_DATE;
 
   function getTotal(item: CartItemType) {
     return item.price.amount * item.quantity;
   }
 
   function getDiscountedTotal(item: CartItemType) {
+    if (isAbueloDay && item.discountedAmount) {
+      return item.discountedAmount * item.quantity;
+    }
     return (item.price.amount - item.price.discount) * item.quantity;
   }
 
