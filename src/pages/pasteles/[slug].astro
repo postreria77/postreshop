@@ -11,6 +11,7 @@ import { Icon } from "astro-icon/components";
 import {
   PRESENTACIONES_DISCOUNT,
   PRESENTACIONES_PERSONAS,
+  PRESENTACIONES_PRICE,
   type PresentacionesType,
 } from "@/lib/pricesConfig";
 import type { PastelPrecioDescuentos } from "db/config";
@@ -43,16 +44,19 @@ export const getStaticPaths = (async () => {
         fetchStripeAmount(pastel.precioGift),
       ]);
 
+      // Fallback a precios estáticos si Stripe no responde
+      const safeAmounts = {
+        tradicional: amountTradicional || PRESENTACIONES_PRICE.tradicional * 100,
+        anytime: amountAnytime || PRESENTACIONES_PRICE.anytime * 100,
+        gift: amountGift || PRESENTACIONES_PRICE.gift * 100,
+      };
+
       return {
         params: { slug: slugify(pastel.nombre) },
         props: {
           pastel,
           descuentos,
-          amounts: {
-            tradicional: amountTradicional,
-            anytime: amountAnytime,
-            gift: amountGift,
-          },
+          amounts: safeAmounts,
         },
       };
     }),
