@@ -18,15 +18,17 @@ export default function OrdersTable() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [fecha, setFecha] = useState("");
   const [sort, setSort] = useState<"asc" | "desc">("desc");
   const [buscar, setBuscar] = useState("");
+  const [fechaEntrega, setFechaEntrega] = useState("");
+  const [fechaPedido, setFechaPedido] = useState("");
 
   const fetchOrders = async () => {
     setLoading(true);
     const params = new URLSearchParams();
-    if (fecha) params.set("fecha", fecha);
     if (buscar) params.set("buscar", buscar);
+    if (fechaEntrega) params.set("fechaEntrega", fechaEntrega);
+    if (fechaPedido) params.set("fechaPedido", fechaPedido);
     params.set("sort", sort);
     const response = await fetch(`/api/dashboard/orders/${currentPage}.json?${params.toString()}`);
     const data = await response.json();
@@ -37,52 +39,56 @@ export default function OrdersTable() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [fecha, sort, buscar]);
+  }, [buscar, fechaEntrega, fechaPedido, sort]);
 
   useEffect(() => {
     fetchOrders();
-  }, [currentPage, fecha, sort, buscar]);
+  }, [currentPage, buscar, fechaEntrega, fechaPedido, sort]);
+
+  const hasFilters = buscar || fechaEntrega || fechaPedido;
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-3">
+      <div className="flex flex-wrap items-center gap-3">
         <input
           type="text"
-          placeholder="Buscar por nombre o email..."
+          placeholder="Buscar por ID, nombre o email..."
           value={buscar}
           onChange={(e) => setBuscar(e.target.value)}
           className="w-64 rounded-md border border-light/20 bg-transparent px-3 py-1.5 text-xs text-white placeholder-light/40 focus:outline-none focus:border-brand"
         />
-        {buscar && (
-          <button
-            onClick={() => setBuscar("")}
-            className="rounded-md border border-light/20 px-3 py-1.5 text-xs text-light/60 hover:text-white"
-          >
-            Limpiar
-          </button>
-        )}
-      </div>
-      <div className="flex items-center gap-3">
-        <input
-          type="date"
-          value={fecha}
-          onChange={(e) => setFecha(e.target.value)}
-          className="rounded-md border border-light/20 bg-transparent px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand"
-        />
-        {fecha && (
-          <button
-            onClick={() => setFecha("")}
-            className="rounded-md border border-light/20 px-3 py-1.5 text-xs text-light/60 hover:text-white"
-          >
-            Limpiar
-          </button>
-        )}
+        <div className="flex items-center gap-1.5">
+          <label className="text-xs text-light/50">Entrega:</label>
+          <input
+            type="date"
+            value={fechaEntrega}
+            onChange={(e) => setFechaEntrega(e.target.value)}
+            className="rounded-md border border-light/20 bg-transparent px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand"
+          />
+        </div>
+        <div className="flex items-center gap-1.5">
+          <label className="text-xs text-light/50">Pedido:</label>
+          <input
+            type="date"
+            value={fechaPedido}
+            onChange={(e) => setFechaPedido(e.target.value)}
+            className="rounded-md border border-light/20 bg-transparent px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand"
+          />
+        </div>
         <button
           onClick={() => setSort(sort === "desc" ? "asc" : "desc")}
           className="rounded-md border border-light/20 px-3 py-1.5 text-xs text-light/60 hover:text-white"
         >
           Fecha entrega: {sort === "desc" ? "↓ Más reciente" : "↑ Más antigua"}
         </button>
+        {hasFilters && (
+          <button
+            onClick={() => { setBuscar(""); setFechaEntrega(""); setFechaPedido(""); }}
+            className="rounded-md border border-light/20 px-3 py-1.5 text-xs text-light/60 hover:text-white"
+          >
+            Limpiar
+          </button>
+        )}
       </div>
 
       {loading ? (
@@ -92,6 +98,7 @@ export default function OrdersTable() {
           aria-label="Orders table"
           removeWrapper
           className="w-full overflow-scroll text-xs"
+          emptyContent="No se encontraron pedidos"
           bottomContent={
             <div className="flex w-full justify-center">
               <Pagination
