@@ -1,4 +1,4 @@
-import { db, Orders, Pasteles, count, like, asc, desc, or, and, inArray } from "astro:db";
+import { db, Orders, Pasteles, count, like, eq, asc, desc, or, and, inArray } from "astro:db";
 import type { Params } from "astro";
 import type { Order, OrderProduct } from "db/config";
 
@@ -22,22 +22,24 @@ export async function GET({ params, request }: { params: Params; request: Reques
   const offset = (page - 1) * limit;
 
   const url = new URL(request.url);
-  const fecha = url.searchParams.get("fecha");
   const sort = url.searchParams.get("sort") === "asc" ? "asc" : "desc";
   const buscar = url.searchParams.get("buscar")?.trim() || "";
+  const fechaEntrega = url.searchParams.get("fechaEntrega")?.trim() || "";
+  const fechaPedido = url.searchParams.get("fechaPedido")?.trim() || "";
 
   const orderBy = sort === "asc" ? asc(Orders.fecha) : desc(Orders.fecha);
 
+  const isId = buscar && /^\d+$/.test(buscar);
   const searchFilter = buscar
-    ? or(like(Orders.nombre, `%${buscar}%`), like(Orders.email, `%${buscar}%`))
+    ? isId
+      ? eq(Orders.id, parseInt(buscar))
+      : or(like(Orders.nombre, `%${buscar}%`), like(Orders.email, `%${buscar}%`))
     : undefined;
+  const fechaEntregaFilter = fechaEntrega ? like(Orders.fecha, `${fechaEntrega}%`) : undefined;
+  const fechaPedidoFilter = fechaPedido ? like(Orders.creado, `${fechaPedido}%`) : undefined;
 
-  const fechaFilter = fecha ? like(Orders.fecha, `${fecha}%`) : undefined;
-
-  const whereClause =
-    searchFilter && fechaFilter
-      ? and(fechaFilter, searchFilter)
-      : searchFilter ?? fechaFilter;
+  const filters = [searchFilter, fechaEntregaFilter, fechaPedidoFilter].filter(Boolean);
+  const whereClause = filters.length === 0 ? undefined : filters.length === 1 ? filters[0] : and(...(filters as any[]));
 
   const orders = await db
     .select()
@@ -52,7 +54,6 @@ export async function GET({ params, request }: { params: Params; request: Reques
     .from(Orders)
     .where(whereClause);
 
-  // Collect unique pastel IDs from all orders to fetch names
   const allProductos = orders.flatMap((order) => {
     try {
       return JSON.parse(order.productos as string) as OrderProduct[];
