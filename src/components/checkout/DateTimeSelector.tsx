@@ -53,23 +53,57 @@ export function DateTimeSelector({
 
     const [year, month, day] = monterreyDate.split("-").map(Number);
     const monterreyDateObj = new Date(year, month - 1, day);
-    const isSunday = monterreyDateObj.getDay() === 0;
+    const todayDow = monterreyDateObj.getDay(); // 0=Dom, 6=Sáb
+    const isSunday = todayDow === 0;
+    const isSaturday = todayDow === 6;
+
+    const SALTILLO = ["50", "109", "520", "536"];
+    const after = (h: number, m = 0) =>
+      currentHour > h || (currentHour === h && currentMinute >= m);
 
     let extraDays = 1;
 
     switch (selectedSucursalId) {
-      case "536":
-      case "49":
-        extraDays = currentHour >= 20 ? 2 : 1;
+      case "49": // Paseo La Fe — cierra 8pm todos los días
+        extraDays = after(20) ? 2 : 1;
         break;
-      // ❌ AQUÍ BORRAMOS EL BLOQUE DE SALTILLO (IDs 109, 50, 520) ❌
+
+      case "536": // Herradura — 8pm, Dom 6pm, Sáb→no Dom
+        if (isSaturday) {
+          extraDays = 2; // salta domingo
+        } else if (isSunday) {
+          extraDays = after(18) ? 2 : 1;
+        } else {
+          extraDays = after(20) ? 2 : 1;
+        }
+        break;
+
+      case "520": // Pastelería Saltillo — 8pm, Dom 6pm, Sáb→no Dom
+        if (isSaturday) {
+          extraDays = 2;
+        } else if (isSunday) {
+          extraDays = after(18) ? 2 : 1;
+        } else {
+          extraDays = after(20) ? 2 : 1;
+        }
+        break;
+
+      case "109": // Parque Centro — 7:30pm, Sáb→no Dom
+        if (isSaturday) {
+          extraDays = 2;
+        } else {
+          extraDays = after(19, 30) ? 2 : 1;
+        }
+        break;
 
       default:
-        // Ahora Saltillo caerá aquí (Horario normal hasta las 9:30 PM)
-        extraDays =
-          currentHour > 21 || (currentHour === 21 && currentMinute >= 30)
-            ? 2
-            : 1;
+        // Carranza (50) y resto: 9:30pm
+        // Saltillo: sábado → mínimo lunes (salta domingo)
+        if (selectedSucursalId && SALTILLO.includes(selectedSucursalId) && isSaturday) {
+          extraDays = 2;
+        } else {
+          extraDays = after(21, 30) ? 2 : 1;
+        }
         break;
     }
 
