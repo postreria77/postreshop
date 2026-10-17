@@ -202,6 +202,18 @@ export const uploadOrderToSystem = async (
         .returning();
       throw new Error(`HTTP error! Status: ${response.status}`);
     }
+    // Save ticket_id from RMS response if present
+    try {
+      const body = await response.json();
+      if (body?.ticket_id) {
+        await db
+          .update(Orders)
+          .set({ ticket_id: String(body.ticket_id) })
+          .where(eq(Orders.id, orderId));
+      }
+    } catch {
+      // Response body parsing is best-effort
+    }
     return { data: "No HTTP error", error: null };
   } catch (error) {
     return { data: null, error: error as Error };

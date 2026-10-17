@@ -109,6 +109,7 @@ const Orders = defineTable({
     estado: column.text(),
     creado: column.text(),
     modificado: column.text(),
+    ticket_id: column.text({ optional: true }),
   },
 });
 
@@ -123,6 +124,7 @@ export type Order = {
   estado: string;
   creado: string;
   modificado: string;
+  ticket_id?: string | null;
 };
 
 export type OrderProduct = {
