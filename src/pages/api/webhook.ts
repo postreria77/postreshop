@@ -11,6 +11,7 @@ import type {
   SystemOrderProduct,
   PastelIdsEspeciales,
 } from "db/config";
+import { isStripeTest, isPatch5Test } from "@/lib/stripe";
 import { getPresentacionIds } from "@/lib/pricesConfig";
 import {
   handleProcessError,
@@ -136,6 +137,10 @@ export const POST: APIRoute = async ({ request, callAction }) => {
     return handleProcessError(`Webhook Error: ${err}`, 400);
   }
 
+  if (event.livemode === isStripeTest || (!event.livemode && !isPatch5Test)) {
+    return new Response("Payment environment mismatch", { status: 400 });
+  }
+
   // Idempotency check: skip if this event was already processed
   const existingEvent = await db
     .select()
@@ -153,6 +158,9 @@ export const POST: APIRoute = async ({ request, callAction }) => {
   switch (event.type) {
     case "payment_intent.succeeded":
       const paymentIntent = event.data.object;
+      if (!event.livemode && paymentIntent.metadata.test_source !== "patch-5-aleman") {
+        return new Response("Unrelated test event ignored", { status: 200 });
+      }
 
       // Handle missing orderId on stripe event
       const orderId = paymentIntent.metadata.order_id;
@@ -200,19 +208,26 @@ export const POST: APIRoute = async ({ request, callAction }) => {
         console.error(error.message);
         return new Response("Error updating order", { status: 500 });
       } else if (data) {
+        if (!event.livemode) {
+          if (data.sucursalId !== "520" || data.productos.length !== 1 || data.productos[0].producto !== "91" || data.productos[0].presentacion !== "199" || data.nombre !== "prueba — no preparar") {
+            return new Response("Invalid test order", { status: 400 });
+          }
+          data.productos[0].comentarios = "PRUEBA — NO PREPARAR";
+          data.referencia = "PRUEBA — NO PREPARAR";
+        }
         console.log("Uploading order to system...");
         const { data: orderData, error: orderError } =
           await uploadOrderToSystem(data, numberOrderId);
         if (orderError) {
           // Retorna 500 para que Stripe reintente el webhook automáticamente
           console.error("RMS error:", orderError.message);
-          await sendRmsFailureAlert(numberOrderId, data.nombre, orderError.message);
+          if (event.livemode) await sendRmsFailureAlert(numberOrderId, data.nombre, orderError.message);
           return new Response("Error uploading to RMS", { status: 500 });
         } else if (orderData) {
           if (!email) {
             return new Response("No email provided", { status: 500 });
           }
-          await sendEmailReceipt(numberOrderId, email, callAction);
+          if (event.livemode) await sendEmailReceipt(numberOrderId, email, callAction);
           await db.insert(ProcessedEvents).values({
             id: event.id,
             processedAt: new Date().toISOString(),

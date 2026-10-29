@@ -1,7 +1,12 @@
 import { getSecret } from "astro:env/server";
 import Stripe from "stripe";
 
-export const stripe = new Stripe(getSecret("STRIPE_SECRET_KEY")!, {
+const secretKey = getSecret("STRIPE_SECRET_KEY")!;
+export const isStripeTest = secretKey?.startsWith("sk_test_") ?? false;
+export const isPatch5Test = isStripeTest && process.env.VERCEL_ENV === "preview" && process.env.VERCEL_GIT_COMMIT_REF === "patch-5";
+export const ALEMAN_TEST_PRICE = "price_1UVz6G2N0hejjjHD3eOKpbmb";
+
+export const stripe = new Stripe(secretKey, {
   apiVersion: "2025-01-27.acacia",
 });
 
@@ -48,11 +53,12 @@ export async function createStripeCheckout(
   // discounts: Discount[],
 ): Promise<Stripe.Checkout.Session> {
   let payment_intent_data: Stripe.Checkout.SessionCreateParams.PaymentIntentData;
-  if (connectedStripeAccount === "acct_1Qg3Dy2N0hejjjHD") {
+  if (isPatch5Test || connectedStripeAccount === "acct_1Qg3Dy2N0hejjjHD") {
     payment_intent_data = {
       metadata: {
         order_id: order_id,
         nombre_receptor: nombre,
+        ...(isPatch5Test ? { test_source: "patch-5-aleman" } : {}),
       },
     };
   } else {
@@ -63,6 +69,7 @@ export async function createStripeCheckout(
       metadata: {
         order_id: order_id,
         nombre_receptor: nombre,
+        ...(isPatch5Test ? { test_source: "patch-5-aleman" } : {}),
       },
     };
   }

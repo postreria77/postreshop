@@ -17,7 +17,7 @@ import {
 import type { PastelPrecioDescuentos } from "db/config";
 
 export const getStaticPaths = (async () => {
-  const { stripe } = await import("@/lib/stripe");
+  const { stripe, isPatch5Test, ALEMAN_TEST_PRICE } = await import("@/lib/stripe");
 
   const fetchStripeAmount = async (priceId: string | null | undefined): Promise<number> => {
     if (!priceId) return 0;
@@ -35,7 +35,11 @@ export const getStaticPaths = (async () => {
     .where(eq(Pasteles.archived, false));
 
   return await Promise.all(
-    pasteles.map(async (pastel) => {
+    pasteles.map(async (record) => {
+      // Override only the preview props; never write test prices to the shared DB.
+      const pastel = isPatch5Test && record.id === "63"
+        ? { ...record, precioAnytime: ALEMAN_TEST_PRICE }
+        : record;
       const descuentos = (pastel.precio_descuentos ?? {}) as PastelPrecioDescuentos;
 
       const [amountTradicional, amountAnytime, amountGift] = await Promise.all([

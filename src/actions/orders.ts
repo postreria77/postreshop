@@ -8,7 +8,7 @@ import {
   DisabledDateTimes,
   Pasteles,
 } from "astro:db";
-import { createStripeCheckout, generateDiscountArray } from "@/lib/stripe";
+import { createStripeCheckout, generateDiscountArray, isStripeTest, isPatch5Test, ALEMAN_TEST_PRICE } from "@/lib/stripe";
 
 import type { OrderProduct } from "db/config";
 
@@ -95,6 +95,21 @@ export const orders = {
           code: "INTERNAL_SERVER_ERROR",
           message: "Error en los productos. Intente nuevamente.",
         });
+      }
+
+      if (isStripeTest) {
+        if (!isPatch5Test || sucursal !== "520" || parsedProducts.length !== 1 ||
+            parsedProducts[0].id !== "63" || parsedProducts[0].categoria !== "pasteles" ||
+            parsedProducts[0].presentacion !== "anytime" || parsedProducts[0].cantidad !== 1) {
+          throw new ActionError({ code: "BAD_REQUEST", message: "La prueba permite solo un Alemán Anytime para Pastelería Parque (520)." });
+        }
+        const { stripe } = await import("@/lib/stripe");
+        const price = await stripe.prices.retrieve(ALEMAN_TEST_PRICE);
+        if (price.livemode || !price.active || price.currency !== "mxn" || price.type !== "one_time" || price.unit_amount === null) {
+          throw new ActionError({ code: "BAD_REQUEST", message: "El precio de prueba no está disponible." });
+        }
+        parsedProducts = [{ ...parsedProducts[0], id_pasteleria: "91", stripePriceId: ALEMAN_TEST_PRICE,
+          discountedStripePriceId: undefined, precio: price.unit_amount / 100 }];
       }
 
       const { available, message } = checkRoscaAvailability(
@@ -263,13 +278,13 @@ export const orders = {
         });
       }
 
-      const nombreCompleto = `${nombre} ${apellido}`;
+      const nombreCompleto = isPatch5Test ? "PRUEBA — NO PREPARAR" : `${nombre} ${apellido}`;
       const fechaCompleta = `${fecha}T${hora}`;
 
       const order = await db
         .insert(Orders)
         .values({
-          productos,
+          productos: JSON.stringify(parsedProducts),
           tel,
           email,
           nombre: nombreCompleto.toLowerCase(),
